@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>	
+
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+
+</head>
+<body>
+
+	<div class="py-4 container" id="app">
+
+		<nav>
+			<ul class="nav nav-tabs">
+			    <li class="nav-item"  v-for="character in characters" @click="selected = character">
+			        <a class="nav-link">{{character.name}}</a>
+			    </li>
+			    <li class="nav-item ml-auto" @click="selected = 'create-character'">
+			    	<a class="nav-link">Create a Character</a>
+			    </li>
+
+			</ul>
+		</nav>
+		 
+		<div class="row">
+
+			<div class="col-md-12">
+
+				<character-stats v-bind:character="selected" v-if="selected != 'create-character'">
+				</character-stats>
+
+				<create-character v-if="selected == 'create-character'">
+				</create-character>
+
+
+
+				<div class="card-footer">
+					<ul class="list-group" v-for="item in feed">
+						<li class="list-group-item feed-item">
+							{{ item }}
+						</li>
+					</ul>
+				</div>
+
+			</div>
+
+
+
+		</div>
+
+
+
+	</div>
+
+	<script src="js/vue.js"></script>
+	<script src="js/app.js"></script>
+</body>
+</html>
+
