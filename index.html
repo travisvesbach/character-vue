@@ -15,17 +15,9 @@
 
 	<div class="py-4 container" id="app">
 
-		<nav>
-			<ul class="nav nav-tabs">
-			    <li class="nav-item"  v-for="character in characters" @click="selected = character">
-			        <a class="nav-link">{{character.name}}</a>
-			    </li>
-			    <li class="nav-item ml-auto" @click="selected = 'create-character'">
-			    	<a class="nav-link">Create a Character</a>
-			    </li>
+		<nav-vue v-bind:characters="characters">
 
-			</ul>
-		</nav>
+		</nav-vue>
 		 
 		<div class="row">
 

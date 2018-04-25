@@ -47,13 +47,18 @@ class Character {
 			this.nineSpells = input.nineSpells;
 		}
 		this.attacks = [];
+		if (input.attacks) {
+			for (var j=0;j<input.attacks.length;j++) {
+				this.addAttack(input.attacks[j]);
+			}
+		}
 		this.currentHp = this.maxHp;
 		console.log('Character ' + this.name + ' created!');
 
 	}
 
-	addAttack(name, attackType, damageDiceNum, damageDice, damageModifier) {
-		this.attacks.push(new Attack(name, attackType, damageDiceNum, damageDice, damageModifier));
+	addAttack(attackData) {
+		this.attacks.push(new Attack(attackData));
 	}
 
 	attack(attack, type = 'normal'){
@@ -66,19 +71,19 @@ class Character {
 
 class Attack {
 
-	constructor(name, attackType, damageDiceNum, damageDice, damageModifier = 0) {
-		this.name = name;
-		if(attackType[0] == 'roll') {
-			this.attackType = attackType[0];
-			this.attackModifier = attackType[1];
-		} else if (attackType[0] == 'save' ) {
-			this.attackType = attackType[0];
-			this.saveDC = attackType[1];
-			this.saveType = attackType[2];
+	constructor(attackData) {
+		this.name = attackData.name;
+		if(attackData.attackType == 'roll') {
+			this.attackType = attackData.attackType;
+			this.attackModifier = attackData.attackModifier;
+		} else if (attackData.attackType == 'save' ) {
+			this.attackType = attackData.attackType;
+			this.saveDC = attackData.saveDC;
+			this.saveType = attackData.saveType;
 		}
-		this.damageDiceNum = damageDiceNum;
-		this.damageDice = damageDice;
-		this.damageModifier = damageModifier;
+		this.damageDiceNum = attackData.damageDiceNum;
+		this.damageDice = attackData.damageDice;
+		this.damageModifier = attackData.damageModifier;
 		console.log(this.name + " has been added");
 	}
 
@@ -167,19 +172,19 @@ class Attack {
 		return results;
 	}
 
-	editAttack(name, attackType, damageDiceNum, damageDice, damageModifier = 0) {
-		this.name = name;
-		if(attackType[0] == 'roll') {
-			this.attackType = attackType[0];
-			this.attackModifier = attackType[1];
-		} else if (attackType[0] == 'save' ) {
-			this.attackType = attackType[0];
-			this.saveDC = attackType[1];
-			this.saveType = attackType[2];
+	editAttack(attackData) {
+		this.name = attackData.name;
+		if(attackData.attackType == 'roll') {
+			this.attackType = attackData.attackType;
+			this.attackModifier = attackData.attackModifier;
+		} else if (attackData.attackType == 'save' ) {
+			this.attackType = attackData.attackType;
+			this.saveDC = attackData.saveDC;
+			this.saveType = attackData.saveType;
 		}
-		this.damageDiceNum = damageDiceNum;
-		this.damageDice = damageDice;
-		this.damageModifier = damageModifier;
+		this.damageDiceNum = attackData.damageDiceNum;
+		this.damageDice = attackData.damageDice;
+		this.damageModifier = attackData.damageModifier;
 		console.log(this.name + " has been edited");
 	}
 }
@@ -197,6 +202,35 @@ var dice = {
 }
 
 
+
+Vue.component('nav-vue', {
+	template: `
+		<nav>
+			<ul class="nav nav-tabs">
+			    <li class="nav-item"  v-for="character in characterList" @click="select(character)">
+			        <a class="nav-link">{{character.name}}</a>
+			    </li>
+			    <li class="nav-item ml-auto" @click="select('create-character')">
+			    	<a class="nav-link">Create a Character</a>
+			    </li>
+
+			</ul>
+		</nav>
+	`,
+	props: ["characters", "selected"],
+	computed: {
+		characterList() {
+			return this.characters;
+		}
+	},
+	methods: {
+		select(selected) {
+			app.selected = selected;
+		}
+	}
+
+
+});
 
 
 Vue.component('character-stats', {
@@ -221,204 +255,207 @@ Vue.component('character-stats', {
 
 Vue.component('create-character', {
 	template: `
-		<form>
-			<h4>Basic info</h4>
-		    <div class="form-group">
-		        <label for="name">Name:</label>
-		        <input type="text" class="form-control" id="name" placeholder="Enter character name" v-model="name">
-		    </div>
-		    <div class="form-group">
-		        <label for="characterLevel">Level:</label>
-		        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model="level">
-		    </div>
-		    <div class="form-group">
-		        <label for="characterMaxHp">Max HP:</label>
-		        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
-		    </div>
-			
-			<hr>
-			<h4>Stats</h4>
-		    <div class="form-group">
-		        <label for="characterStrength"><b>Strength:</b></label>
-		        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
-		    </div>
-		    <div class="form-check">
-			    <label for="strengthSave">Save</label>
-			    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="athletics">Athletics</label>
-			    <input type="number" class="form-control" id="athletics" placeholder="0" v-model="athletics">
-			</div>
-			
-			<hr>
-		    <div class="form-group">
-		        <label for="characterDexterity"><b>Dexterity:</b></label>
-		        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
-		    </div>			
-		    <div class="form-check">
-			    <label class="form-check-label" for="dexteritySave">Save</label>
-			    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="acrobatics">Acrobatics</label>
-			    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model="acrobatics">
-			</div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
-			    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="history">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="stealth">Stealth</label>
-			    <input type="number" class="form-control" id="stealth" placeholder="0" v-model="stealth">
-			</div>
+		<div>
+			<h1 class="card-header">Create a Character</h1>
+			<form>
+				<h4>Basic info</h4>
+			    <div class="form-group">
+			        <label for="name">Name:</label>
+			        <input type="text" class="form-control" id="name" placeholder="Enter character name" v-model="name">
+			    </div>
+			    <div class="form-group">
+			        <label for="characterLevel">Level:</label>
+			        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model="level">
+			    </div>
+			    <div class="form-group">
+			        <label for="characterMaxHp">Max HP:</label>
+			        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
+			    </div>
+				
+				<hr>
+				<h4>Stats</h4>
+			    <div class="form-group">
+			        <label for="characterStrength"><b>Strength:</b></label>
+			        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
+			    </div>
+			    <div class="form-check">
+				    <label for="strengthSave">Save</label>
+				    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="athletics">Athletics</label>
+				    <input type="number" class="form-control" id="athletics" placeholder="0" v-model="athletics">
+				</div>
+				
+				<hr>
+			    <div class="form-group">
+			        <label for="characterDexterity"><b>Dexterity:</b></label>
+			        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
+			    </div>			
+			    <div class="form-check">
+				    <label class="form-check-label" for="dexteritySave">Save</label>
+				    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="acrobatics">Acrobatics</label>
+				    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model="acrobatics">
+				</div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
+				    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="history">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="stealth">Stealth</label>
+				    <input type="number" class="form-control" id="stealth" placeholder="0" v-model="stealth">
+				</div>
 
-			<hr>
-		    <div class="form-group">
-		        <label for="characterConstitution"><b>Constitution:</b></label>
-		        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
-		    </div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="constitutionSave">Save</label>
-			    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
-			</div>
+				<hr>
+			    <div class="form-group">
+			        <label for="characterConstitution"><b>Constitution:</b></label>
+			        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
+			    </div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="constitutionSave">Save</label>
+				    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
+				</div>
 
-			<hr>
-		    <div class="form-group">
-		        <label for="characterIntelligence"><b>Intelligence:</b></label>
-		        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
-		    </div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="intelligenceSave">Save</label>
-			    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model="intelligenceSave">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="arcana">Arcana</label>
-			    <input type="number" class="form-control" id="arcana" placeholder="0" v-model="arcana">
-			</div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="history">History</label>
-			    <input type="number" class="form-control" id="history" placeholder="0" v-model="history">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="investigation">Investigation</label>
-			    <input type="number" class="form-control" id="investigation" placeholder="0" v-model="investigation">
-			</div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="nature">Nature</label>
-			    <input type="number" class="form-control" id="nature" placeholder="0" v-model="nature">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="religion">Religion</label>
-			    <input type="number" class="form-control" id="religion" placeholder="0" v-model="religion">
-			</div>
+				<hr>
+			    <div class="form-group">
+			        <label for="characterIntelligence"><b>Intelligence:</b></label>
+			        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
+			    </div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="intelligenceSave">Save</label>
+				    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model="intelligenceSave">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="arcana">Arcana</label>
+				    <input type="number" class="form-control" id="arcana" placeholder="0" v-model="arcana">
+				</div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="history">History</label>
+				    <input type="number" class="form-control" id="history" placeholder="0" v-model="history">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="investigation">Investigation</label>
+				    <input type="number" class="form-control" id="investigation" placeholder="0" v-model="investigation">
+				</div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="nature">Nature</label>
+				    <input type="number" class="form-control" id="nature" placeholder="0" v-model="nature">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="religion">Religion</label>
+				    <input type="number" class="form-control" id="religion" placeholder="0" v-model="religion">
+				</div>
 
-			<hr>
-		    <div class="form-group">
-		        <label for="characterWisdom"><b>Wisdom:</b></label>
-		        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
-		    </div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="wisdomSave">Save</label>
-			    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="animalHandling">Animal Handling</label>
-			    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model="animalHandling">
-			</div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="insight">Insight</label>
-			    <input type="number" class="form-control" id="insight" placeholder="0" v-model="insight">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="medicine">Medicine</label>
-			    <input type="number" class="form-control" id="medicine" placeholder="0" v-model="medicine">
-			</div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="perception">Perception</label>
-			    <input type="number" class="form-control" id="perception" placeholder="0" v-model="perception">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="survival">Survival</label>
-			    <input type="number" class="form-control" id="survival" placeholder="0" v-model="survival">
-			</div>			
+				<hr>
+			    <div class="form-group">
+			        <label for="characterWisdom"><b>Wisdom:</b></label>
+			        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
+			    </div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="wisdomSave">Save</label>
+				    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="animalHandling">Animal Handling</label>
+				    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model="animalHandling">
+				</div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="insight">Insight</label>
+				    <input type="number" class="form-control" id="insight" placeholder="0" v-model="insight">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="medicine">Medicine</label>
+				    <input type="number" class="form-control" id="medicine" placeholder="0" v-model="medicine">
+				</div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="perception">Perception</label>
+				    <input type="number" class="form-control" id="perception" placeholder="0" v-model="perception">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="survival">Survival</label>
+				    <input type="number" class="form-control" id="survival" placeholder="0" v-model="survival">
+				</div>			
 
-			<hr>
-		    <div class="form-group">
-		        <label for="characterCharisma"><b>Charisma:</b></label>
-		        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
-		    </div>
-		    <div class="form-check">
-			    <label class="form-check-label" for="charismaSave">Save</label>
-			    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model="charismaSave">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="deception">Deception</label>
-			    <input type="number" class="form-control" id="deception" placeholder="0" v-model="deception">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="intimidation">Intimidation</label>
-			    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model="intimidation">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="performance">Performance</label>
-			    <input type="number" class="form-control" id="performance" placeholder="0" v-model="performance">
-			</div>
-			<div class="form-check">
-			    <label class="form-check-label" for="persuasion">Persuasion</label>
-			    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model="persuasion">
-			</div>
+				<hr>
+			    <div class="form-group">
+			        <label for="characterCharisma"><b>Charisma:</b></label>
+			        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
+			    </div>
+			    <div class="form-check">
+				    <label class="form-check-label" for="charismaSave">Save</label>
+				    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model="charismaSave">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="deception">Deception</label>
+				    <input type="number" class="form-control" id="deception" placeholder="0" v-model="deception">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="intimidation">Intimidation</label>
+				    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model="intimidation">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="performance">Performance</label>
+				    <input type="number" class="form-control" id="performance" placeholder="0" v-model="performance">
+				</div>
+				<div class="form-check">
+				    <label class="form-check-label" for="persuasion">Persuasion</label>
+				    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model="persuasion">
+				</div>
 
-			<h4>Spells</h4>
-			<div class="form-check form-check-inline">
-			    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpells" value="yes" v-model="spells">
-			    <label class="form-check-label" for="yesSpells">Yes</label>
-			</div>
-			<div class="form-check form-check-inline">
-			    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spells">
-			    <label class="form-check-label" for="noSpells">No</label>
-			</div>
-			<div v-if="spells == 'yes'">
-				<div class="form-group">
-			        <label for="oneSpells">1st Level Spells:</label>
-			        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model="oneSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="twoSpells">2nd Level Spells:</label>
-			        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model="twoSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="threeSpells">3rd Level Spells:</label>
-			        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model="threeSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="fourSpells">4th Level Spells:</label>
-			        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model="fourSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="fiveSpells">5th Level Spells:</label>
-			        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model="fiveSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="sixSpells">6th Level Spells:</label>
-			        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model="sixSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="sevenSpells">7th Level Spells:</label>
-			        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model="sevenSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="eightSpells">8th Level Spells:</label>
-			        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model="eightSpells">
-			    </div>
-			    <div class="form-group">
-			        <label for="nineSpells">9th Level Spells:</label>
-			        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model="nineSpells">
-			    </div>
-			</div>
+				<h4>Spells</h4>
+				<div class="form-check form-check-inline">
+				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpells" value="yes" v-model="spells">
+				    <label class="form-check-label" for="yesSpells">Yes</label>
+				</div>
+				<div class="form-check form-check-inline">
+				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spells">
+				    <label class="form-check-label" for="noSpells">No</label>
+				</div>
+				<div v-if="spells == 'yes'">
+					<div class="form-group">
+				        <label for="oneSpells">1st Level Spells:</label>
+				        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model="oneSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="twoSpells">2nd Level Spells:</label>
+				        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model="twoSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="threeSpells">3rd Level Spells:</label>
+				        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model="threeSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="fourSpells">4th Level Spells:</label>
+				        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model="fourSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="fiveSpells">5th Level Spells:</label>
+				        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model="fiveSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="sixSpells">6th Level Spells:</label>
+				        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model="sixSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="sevenSpells">7th Level Spells:</label>
+				        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model="sevenSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="eightSpells">8th Level Spells:</label>
+				        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model="eightSpells">
+				    </div>
+				    <div class="form-group">
+				        <label for="nineSpells">9th Level Spells:</label>
+				        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model="nineSpells">
+				    </div>
+				</div>
 
-		    <button type="button" class="btn btn-primary" @click="createCharacter">Submit</button>
-		</form>
+			    <button type="button" class="btn btn-primary" @click="createCharacter">Submit</button>
+			</form>
+		</div>
 	`,
 	data() {
 		return {
@@ -522,7 +559,8 @@ Vue.component('create-character', {
 				app.characters.push(newCharacter);
 				app.selected = newCharacter;
 				$(".nav").find(".active").removeClass("active");
-    			$(".nav-link:contains(this.name)").addClass("active");
+				$(".nav-link:contains(this.name)").tab('show');
+    			//$(".nav-link:contains(this.name)").addClass("active");
 			}
 		}
 	}
@@ -643,23 +681,26 @@ Vue.component('attack-field', {
 	},
 	methods: {
 		addAttack() {
-			var rollSave = this.prepareAttackType();
-			this.character.addAttack(this.name, rollSave, parseInt(this.damageDiceNum), parseInt(this.damageDice), parseInt(this.damageModifier));
+			var attackData = this.prepareAttackData();
+			this.character.addAttack(attackData);
 			this.reset();
 		},
 		editAttack() {
-			var rollSave = this.prepareAttackType();
-			this.attack.editAttack(this.name, rollSave, parseInt(this.damageDiceNum), parseInt(this.damageDice), parseInt(this.damageModifier));
+			var attackData = this.prepareAttackData();
+			this.attack.editAttack(attackData);
 			this.reset();
 		},
-		prepareAttackType() {
-			var output = [this.attackType];
-			if (this.attackType == 'roll') {
-				output.push(parseInt(this.attackModifier));
-			} else {
-				output.push(parseInt(this.saveDC));
-				output.push(this.saveType);
-			}
+		prepareAttackData() {
+			var output = {
+				name: this.name,
+				attackType: this.attackType,
+				attackModifier: parseInt(this.attackModifier),
+				saveDC: parseInt(this.saveDC),
+				saveType: this.saveType,
+				damageDiceNum: parseInt(this.damageDiceNum),
+				damageDice: parseInt(this.damageDice),
+				damageModifier: parseInt(this.damageModifier)
+				};
 			return output;
 		},
 		reset() {
@@ -707,6 +748,8 @@ const app = new Vue({
 		this.characters.push(tom);
 		bob = new Character({name: 'bob', level: 9, maxHp: 66});
 		this.characters.push(bob);
+		steve = new Character({name: 'steve', level: 9, maxHp: 66});
+		this.characters.push(steve);		
 	},
 	methods: {
 		createCharacter() {
@@ -722,4 +765,28 @@ const app = new Vue({
 $(".nav .nav-link").on("click", function(){
    $(".nav").find(".active").removeClass("active");
    $(this).addClass("active");
+});
+
+function getData() {
+	console.log('getting data');
+	var retrievedObject;
+	if (retrievedObject = localStorage.getItem('appCharacters')) {
+		var jsonCharacters = JSON.parse(retrievedObject);
+		for (var i=0;i<jsonCharacters.length;i++) {
+			console.log(i + '/' + jsonCharacters.length);
+			app.characters.push(new Character(jsonCharacters[i]));
+		}
+	}
+}
+
+function saveData() {
+	window.setInterval(function(){
+			console.log('saving to localStorage');
+			localStorage.setItem('appCharacters', JSON.stringify(app.characters));
+		}, 10000);
+}
+
+$(document).ready(function() {
+	getData();
+	saveData();
 });
