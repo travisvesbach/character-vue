@@ -15,36 +15,25 @@
 
 	<div class="py-4 container" id="app">
 
-		<nav-vue v-bind:characters="characters">
-
-		</nav-vue>
+		<nav-vue v-bind:characters="characters"></nav-vue>
 		 
-		<div class="row">
 
-			<div class="col-md-12">
 
-				<character-stats v-bind:character="selected" v-if="selected != 'create-character'">
-				</character-stats>
+		<character-stats v-bind:character="selected" v-if="selected != 'create-character'">
+		</character-stats>
 
-				<create-character v-if="selected == 'create-character'">
-				</create-character>
+		<character-creator v-if="selected == 'create-character'">
+		</character-creator>
 
 
 
-				<div class="card-footer">
-					<ul class="list-group" v-for="item in feed">
-						<li class="list-group-item feed-item">
-							{{ item }}
-						</li>
-					</ul>
-				</div>
-
-			</div>
-
-
-
+		<div class="card-footer" v-if="feed.length > 0">
+			<ul class="list-group" v-for="item in feed">
+				<li class="list-group-item feed-item">
+					{{ item }}
+				</li>
+			</ul>
 		</div>
-
 
 
 	</div>

@@ -4,17 +4,22 @@ class Character {
 		this.name = input.name;
 		this.level = input.level;
 		this.maxHp = input.maxHp;
+		this.ac = input.ac;
 		this.strength = input.strength;
+		this.strengthModifier = input.strengthModifier;
 		this.strengthSave = input.strengthSave;
 		this.athletics = input.athletics;
 		this.dexterity = input.dexterity;
+		this.dexterityModifier = input.dexterityModifier;
 		this.dexteritySave = input.dexteritySave;
 		this.acrobatics = input.acrobatics;
 		this.sleightOfHand = input.sleightOfHand;
 		this.stealth = input.stealth;
 		this.constitution = input.constitution;
+		this.constitutionModifier = input.constitutionModifier;
 		this.constitutionSave = input.constitutionSave;
 		this.intelligence = input.intelligence;
+		this.intelligenceModifier = input.intelligenceModifier;
 		this.intelligenceSave = input.intelligenceSave;
 		this.arcana = input.arcana;
 		this.history = input.history;
@@ -22,6 +27,7 @@ class Character {
 		this.nature = input.nature;
 		this.religion = input.religion;
 		this.wisdom = input.wisdom;
+		this.wisdomModifier = input.wisdomModifier;
 		this.wisdomSave = input.wisdomSave;
 		this.animalHandling = input.animalHandling;
 		this.insight = input.insight;
@@ -29,6 +35,7 @@ class Character {
 		this.perception = input.perception;
 		this.survival = input.survival;
 		this.charisma = input.charisma;
+		this.charismaModifier = input.charismaModifier;
 		this.charismaSave = input.charismaSave;
 		this.deception = input.deception;
 		this.intimidation = input.intimidation;
@@ -55,6 +62,8 @@ class Character {
 		this.currentHp = this.maxHp;
 		console.log('Character ' + this.name + ' created!');
 
+		console.log(this.currentHp);
+
 	}
 
 	addAttack(attackData) {
@@ -66,7 +75,24 @@ class Character {
 		app.addToFeed(output);
 	}
 
+	rollStat(stat, statModifier, rollModifier) {
+		var roll = dice.d20();
+		if (rollModifier == 'advantage') {
+			var rollTwo = dice.d20();
+			var winningRoll = (( roll > rollTwo ) ? roll : rollTwo);
+			return stat + ' with advantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
+		} else if (rollModifier == 'disadvantage') {
+			var rollTwo = dice.d20();
+			var winningRoll = (( roll < rollTwo ) ? roll : rollTwo);
+			return stat + ' with disadvantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
+		} else {
+			return stat + ': [' + roll + '] + ' + statModifier + ' = ' + (roll + statModifier);
+		}
+	}
+
 }
+
+
 
 
 class Attack {
@@ -207,7 +233,7 @@ Vue.component('nav-vue', {
 	template: `
 		<nav>
 			<ul class="nav nav-tabs">
-			    <li class="nav-item"  v-for="character in characterList" @click="select(character)">
+			    <li class="nav-item" v-if="characterList" v-for="character in characterList" @click="select(character)">
 			        <a class="nav-link">{{character.name}}</a>
 			    </li>
 			    <li class="nav-item ml-auto" @click="select('create-character')">
@@ -236,24 +262,227 @@ Vue.component('nav-vue', {
 Vue.component('character-stats', {
 	template: `
 		<div v-if="character">
-			<h1 class="card-header">{{character.name}}</h1>
-			HP: <input type="number" class="numInput" v-model.number="character.currentHp"> 
-			out of {{character.maxHp}}
-			<hr>
+			<div class="card-header">
+				<h2 class="d-inline-block">{{character.name}}</h2>
+				<h3 class="float-right d-inline-block">
+					HP: <input type="number" class="hpInput" v-model.number="character.currentHp"> 
+					/ {{character.maxHp}}
+				</h3>
+			</div>
+
+			<div class="row" style="margin: auto;">
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Strength check', character.strengthModifier)">
+						<b>Strength {{character.strength}}</b> 
+						(<span v-if="character.strengthModifier > 0">+</span>{{character.strengthModifier}})
+					</a>
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Strength save', character.strengthSave)">
+					  			Save: <span v-if="character.strengthSave > 0">+</span>{{character.strengthSave}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Athletics check', character.athletics)">
+					  			Athletics: <span v-if="character.athletics > 0">+</span>{{character.athletics}}
+					  		</a>
+					  	</li>
+					</ul>
+
+					<hr>
+
+					<b>Roll Modifier</b>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" value="advantage" id="rollAdvantage" v-model="rollModifier">
+						<label class="form-check-label" for="rollAdvantage">Advantage</label>
+					</div>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" value="normal" id="rollNormal" v-model="rollModifier">
+						<label class="form-check-label" for="rollNormal">Normal</label>
+					</div>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" value="disadvantage" id="rollDisadvantage" v-model="rollModifier">
+						<label class="form-check-label" for="rollDisadvantage">Disadvantage</label>
+					</div>
+
+
+				</div>
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Dexterity check', character.dexterityModifier)">
+						<b>Dexterity {{character.dexterity}}</b> 
+						(<span v-if="character.dexterityModifier > 0">+</span>{{character.dexterityModifier}})
+					</a>
+
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Dexterity save', character.dexteritySave)">
+					  			Save: <span v-if="character.dexteritySave > 0">+</span>{{character.dexteritySave}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Acrobatics check', character.acrobatics)">
+					  			Acrobatics: <span v-if="character.acrobatics > 0">+</span>{{character.acrobatics}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Slight of Hand check', character.sleightOfHand)">
+					  			Slight of Hand: <span v-if="character.sleightOfHand > 0">+</span>{{character.sleightOfHand}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Stealth check', character.stealth)">
+					  			Stealth: <span v-if="character.stealth > 0">+</span>{{character.stealth}}
+					  		</a>
+					  	</li>
+					</ul>
+				</div>
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Constitution check', character.constitutionModifier)">
+						<b>Constitution {{character.Constitution}}</b> 
+						(<span v-if="character.constitutionModifier > 0">+</span>{{character.constitutionModifier}})
+					</a>
+
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Constitution save', character.constitutionSave)">
+					  			Save: <span v-if="character.constitutionSave > 0">+</span>{{character.constitutionSave}}
+					  		</a>
+					  	</li>
+					</ul>
+				</div>	
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Intelligence check', character.intelligenceModifier)">
+						<b>Intelligence {{character.intelligence}}</b> 
+						(<span v-if="character.intelligenceModifier > 0">+</span>{{character.intelligenceModifier}})
+					</a>
+
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Intelligence save', character.intelligenceSave)">
+					  			Save: <span v-if="character.intelligenceSave > 0">+</span>{{character.intelligenceSave}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Arcana check', character.arcana)">
+					  			Arcana: <span v-if="character.arcana > 0">+</span>{{character.arcana}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('History check', character.history)">
+					  			History: <span v-if="character.history > 0">+</span>{{character.history}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Investigation check', character.investigation)">
+					  			Investigation: <span v-if="character.investigation > 0">+</span>{{character.investigation}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Nature check', character.nature)">
+					  			Nature: <span v-if="character.nature > 0">+</span>{{character.nature}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Religion check', character.religion)">
+					  			Religion: <span v-if="character.religion > 0">+</span>{{character.religion}}
+					  		</a>
+					  	</li>
+					</ul>
+				</div>	
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Wisdom check', character.wisdomModifier)">
+						<b>Wisdom {{character.wisdom}}</b> 
+						(<span v-if="character.wisdomModifier > 0">+</span>{{character.wisdomModifier}})
+					</a>
+
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Wisdom save', character.wisdomSave)">
+					  			Save: <span v-if="character.wisdomSave > 0">+</span>{{character.wisdomSave}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Animal Handling check', character.animalHandling)">
+					  			Animal Handling: <span v-if="character.animalHandling > 0">+</span>{{character.animalHandling}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Insight check', character.insight)">
+					  			Insight: <span v-if="character.insight > 0">+</span>{{character.insight}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Medicine check', character.medicine)">
+					  			Medicine: <span v-if="character.medicine > 0">+</span>{{character.medicine}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Perception check', character.perception)">
+					  			Perception: <span v-if="character.perception > 0">+</span>{{character.perception}}
+					  		</a>
+
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Survival check', character.survival)">
+					  			Survival: <span v-if="character.survival > 0">+</span>{{character.survival}}
+					  		</a>
+					  	</li>
+					</ul>
+				</div>	
+				<div class="card d-inline-block col-md">
+					<a @click="rollStat('Charisma check', character.charismaModifier)">
+						<b>Charisma {{character.charisma}}</b> 
+						(<span v-if="character.charismaModifier > 0">+</span>{{character.charismaModifier}})
+					</a>
+					<ul class="list-group list-group-flush">
+					  	<li>
+					  		<a @click="rollStat('Charisma save', character.charismaSave)">
+					  			Save: <span v-if="character.charismaSave > 0">+</span>{{character.charismaSave}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Deception check', character.deception)">
+					  			Deception: <span v-if="character.deception > 0">+</span>{{character.deception}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Intimidation check', character.intimidation)">
+					  			Intimidation: <span v-if="character.intimidation > 0">+</span>{{character.intimidation}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Performance check', character.performance)">
+					  			Performance: <span v-if="character.performance > 0">+</span>{{character.performance}}
+					  		</a>
+					  	</li>
+					  	<li>
+					  		<a @click="rollStat('Persuasion check', character.persuasion)">
+					  			Persuasion: <span v-if="character.persuasion > 0">+</span>{{character.persuasion}}
+					  		</a>
+					  	</li>
+					</ul>
+				</div>				
+			</div>
 			<div class="row">
-				<div class="col-md-3" >
-					stats will go here
-				</div>
-				<div class="col-md-9"
 					<attack v-bind:character="character"></attack>
-				</div>
 			</div>
 		</div>
 	`,
-	props: ["character"]
+	props: ["character"],
+	data() {
+		return {
+			rollModifier: 'normal'
+		}
+	},
+	methods: {
+		rollStat(stat, statModifier) {
+			var result = this.character.rollStat(stat, statModifier, this.rollModifier);
+			app.feed.unshift(result)
+		}
+	}
 });
 
-Vue.component('create-character', {
+Vue.component('character-creator', {
 	template: `
 		<div>
 			<h1 class="card-header">Create a Character</h1>
@@ -271,6 +500,10 @@ Vue.component('create-character', {
 			        <label for="characterMaxHp">Max HP:</label>
 			        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
 			    </div>
+			    <div class="form-group">
+			        <label for="ac">AC:</label>
+			        <input type="number" class="form-control" id="ac" placeholder="0" v-model="ac">
+			    </div>
 				
 				<hr>
 				<h4>Stats</h4>
@@ -278,6 +511,10 @@ Vue.component('create-character', {
 			        <label for="characterStrength"><b>Strength:</b></label>
 			        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
 			    </div>
+			    <div class="form-check">
+			        <label for="strengthModifier">Strength Modifier:</label>
+			        <input type="number" class="form-control" id="strengthModifier" placeholder="0" v-model="strengthModifier">
+			    </div>			    
 			    <div class="form-check">
 				    <label for="strengthSave">Save</label>
 				    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
@@ -291,7 +528,11 @@ Vue.component('create-character', {
 			    <div class="form-group">
 			        <label for="characterDexterity"><b>Dexterity:</b></label>
 			        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
-			    </div>			
+			    </div>		
+			    <div class="form-check">
+			        <label for="dexterityModifier">Dexterity Modifier:</label>
+			        <input type="number" class="form-control" id="dexterityModifier" placeholder="0" v-model="dexterityModifier">
+			    </div>	
 			    <div class="form-check">
 				    <label class="form-check-label" for="dexteritySave">Save</label>
 				    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
@@ -315,6 +556,10 @@ Vue.component('create-character', {
 			        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
 			    </div>
 			    <div class="form-check">
+			        <label for="constitutionModifier">Constitution Modifier:</label>
+			        <input type="number" class="form-control" id="constitutionModifier" placeholder="0" v-model="constitutionModifier">
+			    </div>
+			    <div class="form-check">
 				    <label class="form-check-label" for="constitutionSave">Save</label>
 				    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
 				</div>
@@ -323,6 +568,10 @@ Vue.component('create-character', {
 			    <div class="form-group">
 			        <label for="characterIntelligence"><b>Intelligence:</b></label>
 			        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
+			    </div>
+			    <div class="form-check">
+			        <label for="intelligenceModifier">Intelligence Modifier:</label>
+			        <input type="number" class="form-control" id="intelligenceModifier" placeholder="0" v-model="intelligenceModifier">
 			    </div>
 			    <div class="form-check">
 				    <label class="form-check-label" for="intelligenceSave">Save</label>
@@ -355,6 +604,10 @@ Vue.component('create-character', {
 			        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
 			    </div>
 			    <div class="form-check">
+			        <label for="wisdomModifier">Wisdom Modifier:</label>
+			        <input type="number" class="form-control" id="wisdomModifier" placeholder="0" v-model="wisdomModifier">
+			    </div>
+			    <div class="form-check">
 				    <label class="form-check-label" for="wisdomSave">Save</label>
 				    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
 				</div>
@@ -383,6 +636,10 @@ Vue.component('create-character', {
 			    <div class="form-group">
 			        <label for="characterCharisma"><b>Charisma:</b></label>
 			        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
+			    </div>
+			    <div class="form-check">
+			        <label for="charismaModifier">Charisma Modifier:</label>
+			        <input type="number" class="form-control" id="charismaModifier" placeholder="0" v-model="charismaModifier">
 			    </div>
 			    <div class="form-check">
 				    <label class="form-check-label" for="charismaSave">Save</label>
@@ -462,17 +719,22 @@ Vue.component('create-character', {
 			name: '',
 			level: '',
 			maxHp: '',
+			ac: 0,
 			strength: 0,
 			strengthSave: 0,
+			strengthModifier: 0,
 			athletics: 0,
 			dexterity: 0,
+			dexterityModifier: 0,
 			dexteritySave: 0,
 			acrobatics: 0,
 			sleightOfHand: 0,
 			stealth: 0,
 			constitution: 0,
+			constitutionModifier: 0,
 			constitutionSave: 0,
 			intelligence: 0,
+			intelligenceModifier: 0,
 			intelligenceSave: 0,
 			arcana: 0,
 			history: 0,
@@ -480,6 +742,7 @@ Vue.component('create-character', {
 			nature: 0,
 			religion: 0,
 			wisdom: 0,
+			wisdomModifier: 0,
 			wisdomSave: 0,
 			animalHandling: 0,
 			insight: 0,
@@ -487,6 +750,7 @@ Vue.component('create-character', {
 			perception: 0,
 			survival: 0,
 			charisma: 0,
+			charismaModifier: 0,
 			charismaSave: 0,
 			deception: 0,
 			intimidation: 0,
@@ -511,48 +775,55 @@ Vue.component('create-character', {
 			console.log('entering createCharacter');
 			var characterData = {
 				name: this.name,
-				level: this.level,
-				maxHp: this.maxHp,
-				strength: this.strength,
-				strengthSave: this.strengthSave,
-				athletics: this.athletics,
-				dexterity: this.dexterity,
-				dexteritySave: this.dexteritySave,
-				acrobatics: this.acrobatics,
-				sleightOfHand: this.sleightOfHand,
-				stealth: this.stealth,
-				constitution: this.constitution,
-				constitutionSave: this.constitutionSave,
-				intelligence: this.intelligence,
-				intelligenceSave: this.intelligenceSave,
-				arcana: this.arcana,
-				history: this.history,
-				investigation: this.investigation,
-				nature: this.nature,
-				religion: this.religion,
-				wisdom: this.wisdom,
-				wisdomSave: this.wisdomSave,
-				animalHandling: this.animalHandling,
-				insight: this.insight,
-				medicine: this.medicine,
-				perception: this.perception,
-				survival: this.survival,
-				charisma: this.charisma,
-				charismaSave: this.charismaSave,
-				deception: this.deception,
-				intimidation: this.intimidation,
-				performance: this.performance,
-				persuasion: this.persuasion,
+				level: parseInt(this.level),
+				maxHp: parseInt(this.maxHp),
+				ac: parseInt(this.ac),
+				strength: parseInt(this.strength),
+				strengthModifier: parseInt(this.strengthModifier),
+				strengthSave: parseInt(this.strengthSave),
+				athletics: parseInt(this.athletics),
+				dexterity: parseInt(this.dexterity),
+				dexterityModifier: parseInt(this.dexterityModifier),
+				dexteritySave: parseInt(this.dexteritySave),
+				acrobatics: parseInt(this.acrobatics),
+				sleightOfHand: parseInt(this.sleightOfHand),
+				stealth: parseInt(this.stealth),
+				constitution: parseInt(this.constitution),
+				constitutionModifier: parseInt(this.constitutionModifier),
+				constitutionSave: parseInt(this.constitutionSave),
+				intelligence: parseInt(this.intelligence),
+				intelligenceModifier: parseInt(this.intelligenceModifier),
+				intelligenceSave: parseInt(this.intelligenceSave),
+				arcana: parseInt(this.arcana),
+				history: parseInt(this.history),
+				investigation: parseInt(this.investigation),
+				nature: parseInt(this.nature),
+				religion: parseInt(this.religion),
+				wisdom: parseInt(this.wisdom),
+				wisdomModifier: parseInt(this.wisdomModifier),
+				wisdomSave: parseInt(this.wisdomSave),
+				animalHandling: parseInt(this.animalHandling),
+				insight: parseInt(this.insight),
+				medicine: parseInt(this.medicine),
+				perception: parseInt(this.perception),
+				survival: parseInt(this.survival),
+				charisma: parseInt(this.charisma),
+				charismaModifier: parseInt(this.charismaModifier),
+				charismaSave: parseInt(this.charismaSave),
+				deception: parseInt(this.deception),
+				intimidation: parseInt(this.intimidation),
+				performance: parseInt(this.performance),
+				persuasion: parseInt(this.persuasion),
 				spells: this.spells,
-				oneSpells: this.oneSpells,
-				twoSpells: this.twoSpells,
-				threeSpells: this.threeSpells,
-				fourSpells: this.fourSpells,
-				fiveSpells: this.fiveSpells,
-				sixSpells: this.sixSpells,
-				sevenSpells: this.sevenSpells,
-				eightSpells: this.eightSpells,
-				nineSpells: this.nineSpells
+				oneSpells: parseInt(this.oneSpells),
+				twoSpells: parseInt(this.twoSpells),
+				threeSpells: parseInt(this.threeSpells),
+				fourSpells: parseInt(this.fourSpells),
+				fiveSpells: parseInt(this.fiveSpells),
+				sixSpells: parseInt(this.sixSpells),
+				sevenSpells: parseInt(this.sevenSpells),
+				eightSpells: parseInt(this.eightSpells),
+				nineSpells: parseInt(this.nineSpells)
 			};
 			console.log(characterData);
 			if(newCharacter = new Character(characterData)) {
@@ -569,38 +840,52 @@ Vue.component('create-character', {
 
 Vue.component('attack', {
 	template: `
-		<div class="card col">
-			<div class="card-header">
-				<h3>Attacks</h3>
-			</div>
-			<div class="card-body">
-				<ul class="list-group" v-if="character.attacks" v-for="attack in character.attacks">
-					<li class="list-group-item">
-						{{attack.name}} 
-						{{attack.attackModifier}} 
-						{{attack.damageDiceNum}}d{{attack.damageDice}} 
-						{{attack.damageModifier}} 
-						<button class="btn btn-primary" @click="character.attack(attack, 'disadvantage')" v-if="attack.attackType == 'roll'">Roll with disadvantage!</button>
-						<button class="btn btn-primary" @click="character.attack(attack)">Roll!</button>
-						<button class="btn btn-primary" @click="character.attack(attack, 'advantage')" v-if="attack.attackType == 'roll'">Roll with advantage!</button>
-						<attack-field v-bind:character="character" v-bind:attack="attack"></attack-field>
-
-					</li>
-				</ul>
-			</div>
-			<div class="card-footer">
-				<attack-field v-bind:character="character"></attack-field>
+		<div class="col">
+			<div class="card">
+				<div class="card-header">
+					<h3>Attacks</h3>
+				</div>
+				<div class="card-body">
+					<ul class="list-group" v-if="character.attacks" v-for="attack in character.attacks">
+						<li class="list-group-item">
+							<span>
+								{{attack.name}} |
+								<span v-if="attack.attackModifier && attack.attackModifier != 0 ">
+									+{{attack.attackModifier}} |
+								</span>
+								{{attack.damageDiceNum}}d{{attack.damageDice}}
+								<span v-if="attack.damageModifier && attack.damageModifier != 0 ">
+									+{{attack.damageModifier}}
+								</span> 
+							</span>
+							<span class="float-right">
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.attackType == 'roll'">Roll with disadvantage!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack)">Roll!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'advantage')" v-if="attack.attackType == 'roll'">Roll with advantage!</button>
+							</span>
+							<attack-field v-bind:character="character" v-bind:attack="attack"></attack-field>
+						</li>
+					</ul>
+				</div>
+				<div class="card-footer">
+					<attack-field v-bind:character="character"></attack-field>
+				</div>
 			</div>
 		</div>
 	`,
-	props: ["character"]
+	props: ["character"],
+	methods: {
+		rollAttack(attack, type) {
+			this.character.attack(attack, type);
+		}
+	}
 });
 
 Vue.component('attack-field', {
 	template:`
 		<div>
 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newAttack && show == false">Add Attack</button>
-			<button class="btn btn-primary btn-sm" @click="show = true" v-if="changeAttack && show == false">Edit Attack</button>
+			<a class="badge badge-light" @click="show = true" v-if="changeAttack && show == false">Edit Attack</a>
 
 			<div class="my-2" v-if="show">
 				<div v-if="newAttack">
@@ -744,27 +1029,39 @@ const app = new Vue({
 		
 	},
 	created() {
-		tom = new Character({name: 'tom', level: 7, maxHp: 56});
-		this.characters.push(tom);
-		bob = new Character({name: 'bob', level: 9, maxHp: 66});
-		this.characters.push(bob);
-		steve = new Character({name: 'steve', level: 9, maxHp: 66});
-		this.characters.push(steve);		
+		// tom = new Character({name: 'tom', level: 7, maxHp: 56});
+		// this.characters.push(tom);
+		// bob = new Character({name: 'bob', level: 9, maxHp: 66});
+		// this.characters.push(bob);
+		// steve = new Character({name: 'steve', level: 9, maxHp: 66});
+		// this.characters.push(steve);		
 	},
 	methods: {
 		createCharacter() {
 
 		},
+		deleteCharacter(removingCharacter) {
+			var index = this.characters.indexOf(removingCharacter);
+			delete this.characters[index];
+			var newArray = [];
+			for (i=0;i<this.characters.length;i++) {
+				if (this.characters[i]) {
+					newArray.push(this.characters[i]);
+				}
+			}
+			this.characters = newArray;
+		},
 		addToFeed(input) {
 			this.feed.unshift(input);
 		}
 	}
+
 });
 
 
-$(".nav .nav-link").on("click", function(){
-   $(".nav").find(".active").removeClass("active");
-   $(this).addClass("active");
+$('.nav').on('click', '.nav-link', function(){
+   $('.nav').find('.active').removeClass('active');
+   $(this).addClass('active');
 });
 
 function getData() {

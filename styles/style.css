@@ -7,3 +7,15 @@
 .numInput {
 	width: 50px;
 }
+
+.hpInput {
+	width: 80px;
+}
+
+a:hover {
+	cursor: pointer;
+}
+
+.list-group li {
+	list-style: none;
+}
