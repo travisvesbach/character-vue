@@ -59,10 +59,70 @@ class Character {
 				this.addAttack(input.attacks[j]);
 			}
 		}
-		this.currentHp = this.maxHp;
+		if (input.currentHp) {
+			this.currentHp = input.currentHp;
+		} else {
+			this.currentHp = this.maxHp;
+		}
 		console.log('Character ' + this.name + ' created!');
 
 		console.log(this.currentHp);
+
+	}
+
+	updateCharacter(input) {
+		this.name = input.name;
+		this.level = input.level;
+		this.maxHp = input.maxHp;
+		this.ac = input.ac;
+		this.strength = input.strength;
+		this.strengthModifier = input.strengthModifier;
+		this.strengthSave = input.strengthSave;
+		this.athletics = input.athletics;
+		this.dexterity = input.dexterity;
+		this.dexterityModifier = input.dexterityModifier;
+		this.dexteritySave = input.dexteritySave;
+		this.acrobatics = input.acrobatics;
+		this.sleightOfHand = input.sleightOfHand;
+		this.stealth = input.stealth;
+		this.constitution = input.constitution;
+		this.constitutionModifier = input.constitutionModifier;
+		this.constitutionSave = input.constitutionSave;
+		this.intelligence = input.intelligence;
+		this.intelligenceModifier = input.intelligenceModifier;
+		this.intelligenceSave = input.intelligenceSave;
+		this.arcana = input.arcana;
+		this.history = input.history;
+		this.investigation = input.investigation;
+		this.nature = input.nature;
+		this.religion = input.religion;
+		this.wisdom = input.wisdom;
+		this.wisdomModifier = input.wisdomModifier;
+		this.wisdomSave = input.wisdomSave;
+		this.animalHandling = input.animalHandling;
+		this.insight = input.insight;
+		this.medicine = input.medicine;
+		this.perception = input.perception;
+		this.survival = input.survival;
+		this.charisma = input.charisma;
+		this.charismaModifier = input.charismaModifier;
+		this.charismaSave = input.charismaSave;
+		this.deception = input.deception;
+		this.intimidation = input.intimidation;
+		this.performance = input.performance;
+		this.persuasion = input.persuasion;
+		this.spells = input.spells;
+		if(this.spells == 'yes') {
+			this.oneSpells = input.oneSpells;
+			this.twoSpells = input.twoSpells;
+			this.threeSpells = input.threeSpells;
+			this.fourSpells = input.fourSpells;
+			this.fiveSpells = input.fiveSpells;
+			this.sixSpells = input.sixSpells;
+			this.sevenSpells = input.sevenSpells;
+			this.eightSpells = input.eightSpells;
+			this.nineSpells = input.nineSpells;
+		}
 
 	}
 
@@ -243,7 +303,7 @@ Vue.component('nav-vue', {
 			</ul>
 		</nav>
 	`,
-	props: ["characters", "selected"],
+	props: ["characters"],
 	computed: {
 		characterList() {
 			return this.characters;
@@ -264,13 +324,24 @@ Vue.component('character-stats', {
 		<div v-if="character">
 			<div class="card-header">
 				<h2 class="d-inline-block">{{character.name}}</h2>
+				<span class="dropdown">
+				  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				    <a class="dropdown-item" @click="editCharacter">Edit {{character.name}}</a>
+				    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
+				  </div>
+				</span>
 				<h3 class="float-right d-inline-block">
 					HP: <input type="number" class="hpInput" v-model.number="character.currentHp"> 
 					/ {{character.maxHp}}
 				</h3>
 			</div>
 
-			<div class="row" style="margin: auto;">
+			<character-creator v-if="edit == 'editing'" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
+			</character-creator>
+
+			<div class="row" style="margin: auto;" v-if="edit != 'editing'">
 				<div class="card d-inline-block col-md">
 					<a @click="rollStat('Strength check', character.strengthModifier)">
 						<b>Strength {{character.strength}}</b> 
@@ -463,7 +534,7 @@ Vue.component('character-stats', {
 					</ul>
 				</div>				
 			</div>
-			<div class="row">
+			<div class="row" v-if="edit != 'editing'">
 					<attack v-bind:character="character"></attack>
 			</div>
 		</div>
@@ -471,13 +542,22 @@ Vue.component('character-stats', {
 	props: ["character"],
 	data() {
 		return {
-			rollModifier: 'normal'
+			rollModifier: 'normal',
+			edit: false
 		}
 	},
 	methods: {
 		rollStat(stat, statModifier) {
 			var result = this.character.rollStat(stat, statModifier, this.rollModifier);
 			app.feed.unshift(result)
+		},
+		editCharacter(){
+			this.edit = 'editing';
+		},
+		deleteCharacter(){
+			if (confirm('Delete ' + this.character.name + '?')) {
+				app.deleteCharacter(this.character);
+			}
 		}
 	}
 });
@@ -485,7 +565,7 @@ Vue.component('character-stats', {
 Vue.component('character-creator', {
 	template: `
 		<div>
-			<h1 class="card-header">Create a Character</h1>
+			<h1 class="card-header" v-if="edit != 'editing'">Create a Character</h1>
 			<form>
 				<h4>Basic info</h4>
 			    <div class="form-group">
@@ -543,7 +623,7 @@ Vue.component('character-creator', {
 				</div>
 			    <div class="form-check">
 				    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
-				    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="history">
+				    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="sleightOfHand">
 				</div>
 				<div class="form-check">
 				    <label class="form-check-label" for="stealth">Stealth</label>
@@ -710,12 +790,17 @@ Vue.component('character-creator', {
 				    </div>
 				</div>
 
-			    <button type="button" class="btn btn-primary" @click="createCharacter">Submit</button>
+			    <button type="button" class="btn btn-primary" @click="createCharacter" v-if="edit != 'editing'">Create Character</button>
+			    <button type="button" class="btn btn-primary" @click="updateCharacter" v-if="edit == 'editing'">Update Character</button>
+			    <button type="button" class="btn btn-danger" @click="$emit('edit', 'no')" v-if="edit == 'editing'">Cancel</button>			    
 			</form>
 		</div>
 	`,
+	props: ['editCharacterData'],
 	data() {
 		return {
+			character: null,
+			edit: false,
 			name: '',
 			level: '',
 			maxHp: '',
@@ -770,10 +855,84 @@ Vue.component('character-creator', {
 			
 		};
 	},
+	created() {
+		if (this.editCharacterData) {
+			this.edit = this.editCharacterData.edit;
+			this.character = this.editCharacterData.characterData;
+			this.name = this.character.name;
+			this.level = this.character.level;
+			this.maxHp = this.character.maxHp;
+			this.ac = this.character.ac;
+			this.strength = this.character.strength;
+			this.strengthModifier = this.character.strengthModifier;
+			this.strengthSave = this.character.strengthSave;
+			this.athletics = this.character.athletics;
+			this.dexterity = this.character.dexterity;
+			this.dexterityModifier = this.character.dexterityModifier;
+			this.dexteritySave = this.character.dexteritySave;
+			this.acrobatics = this.character.acrobatics;
+			this.sleightOfHand = this.character.sleightOfHand;
+			this.stealth = this.character.stealth;
+			this.constitution = this.character.constitution;
+			this.constitutionModifier = this.character.constitutionModifier;
+			this.constitutionSave = this.character.constitutionSave;
+			this.intelligence = this.character.intelligence;
+			this.intelligenceModifier = this.character.intelligenceModifier;
+			this.intelligenceSave = this.character.intelligenceSave;
+			this.arcana = this.character.arcana;
+			this.history = this.character.history;
+			this.investigation = this.character.investigation;
+			this.nature = this.character.nature;
+			this.religion = this.character.religion;
+			this.wisdom = this.character.wisdom;
+			this.wisdomModifier = this.character.wisdomModifier;
+			this.wisdomSave = this.character.wisdomSave;
+			this.animalHandling = this.character.animalHandling;
+			this.insight = this.character.insight;
+			this.medicine = this.character.medicine;
+			this.perception = this.character.perception;
+			this.survival = this.character.survival;
+			this.charisma = this.character.charisma;
+			this.charismaModifier = this.character.charismaModifier;
+			this.charismaSave = this.character.charismaSave;
+			this.deception = this.character.deception;
+			this.intimidation = this.character.intimidation;
+			this.performance = this.character.performance;
+			this.persuasion = this.character.persuasion;
+			this.spells = this.character.spells;
+			if(this.spells == 'yes') {
+				this.oneSpells = this.character.oneSpells;
+				this.twoSpells = this.character.twoSpells;
+				this.threeSpells = this.character.threeSpells;
+				this.fourSpells = this.character.fourSpells;
+				this.fiveSpells = this.character.fiveSpells;
+				this.sixSpells = this.character.sixSpells;
+				this.sevenSpells = this.character.sevenSpells;
+				this.eightSpells = this.character.eightSpells;
+				this.nineSpells = this.character.nineSpells;
+			}
+		}
+	},
 	methods: {
 		createCharacter() {
 			console.log('entering createCharacter');
-			var characterData = {
+			var characterData = this.prepareCharacterData();
+			console.log(characterData);
+			if(newCharacter = new Character(characterData)) {
+				app.characters.push(newCharacter);
+				app.selected = newCharacter;
+				$(".nav").find(".active").removeClass("active");
+				//$(".nav-link:contains(this.name)").tab('show');
+    			$(".nav-link:contains(this.name)").addClass("active");
+			}
+		},
+		updateCharacter() {
+			var characterData = this.prepareCharacterData();
+			this.character.updateCharacter(characterData);
+			this.$emit('edit', 'no');
+		},
+		prepareCharacterData() {
+			return {
 				name: this.name,
 				level: parseInt(this.level),
 				maxHp: parseInt(this.maxHp),
@@ -825,14 +984,6 @@ Vue.component('character-creator', {
 				eightSpells: parseInt(this.eightSpells),
 				nineSpells: parseInt(this.nineSpells)
 			};
-			console.log(characterData);
-			if(newCharacter = new Character(characterData)) {
-				app.characters.push(newCharacter);
-				app.selected = newCharacter;
-				$(".nav").find(".active").removeClass("active");
-				$(".nav-link:contains(this.name)").tab('show');
-    			//$(".nav-link:contains(this.name)").addClass("active");
-			}
 		}
 	}
 
@@ -1050,6 +1201,7 @@ const app = new Vue({
 				}
 			}
 			this.characters = newArray;
+			this.selected = null;
 		},
 		addToFeed(input) {
 			this.feed.unshift(input);
