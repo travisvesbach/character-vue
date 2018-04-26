@@ -43,15 +43,83 @@ class Character {
 		this.persuasion = input.persuasion;
 		this.spells = input.spells;
 		if(this.spells == 'yes') {
-			this.oneSpells = input.oneSpells;
-			this.twoSpells = input.twoSpells;
-			this.threeSpells = input.threeSpells;
-			this.fourSpells = input.fourSpells;
-			this.fiveSpells = input.fiveSpells;
-			this.sixSpells = input.sixSpells;
-			this.sevenSpells = input.sevenSpells;
-			this.eightSpells = input.eightSpells;
-			this.nineSpells = input.nineSpells;
+			this.spellSlots = [];
+			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
+				this.spellSlots = input.spellSlots;
+			} else {
+				this.oneSpells = input.oneSpells;
+				if (isInteger(this.oneSpells)) {
+					this.addSpellSlots(1, this.oneSpells);
+				}
+				// this.oneSpellSlots = input.oneSpellSlots;
+				// if (! this.oneSpellSlots && this.oneSpells) {
+				// 	this.oneSpellSlots = this.addSpells(this.oneSpells);
+				// }
+				this.twoSpells = input.twoSpells;
+				if (isInteger(this.twoSpells)) {
+					this.addSpellSlots(2, this.twoSpells);
+				}
+				// this.twoSpellSlots = input.twoSpellSlots;
+				// if (! this.twoSpellSlots && this.twoSpells) {
+				// 	this.twoSpellSlots = this.addSpells(this.twoSpells);
+				// }
+				this.threeSpells = input.threeSpells;
+				if (isInteger(this.threeSpells)) {
+					this.addSpellSlots(3, this.threeSpells);
+				}
+				// this.threeSpellSlots = input.threeSpellSlots;
+				// if (! this.threeSpellSlots && this.threeSpells) {
+				// 	this.threeSpellSlots = this.addSpells(this.threeSpells);
+				// }
+				this.fourSpells = input.fourSpells;
+				if (isInteger(this.fourSpells)) {
+					this.addSpellSlots(4, this.fourSpells);
+				}
+				// this.fourSpellSlots = input.fourSpellSlots;
+				// if (! this.fourSpellSlots && this.fourSpells) {
+				// 	this.fourSpellSlots = this.addSpells(this.fourSpells);
+				// }
+				this.fiveSpells = input.fiveSpells;
+				if (isInteger(this.fiveSpells)) {
+					this.addSpellSlots(5, this.fiveSpells);
+				}
+				// this.fiveSpellSlots = input.fiveSpellSlots;
+				// if (! this.fiveSpellSlots && this.fiveSpells) {
+				// 	this.fiveSpellSlots = this.addSpells(this.fiveSpells);
+				// }
+				this.sixSpells = input.sixSpells;
+				if (isInteger(this.sixSpells)) {
+					this.addSpellSlots(6, this.sixSpells);
+				}
+				// this.sixSpellSlots = input.sixSpellSlots;
+				// if (! this.sixSpellSlots && this.sixSpells) {
+				// 	this.sixSpellSlots = this.addSpells(this.sixSpells);
+				// }
+				this.sevenSpells = input.sevenSpells;
+				if (isInteger(this.sevenSpells)) {
+					this.addSpellSlots(7, this.sevenSpells);
+				}
+				// this.sevenSpellSlots = input.sevenSpellSlots;
+				// if (! this.sevenSpellSlots && this.sevenSpells) {
+				// 	this.sevenSpellSlots = this.addSpells(this.sevenSpells);
+				// }
+				this.eightSpells = input.eightSpells;
+				if (isInteger(this.eightSpells)) {
+					this.addSpellSlots(8, this.eightSpells);
+				}
+				// this.eightSpellSlots = input.eightSpellSlots;
+				// if (! this.eightSpellSlots && this.eightSpells) {
+				// 	this.eightSpellSlots = this.addSpells(this.eightSpells);
+				// }
+				this.nineSpells = input.nineSpells;
+				if (isInteger(this.nineSpells)) {
+					this.addSpellSlots(9, this.nineSpells);
+				}
+				// this.nineSpellSlots = input.nineSpellSlots;
+				// if (! this.nineSpellSlots && this.nineSpells) {
+				// 	this.nineSpellSlots = this.addSpells(this.nineSpells);
+				// }
+			}
 		}
 		this.attacks = [];
 		if (input.attacks) {
@@ -113,17 +181,110 @@ class Character {
 		this.persuasion = input.persuasion;
 		this.spells = input.spells;
 		if(this.spells == 'yes') {
-			this.oneSpells = input.oneSpells;
-			this.twoSpells = input.twoSpells;
-			this.threeSpells = input.threeSpells;
-			this.fourSpells = input.fourSpells;
-			this.fiveSpells = input.fiveSpells;
-			this.sixSpells = input.sixSpells;
-			this.sevenSpells = input.sevenSpells;
-			this.eightSpells = input.eightSpells;
-			this.nineSpells = input.nineSpells;
+			this.spellSlots = [];
+			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
+				this.spellSlots = input.spellSlots;
+			} else {
+				this.oneSpells = input.oneSpells;
+				if (isInteger(this.oneSpells)) {
+					this.addSpellSlots(1, this.oneSpells);
+				}
+				// this.oneSpellSlots = input.oneSpellSlots;
+				// if (! this.oneSpellSlots && this.oneSpells) {
+				// 	this.oneSpellSlots = this.addSpells(this.oneSpells);
+				// }
+				this.twoSpells = input.twoSpells;
+				if (isInteger(this.twoSpells)) {
+					this.addSpellSlots(2, this.twoSpells);
+				}
+				// this.twoSpellSlots = input.twoSpellSlots;
+				// if (! this.twoSpellSlots && this.twoSpells) {
+				// 	this.twoSpellSlots = this.addSpells(this.twoSpells);
+				// }
+				this.threeSpells = input.threeSpells;
+				if (isInteger(this.threeSpells)) {
+					this.addSpellSlots(3, this.threeSpells);
+				}
+				// this.threeSpellSlots = input.threeSpellSlots;
+				// if (! this.threeSpellSlots && this.threeSpells) {
+				// 	this.threeSpellSlots = this.addSpells(this.threeSpells);
+				// }
+				this.fourSpells = input.fourSpells;
+				if (isInteger(this.fourSpells)) {
+					this.addSpellSlots(4, this.fourSpells);
+				}
+				// this.fourSpellSlots = input.fourSpellSlots;
+				// if (! this.fourSpellSlots && this.fourSpells) {
+				// 	this.fourSpellSlots = this.addSpells(this.fourSpells);
+				// }
+				this.fiveSpells = input.fiveSpells;
+				if (isInteger(this.fiveSpells)) {
+					this.addSpellSlots(5, this.fiveSpells);
+				}
+				// this.fiveSpellSlots = input.fiveSpellSlots;
+				// if (! this.fiveSpellSlots && this.fiveSpells) {
+				// 	this.fiveSpellSlots = this.addSpells(this.fiveSpells);
+				// }
+				this.sixSpells = input.sixSpells;
+				if (isInteger(this.sixSpells)) {
+					this.addSpellSlots(6, this.sixSpells);
+				}
+				// this.sixSpellSlots = input.sixSpellSlots;
+				// if (! this.sixSpellSlots && this.sixSpells) {
+				// 	this.sixSpellSlots = this.addSpells(this.sixSpells);
+				// }
+				this.sevenSpells = input.sevenSpells;
+				if (isInteger(this.sevenSpells)) {
+					this.addSpellSlots(7, this.sevenSpells);
+				}
+				// this.sevenSpellSlots = input.sevenSpellSlots;
+				// if (! this.sevenSpellSlots && this.sevenSpells) {
+				// 	this.sevenSpellSlots = this.addSpells(this.sevenSpells);
+				// }
+				this.eightSpells = input.eightSpells;
+				if (isInteger(this.eightSpells)) {
+					this.addSpellSlots(8, this.eightSpells);
+				}
+				// this.eightSpellSlots = input.eightSpellSlots;
+				// if (! this.eightSpellSlots && this.eightSpells) {
+				// 	this.eightSpellSlots = this.addSpells(this.eightSpells);
+				// }
+				this.nineSpells = input.nineSpells;
+				if (isInteger(this.nineSpells)) {
+					this.addSpellSlots(9, this.nineSpells);
+				}
+				// this.nineSpellSlots = input.nineSpellSlots;
+				// if (! this.nineSpellSlots && this.nineSpells) {
+				// 	this.nineSpellSlots = this.addSpells(this.nineSpells);
+				// }
+			}
 		}
+	}
 
+	addSpellSlots(level, counter) {
+		this.spellSlots[level] = [];
+		for (var i=0;i<counter;i++) {
+			this.spellSlots[level].push(new SpellSlot);
+		}
+	}
+
+	switchSlot(levelIndex, slotIndex) {
+		console.log('entering switchSlot in character');
+		if (this.spellSlots[levelIndex][slotIndex] == "\u26AA") {
+			this.spellSlots[levelIndex][slotIndex] = "\u26AB";
+			return "\u26AB";
+		} else if (this.spellSlots[levelIndex][slotIndex] == "\u26AB") {
+			this.spellSlots[levelIndex][slotIndex] = "\u26AA";
+			return "\u26AA";
+		}
+	}
+
+	addSpells(counter){
+		var spellSlots = [];
+		for (var i=0;i<counter;i++) {
+			spellSlots.push("\u26AA");
+		}
+		return spellSlots;
 	}
 
 	addAttack(attackData) {
@@ -153,6 +314,27 @@ class Character {
 }
 
 
+class SpellSlot {
+
+	constructor(used = false) {
+		this.used = false;
+		this.value = "\u26AA";
+		if (this.used) {
+			this.value = "\u26AB";
+		}
+	}
+
+	switchSlot() {
+		console.log('entering switchSlot in spell');
+		if (this.used) {
+			this.used = false;
+			this.value = "\u26AA";
+		} else {
+			this.used = true;
+			this.value = "\u26AB";
+		}		
+	}
+}
 
 
 class Attack {
@@ -341,7 +523,7 @@ Vue.component('character-stats', {
 			<character-creator v-if="edit == 'editing'" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
 			</character-creator>
 
-			<div class="row" style="margin: auto;" v-if="edit != 'editing'">
+			<div class="row m-auto" v-if="edit != 'editing'">
 				<div class="card d-inline-block col-md">
 					<a @click="rollStat('Strength check', character.strengthModifier)">
 						<b>Strength {{character.strength}}</b> 
@@ -534,7 +716,8 @@ Vue.component('character-stats', {
 					</ul>
 				</div>				
 			</div>
-			<div class="row" v-if="edit != 'editing'">
+			<div class="row m-auto" v-if="edit != 'editing'">
+					<spells v-if="character.spells == 'yes'" v-bind:character="character"></spells>			
 					<attack v-bind:character="character"></attack>
 			</div>
 		</div>
@@ -804,43 +987,43 @@ Vue.component('character-creator', {
 			name: '',
 			level: '',
 			maxHp: '',
-			ac: 0,
-			strength: 0,
-			strengthSave: 0,
-			strengthModifier: 0,
-			athletics: 0,
-			dexterity: 0,
-			dexterityModifier: 0,
-			dexteritySave: 0,
-			acrobatics: 0,
-			sleightOfHand: 0,
-			stealth: 0,
-			constitution: 0,
-			constitutionModifier: 0,
-			constitutionSave: 0,
-			intelligence: 0,
-			intelligenceModifier: 0,
-			intelligenceSave: 0,
-			arcana: 0,
-			history: 0,
-			investigation: 0,
-			nature: 0,
-			religion: 0,
-			wisdom: 0,
-			wisdomModifier: 0,
-			wisdomSave: 0,
-			animalHandling: 0,
-			insight: 0,
-			medicine: 0,
-			perception: 0,
-			survival: 0,
-			charisma: 0,
-			charismaModifier: 0,
-			charismaSave: 0,
-			deception: 0,
-			intimidation: 0,
-			performance: 0,
-			persuasion: 0,
+			ac: null,
+			strength: null,
+			strengthSave: null,
+			strengthModifier: null,
+			athletics: null,
+			dexterity: null,
+			dexterityModifier: null,
+			dexteritySave: null,
+			acrobatics: null,
+			sleightOfHand: null,
+			stealth: null,
+			constitution: null,
+			constitutionModifier: null,
+			constitutionSave: null,
+			intelligence: null,
+			intelligenceModifier: null,
+			intelligenceSave: null,
+			arcana: null,
+			history: null,
+			investigation: null,
+			nature: null,
+			religion: null,
+			wisdom: null,
+			wisdomModifier: null,
+			wisdomSave: null,
+			animalHandling: null,
+			insight: null,
+			medicine: null,
+			perception: null,
+			survival: null,
+			charisma: null,
+			charismaModifier: null,
+			charismaSave: null,
+			deception: null,
+			intimidation: null,
+			performance: null,
+			persuasion: null,
 			spells: null,
 			oneSpells: null,
 			twoSpells: null,
@@ -989,9 +1172,43 @@ Vue.component('character-creator', {
 
 });
 
+
+Vue.component('spells', {
+	template: `
+		<div class="col-md-2 px-0">
+			<div class="card">
+				<div class="card-header">
+					<h3>Spells</h3>
+				</div>
+				<div class="card-body">
+					<ul class="list-group list-group-flush">
+						<li v-for="(level, levelIndex) in character.spellSlots" v-if="levelIndex != 0">
+							{{levelIndex}}: 
+							<a v-for="spellSlot in level" @click="switchSlot(spellSlot)">
+								{{spellSlot.value}}
+							</a>
+						</li>
+						
+					</ul>
+				</div>
+				<div class="card-footer">
+				</div>
+			</div>
+		</div>
+	`,
+	props: ["character"],
+	methods: {
+		switchSlot(spellSlot) {
+			console.log(spellSlot);
+			spellSlot.switchSlot();
+			//this.character.switchSlot(levelIndex, slotIndex);
+		}
+	}
+});
+
 Vue.component('attack', {
 	template: `
-		<div class="col">
+		<div class="col-md px-0">
 			<div class="card">
 				<div class="card-header">
 					<h3>Attacks</h3>
@@ -1234,6 +1451,11 @@ function saveData() {
 			localStorage.setItem('appCharacters', JSON.stringify(app.characters));
 		}, 10000);
 }
+
+function isInteger(x) {
+    return x % 1 === 0;
+}
+
 
 $(document).ready(function() {
 	getData();
