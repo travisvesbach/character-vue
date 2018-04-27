@@ -19,21 +19,26 @@
 		 
 
 
-		<character-stats v-bind:character="selected" v-if="selected != 'create-character'">
+		<character-stats v-bind:character="selected" v-if="selected != 'create-character' && selected != 'dice-roller'">
 		</character-stats>
+
+		<dice-roller v-if="selected == 'dice-roller'">
+		</dice-roller>
 
 		<character-creator v-if="selected == 'create-character'">
 		</character-creator>
 
+		<feed v-bind:feed="feed" v-if="selected != 'create-character' && selected != 'dice-roller'">
+		</feed>
 
 
-		<div class="card-footer" v-if="feed.length > 0">
+		<!-- <div class="card-footer" v-if="feed.length > 0">
 			<ul class="list-group" v-for="item in feed">
 				<li class="list-group-item feed-item">
 					{{ item }}
 				</li>
 			</ul>
-		</div>
+		</div> -->
 
 
 	</div>

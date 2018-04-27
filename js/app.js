@@ -291,6 +291,20 @@ class Character {
 		this.attacks.push(new Attack(attackData));
 	}
 
+	deleteAttack(removingAttack) {
+		console.log(removingAttack);
+		var index = this.attacks.indexOf(removingAttack);
+		console.log(index);
+		delete this.attacks[index];
+		var newArray = [];
+		for (var i=0;i<this.attacks.length;i++) {
+			if (this.attacks[i]) {
+				newArray.push(this.attacks[i]);
+			}
+		}
+		this.attacks = newArray;
+	}
+
 	attack(attack, type = 'normal'){
 		var output = attack.makeAttack(type);
 		app.addToFeed(output);
@@ -368,7 +382,7 @@ class Attack {
 		}
 		results = this.rollDamage(results, attackRoll)
 
-		console.log(results);
+		console.log(results.join('\n'));
 		return results.join('\n');
 	}
 
@@ -478,7 +492,10 @@ Vue.component('nav-vue', {
 			    <li class="nav-item" v-if="characterList" v-for="character in characterList" @click="select(character)">
 			        <a class="nav-link">{{character.name}}</a>
 			    </li>
-			    <li class="nav-item ml-auto" @click="select('create-character')">
+			    <li class="nav-item ml-auto" @click="select('dice-roller')">
+			    	<a class="nav-link">Dice Roller</a>
+			    </li>			    
+			    <li class="nav-item" @click="select('create-character')">
 			    	<a class="nav-link">Create a Character</a>
 			    </li>
 
@@ -504,13 +521,14 @@ Vue.component('nav-vue', {
 Vue.component('character-stats', {
 	template: `
 		<div v-if="character">
-			<div class="card-header">
+			<div class="card-header border-left border-right">
 				<h2 class="d-inline-block">{{character.name}}</h2>
 				<span class="dropdown">
 				  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				  </a>
 				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-				    <a class="dropdown-item" @click="editCharacter">Edit {{character.name}}</a>
+				    <a class="dropdown-item" @click="editCharacter" v-if="! edit">Edit {{character.name}}</a>
+				    <a class="dropdown-item" @click="editCharacter" v-if="edit == 'editing'">Cancel Edit</a>
 				    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
 				  </div>
 				</span>
@@ -524,7 +542,7 @@ Vue.component('character-stats', {
 			</character-creator>
 
 			<div class="row m-auto" v-if="edit != 'editing'">
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Strength check', character.strengthModifier)">
 						<b>Strength {{character.strength}}</b> 
 						(<span v-if="character.strengthModifier > 0">+</span>{{character.strengthModifier}})
@@ -560,7 +578,7 @@ Vue.component('character-stats', {
 
 
 				</div>
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Dexterity check', character.dexterityModifier)">
 						<b>Dexterity {{character.dexterity}}</b> 
 						(<span v-if="character.dexterityModifier > 0">+</span>{{character.dexterityModifier}})
@@ -589,7 +607,7 @@ Vue.component('character-stats', {
 					  	</li>
 					</ul>
 				</div>
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Constitution check', character.constitutionModifier)">
 						<b>Constitution {{character.Constitution}}</b> 
 						(<span v-if="character.constitutionModifier > 0">+</span>{{character.constitutionModifier}})
@@ -603,7 +621,7 @@ Vue.component('character-stats', {
 					  	</li>
 					</ul>
 				</div>	
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Intelligence check', character.intelligenceModifier)">
 						<b>Intelligence {{character.intelligence}}</b> 
 						(<span v-if="character.intelligenceModifier > 0">+</span>{{character.intelligenceModifier}})
@@ -642,7 +660,7 @@ Vue.component('character-stats', {
 					  	</li>
 					</ul>
 				</div>	
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Wisdom check', character.wisdomModifier)">
 						<b>Wisdom {{character.wisdom}}</b> 
 						(<span v-if="character.wisdomModifier > 0">+</span>{{character.wisdomModifier}})
@@ -682,7 +700,7 @@ Vue.component('character-stats', {
 					  	</li>
 					</ul>
 				</div>	
-				<div class="card d-inline-block col-md">
+				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Charisma check', character.charismaModifier)">
 						<b>Charisma {{character.charisma}}</b> 
 						(<span v-if="character.charismaModifier > 0">+</span>{{character.charismaModifier}})
@@ -735,7 +753,11 @@ Vue.component('character-stats', {
 			app.feed.unshift(result)
 		},
 		editCharacter(){
-			this.edit = 'editing';
+			if (this.edit != 'editing') {
+				this.edit = 'editing';
+			} else {
+				this.edit = false;
+			}
 		},
 		deleteCharacter(){
 			if (confirm('Delete ' + this.character.name + '?')) {
@@ -748,7 +770,7 @@ Vue.component('character-stats', {
 Vue.component('character-creator', {
 	template: `
 		<div>
-			<h1 class="card-header" v-if="edit != 'editing'">Create a Character</h1>
+			<h1 class="card-header border-left border-right" v-if="edit != 'editing'">Create a Character</h1>
 			<form>
 				<h4>Basic info</h4>
 			    <div class="form-group">
@@ -1176,11 +1198,11 @@ Vue.component('character-creator', {
 Vue.component('spells', {
 	template: `
 		<div class="col-md-2 px-0">
-			<div class="card">
-				<div class="card-header">
+			<div class="card rounded-0">
+				<div class="card-header p-2">
 					<h3>Spells</h3>
 				</div>
-				<div class="card-body">
+				<div class="card-body p-2">
 					<ul class="list-group list-group-flush">
 						<li v-for="(level, levelIndex) in character.spellSlots" v-if="levelIndex != 0">
 							{{levelIndex}}: 
@@ -1191,16 +1213,21 @@ Vue.component('spells', {
 						
 					</ul>
 				</div>
-				<div class="card-footer">
-				</div>
 			</div>
 		</div>
 	`,
 	props: ["character"],
 	methods: {
 		switchSlot(spellSlot) {
+		if (spellSlot.used) {
+			spellSlot.used = false;
+			spellSlot.value = "\u26AA";
+		} else {
+			spellSlot.used = true;
+			spellSlot.value = "\u26AB";
+		}	
 			console.log(spellSlot);
-			spellSlot.switchSlot();
+			Vue.set(this.character);
 			//this.character.switchSlot(levelIndex, slotIndex);
 		}
 	}
@@ -1209,11 +1236,12 @@ Vue.component('spells', {
 Vue.component('attack', {
 	template: `
 		<div class="col-md px-0">
-			<div class="card">
-				<div class="card-header">
-					<h3>Attacks</h3>
+			<div class="card rounded-0">
+				<div class="card-header p-2">
+					<h3 class="d-inline-block align-middle">Attacks</h3>
+					<attack-field class="d-inline-block float-right .align-bottom" v-bind:character="character"></attack-field>
 				</div>
-				<div class="card-body">
+				<div class="card-body p-2">
 					<ul class="list-group" v-if="character.attacks" v-for="attack in character.attacks">
 						<li class="list-group-item">
 							<span>
@@ -1235,9 +1263,9 @@ Vue.component('attack', {
 						</li>
 					</ul>
 				</div>
-				<div class="card-footer">
+	<!--			<div class="card-footer">
 					<attack-field v-bind:character="character"></attack-field>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	`,
@@ -1310,6 +1338,7 @@ Vue.component('attack-field', {
 				<button class="btn btn-primary btn-sm" @click="addAttack" v-if="newAttack">Add Attack</button>
 				<button class="btn btn-primary btn-sm" @click="editAttack" v-if="changeAttack">Edit Attack</button>
 				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+				<button class="btn btn-danger btn-sm" @click="deleteAttack" v-if="changeAttack">Delete Attack</button>
 			</div>
 		</div>
 	`,
@@ -1356,6 +1385,12 @@ Vue.component('attack-field', {
 				};
 			return output;
 		},
+		deleteAttack() {
+			if (confirm('Delete ' + this.attack.name + '?')) {
+				this.character.deleteAttack(this.attack);
+				this.reset();
+			}
+		},
 		reset() {
 			if (this.attack) {
 				this.show = false;
@@ -1383,6 +1418,93 @@ Vue.component('attack-field', {
 			}
 		}
 
+	}
+});
+
+Vue.component('feed', {
+	template:`
+	<div class="card col px-0 rounded-0" v-if="feed.length > 0">
+		<h3 class="card-header p-2">Feed</h3>
+		<ul class="list-group">
+			<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
+		</ul>
+	</div>
+	`,
+	props: ['feed']
+});
+
+Vue.component('dice-roller',{
+	template: `
+		<div>
+			<div class="card-header border-left border-right">
+				<h1>Roll the Dice!</h1>
+			</div>
+
+			<div class="row m-auto">
+				<div class="col-md-5 card px-0">
+					<h3 class="card-header">How Many / Die / Modifier</h3>
+					<ul class="list-group">
+						<li class="list-group-item" id="dice-list-item" v-for="die in dice">
+							<div class="row my-2 mx-1 text-center">
+								<input class="col numInput" type="number" v-model.number="die.rollTimes">
+								<span class="col">d{{die.die}} +</span>
+								<input class="col numInput" type="number" v-model.number="die.modifier">	
+								<button class="btn btn-primary btn-sm col mx-1" @click="roll(die)">Roll</button>
+							</div>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-md card px-0">
+					<h3 class="card-header">Feed</h3>
+					<ul class="list-group" v-for="item in feed">
+						<li class="list-group-item">
+							{{ item }}
+						</li>
+					</ul>
+				</div>
+			</div>
+			<button class="btn btn-danger btn-sm float-right mt-2" @click="reset()">Reset</button>
+		</div>
+	`,
+	data() {
+		return {
+			dice: [],
+			feed: []
+		}
+	},
+	created() {
+		this.reset();
+	},
+	methods: {
+		roll(die) {
+			var result = [];
+			for(i=0;i<die.rollTimes;i++) {
+				result.push(Math.floor(Math.random() * die.die) + 1);
+			}
+			var total = 0;
+			for(i=0;i<result.length;i++) {
+				total = total + result[i];
+			}
+			var modifiedTotal = total + die.modifier;
+			var resultString = 'You rolled ' + die.rollTimes + 'd' + die.die +' resulting in [' + result + '] for ' + total + ' + ' + die.modifier + ' for a total of ' + modifiedTotal + '.';
+			if(this.feed.length >= 10) {
+				this.feed.pop();
+			}
+			this.feed.unshift(resultString);
+		},
+		reset() {
+			this.dice = [
+				{ die: 4, rollTimes: 1, modifier: 0 },
+				{ die: 6, rollTimes: 1, modifier: 0 },
+				{ die: 8, rollTimes: 1, modifier: 0 },
+				{ die: 10, rollTimes: 1, modifier: 0 },
+				{ die: 12, rollTimes: 1, modifier: 0 },
+				{ die: 20, rollTimes: 1, modifier: 0 },
+				{ die: 100, rollTimes: 1, modifier: 0 },
+			],
+			this.feed = [];
+		}
 	}
 });
 
