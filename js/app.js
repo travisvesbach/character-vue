@@ -289,6 +289,7 @@ class Character {
 
 	addAttack(attackData) {
 		this.attacks.push(new Attack(attackData));
+		this.attacks.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
 	deleteAttack(removingAttack) {
@@ -483,6 +484,22 @@ var dice = {
 	}
 }
 
+// Use with .sort() to sort an array of objects.
+// First param: variable by with to be sorted
+// Second param: boolean to reverse order or not
+// Third param: primer to prepare data to be compared. ex: parseInt() if comparting number. 
+// case insensitive ex.  this.attacks.sort(sort_by('name', false, function(a){return a.toUpperCase()})); 
+var sort_by = function(field, reverse, primer){
+
+   var key = (primer) ? function(x) {return primer(x[field])} : function(x) {return x[field]};
+
+   reverse = (!reverse) ? 1 : -1;
+
+   return function (a, b) {
+       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+     } 
+}
+
 
 
 Vue.component('nav-vue', {
@@ -609,7 +626,7 @@ Vue.component('character-stats', {
 				</div>
 				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Constitution check', character.constitutionModifier)">
-						<b>Constitution {{character.Constitution}}</b> 
+						<b>Constitution {{character.constitution}}</b> 
 						(<span v-if="character.constitutionModifier > 0">+</span>{{character.constitutionModifier}})
 					</a>
 
@@ -772,179 +789,190 @@ Vue.component('character-creator', {
 		<div>
 			<h1 class="card-header border-left border-right" v-if="edit != 'editing'">Create a Character</h1>
 			<form>
-				<h4>Basic info</h4>
-			    <div class="form-group">
-			        <label for="name">Name:</label>
-			        <input type="text" class="form-control" id="name" placeholder="Enter character name" v-model="name">
-			    </div>
-			    <div class="form-group">
-			        <label for="characterLevel">Level:</label>
-			        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model="level">
-			    </div>
-			    <div class="form-group">
-			        <label for="characterMaxHp">Max HP:</label>
-			        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
-			    </div>
-			    <div class="form-group">
-			        <label for="ac">AC:</label>
-			        <input type="number" class="form-control" id="ac" placeholder="0" v-model="ac">
-			    </div>
-				
+				<div class="row">
+					<div class="col">
+						<h4>Basic info</h4>
+					    <div class="form-group">
+					        <label for="name">Name:</label>
+					        <input type="text" class="form-control" id="name" placeholder="Enter character name" v-model="name">
+					    </div>
+					    <div class="form-group">
+					        <label for="characterLevel">Level:</label>
+					        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model="level">
+					    </div>
+					    <div class="form-group">
+					        <label for="characterMaxHp">Max HP:</label>
+					        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
+					    </div>
+					    <div class="form-group">
+					        <label for="ac">AC:</label>
+					        <input type="number" class="form-control" id="ac" placeholder="0" v-model="ac">
+					    </div>
+					</div>
+				</div>
 				<hr>
 				<h4>Stats</h4>
-			    <div class="form-group">
-			        <label for="characterStrength"><b>Strength:</b></label>
-			        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
-			    </div>
-			    <div class="form-check">
-			        <label for="strengthModifier">Strength Modifier:</label>
-			        <input type="number" class="form-control" id="strengthModifier" placeholder="0" v-model="strengthModifier">
-			    </div>			    
-			    <div class="form-check">
-				    <label for="strengthSave">Save</label>
-				    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="athletics">Athletics</label>
-				    <input type="number" class="form-control" id="athletics" placeholder="0" v-model="athletics">
-				</div>
-				
-				<hr>
-			    <div class="form-group">
-			        <label for="characterDexterity"><b>Dexterity:</b></label>
-			        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
-			    </div>		
-			    <div class="form-check">
-			        <label for="dexterityModifier">Dexterity Modifier:</label>
-			        <input type="number" class="form-control" id="dexterityModifier" placeholder="0" v-model="dexterityModifier">
-			    </div>	
-			    <div class="form-check">
-				    <label class="form-check-label" for="dexteritySave">Save</label>
-				    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="acrobatics">Acrobatics</label>
-				    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model="acrobatics">
-				</div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
-				    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="sleightOfHand">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="stealth">Stealth</label>
-				    <input type="number" class="form-control" id="stealth" placeholder="0" v-model="stealth">
-				</div>
+				<div class="row">
+					<div class="col-md-4"> 
+					    <div class="form-group">
+					        <label for="characterStrength"><b>Strength:</b></label>
+					        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
+					    </div>
+					    <div class="form-check">
+					        <label for="strengthModifier">Strength Modifier:</label>
+					        <input type="number" class="form-control" id="strengthModifier" placeholder="0" v-model="strengthModifier">
+					    </div>			    
+					    <div class="form-check">
+						    <label for="strengthSave">Save</label>
+						    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="athletics">Athletics</label>
+						    <input type="number" class="form-control" id="athletics" placeholder="0" v-model="athletics">
+						</div>
+					</div>
+					<div class="col-md-4">
+					    <div class="form-group">
+					        <label for="characterDexterity"><b>Dexterity:</b></label>
+					        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
+					    </div>		
+					    <div class="form-check">
+					        <label for="dexterityModifier">Dexterity Modifier:</label>
+					        <input type="number" class="form-control" id="dexterityModifier" placeholder="0" v-model="dexterityModifier">
+					    </div>	
+					    <div class="form-check">
+						    <label class="form-check-label" for="dexteritySave">Save</label>
+						    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="acrobatics">Acrobatics</label>
+						    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model="acrobatics">
+						</div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
+						    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="sleightOfHand">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="stealth">Stealth</label>
+						    <input type="number" class="form-control" id="stealth" placeholder="0" v-model="stealth">
+						</div>
+					</div>
 
+					<div class="col-md-4">
+					    <div class="form-group">
+					        <label for="characterConstitution"><b>Constitution:</b></label>
+					        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
+					    </div>
+					    <div class="form-check">
+					        <label for="constitutionModifier">Constitution Modifier:</label>
+					        <input type="number" class="form-control" id="constitutionModifier" placeholder="0" v-model="constitutionModifier">
+					    </div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="constitutionSave">Save</label>
+						    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
+						</div>
+					</div>
+				</div>
 				<hr>
-			    <div class="form-group">
-			        <label for="characterConstitution"><b>Constitution:</b></label>
-			        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
-			    </div>
-			    <div class="form-check">
-			        <label for="constitutionModifier">Constitution Modifier:</label>
-			        <input type="number" class="form-control" id="constitutionModifier" placeholder="0" v-model="constitutionModifier">
-			    </div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="constitutionSave">Save</label>
-				    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
-				</div>
-
-				<hr>
-			    <div class="form-group">
-			        <label for="characterIntelligence"><b>Intelligence:</b></label>
-			        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
-			    </div>
-			    <div class="form-check">
-			        <label for="intelligenceModifier">Intelligence Modifier:</label>
-			        <input type="number" class="form-control" id="intelligenceModifier" placeholder="0" v-model="intelligenceModifier">
-			    </div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="intelligenceSave">Save</label>
-				    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model="intelligenceSave">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="arcana">Arcana</label>
-				    <input type="number" class="form-control" id="arcana" placeholder="0" v-model="arcana">
-				</div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="history">History</label>
-				    <input type="number" class="form-control" id="history" placeholder="0" v-model="history">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="investigation">Investigation</label>
-				    <input type="number" class="form-control" id="investigation" placeholder="0" v-model="investigation">
-				</div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="nature">Nature</label>
-				    <input type="number" class="form-control" id="nature" placeholder="0" v-model="nature">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="religion">Religion</label>
-				    <input type="number" class="form-control" id="religion" placeholder="0" v-model="religion">
-				</div>
-
-				<hr>
-			    <div class="form-group">
-			        <label for="characterWisdom"><b>Wisdom:</b></label>
-			        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
-			    </div>
-			    <div class="form-check">
-			        <label for="wisdomModifier">Wisdom Modifier:</label>
-			        <input type="number" class="form-control" id="wisdomModifier" placeholder="0" v-model="wisdomModifier">
-			    </div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="wisdomSave">Save</label>
-				    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="animalHandling">Animal Handling</label>
-				    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model="animalHandling">
-				</div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="insight">Insight</label>
-				    <input type="number" class="form-control" id="insight" placeholder="0" v-model="insight">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="medicine">Medicine</label>
-				    <input type="number" class="form-control" id="medicine" placeholder="0" v-model="medicine">
-				</div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="perception">Perception</label>
-				    <input type="number" class="form-control" id="perception" placeholder="0" v-model="perception">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="survival">Survival</label>
-				    <input type="number" class="form-control" id="survival" placeholder="0" v-model="survival">
-				</div>			
-
-				<hr>
-			    <div class="form-group">
-			        <label for="characterCharisma"><b>Charisma:</b></label>
-			        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
-			    </div>
-			    <div class="form-check">
-			        <label for="charismaModifier">Charisma Modifier:</label>
-			        <input type="number" class="form-control" id="charismaModifier" placeholder="0" v-model="charismaModifier">
-			    </div>
-			    <div class="form-check">
-				    <label class="form-check-label" for="charismaSave">Save</label>
-				    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model="charismaSave">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="deception">Deception</label>
-				    <input type="number" class="form-control" id="deception" placeholder="0" v-model="deception">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="intimidation">Intimidation</label>
-				    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model="intimidation">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="performance">Performance</label>
-				    <input type="number" class="form-control" id="performance" placeholder="0" v-model="performance">
-				</div>
-				<div class="form-check">
-				    <label class="form-check-label" for="persuasion">Persuasion</label>
-				    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model="persuasion">
+				<div class="row">
+					<div class="col-md-4">
+					    <div class="form-group">
+					        <label for="characterIntelligence"><b>Intelligence:</b></label>
+					        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
+					    </div>
+					    <div class="form-check">
+					        <label for="intelligenceModifier">Intelligence Modifier:</label>
+					        <input type="number" class="form-control" id="intelligenceModifier" placeholder="0" v-model="intelligenceModifier">
+					    </div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="intelligenceSave">Save</label>
+						    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model="intelligenceSave">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="arcana">Arcana</label>
+						    <input type="number" class="form-control" id="arcana" placeholder="0" v-model="arcana">
+						</div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="history">History</label>
+						    <input type="number" class="form-control" id="history" placeholder="0" v-model="history">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="investigation">Investigation</label>
+						    <input type="number" class="form-control" id="investigation" placeholder="0" v-model="investigation">
+						</div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="nature">Nature</label>
+						    <input type="number" class="form-control" id="nature" placeholder="0" v-model="nature">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="religion">Religion</label>
+						    <input type="number" class="form-control" id="religion" placeholder="0" v-model="religion">
+						</div>
+					</div>
+					<div class="col-md-4">
+					    <div class="form-group">
+					        <label for="characterWisdom"><b>Wisdom:</b></label>
+					        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
+					    </div>
+					    <div class="form-check">
+					        <label for="wisdomModifier">Wisdom Modifier:</label>
+					        <input type="number" class="form-control" id="wisdomModifier" placeholder="0" v-model="wisdomModifier">
+					    </div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="wisdomSave">Save</label>
+						    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="animalHandling">Animal Handling</label>
+						    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model="animalHandling">
+						</div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="insight">Insight</label>
+						    <input type="number" class="form-control" id="insight" placeholder="0" v-model="insight">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="medicine">Medicine</label>
+						    <input type="number" class="form-control" id="medicine" placeholder="0" v-model="medicine">
+						</div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="perception">Perception</label>
+						    <input type="number" class="form-control" id="perception" placeholder="0" v-model="perception">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="survival">Survival</label>
+						    <input type="number" class="form-control" id="survival" placeholder="0" v-model="survival">
+						</div>			
+					</div>
+					<div class="col-md-4">
+					    <div class="form-group">
+					        <label for="characterCharisma"><b>Charisma:</b></label>
+					        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
+					    </div>
+					    <div class="form-check">
+					        <label for="charismaModifier">Charisma Modifier:</label>
+					        <input type="number" class="form-control" id="charismaModifier" placeholder="0" v-model="charismaModifier">
+					    </div>
+					    <div class="form-check">
+						    <label class="form-check-label" for="charismaSave">Save</label>
+						    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model="charismaSave">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="deception">Deception</label>
+						    <input type="number" class="form-control" id="deception" placeholder="0" v-model="deception">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="intimidation">Intimidation</label>
+						    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model="intimidation">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="performance">Performance</label>
+						    <input type="number" class="form-control" id="performance" placeholder="0" v-model="performance">
+						</div>
+						<div class="form-check">
+						    <label class="form-check-label" for="persuasion">Persuasion</label>
+						    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model="persuasion">
+						</div>
+					</div>
 				</div>
 
 				<h4>Spells</h4>
@@ -1007,45 +1035,45 @@ Vue.component('character-creator', {
 			character: null,
 			edit: false,
 			name: '',
-			level: '',
-			maxHp: '',
-			ac: null,
-			strength: null,
-			strengthSave: null,
-			strengthModifier: null,
-			athletics: null,
-			dexterity: null,
-			dexterityModifier: null,
-			dexteritySave: null,
-			acrobatics: null,
-			sleightOfHand: null,
-			stealth: null,
-			constitution: null,
-			constitutionModifier: null,
-			constitutionSave: null,
-			intelligence: null,
-			intelligenceModifier: null,
-			intelligenceSave: null,
-			arcana: null,
-			history: null,
-			investigation: null,
-			nature: null,
-			religion: null,
-			wisdom: null,
-			wisdomModifier: null,
-			wisdomSave: null,
-			animalHandling: null,
-			insight: null,
-			medicine: null,
-			perception: null,
-			survival: null,
-			charisma: null,
-			charismaModifier: null,
-			charismaSave: null,
-			deception: null,
-			intimidation: null,
-			performance: null,
-			persuasion: null,
+			level: 0,
+			maxHp: 0,
+			ac: 0,
+			strength: 0,
+			strengthSave: 0,
+			strengthModifier: 0,
+			athletics: 0,
+			dexterity: 0,
+			dexterityModifier: 0,
+			dexteritySave: 0,
+			acrobatics: 0,
+			sleightOfHand: 0,
+			stealth: 0,
+			constitution: 0,
+			constitutionModifier: 0,
+			constitutionSave: 0,
+			intelligence: 0,
+			intelligenceModifier: 0,
+			intelligenceSave: 0,
+			arcana: 0,
+			history: 0,
+			investigation: 0,
+			nature: 0,
+			religion: 0,
+			wisdom: 0,
+			wisdomModifier: 0,
+			wisdomSave: 0,
+			animalHandling: 0,
+			insight: 0,
+			medicine: 0,
+			perception: 0,
+			survival: 0,
+			charisma: 0,
+			charismaModifier: 0,
+			charismaSave: 0,
+			deception: 0,
+			intimidation: 0,
+			performance: 0,
+			persuasion: 0,
 			spells: null,
 			oneSpells: null,
 			twoSpells: null,
@@ -1106,15 +1134,15 @@ Vue.component('character-creator', {
 			this.persuasion = this.character.persuasion;
 			this.spells = this.character.spells;
 			if(this.spells == 'yes') {
-				this.oneSpells = this.character.oneSpells;
-				this.twoSpells = this.character.twoSpells;
-				this.threeSpells = this.character.threeSpells;
-				this.fourSpells = this.character.fourSpells;
-				this.fiveSpells = this.character.fiveSpells;
-				this.sixSpells = this.character.sixSpells;
-				this.sevenSpells = this.character.sevenSpells;
-				this.eightSpells = this.character.eightSpells;
-				this.nineSpells = this.character.nineSpells;
+				this.oneSpells = this.character.spellSlots[1].length;
+				this.twoSpells = this.character.spellSlots[2].length;
+				this.threeSpells = this.character.spellSlots[3].length;
+				this.fourSpells = this.character.spellSlots[4].length;
+				this.fiveSpells = this.character.spellSlots[5].length;
+				this.sixSpells = this.character.spellSlots[6].length;
+				this.sevenSpells = this.character.spellSlots[7].length;
+				this.eightSpells = this.character.spellSlots[8].length;
+				this.nineSpells = this.character.spellSlots[9].length;
 			}
 		}
 	},
