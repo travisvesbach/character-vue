@@ -1,148 +1,36 @@
 class Character {
 
 	constructor(input) {
-		this.name = input.name;
-		this.level = input.level;
-		this.maxHp = input.maxHp;
-		this.ac = input.ac;
-		this.strength = input.strength;
-		this.strengthModifier = input.strengthModifier;
-		this.strengthSave = input.strengthSave;
-		this.athletics = input.athletics;
-		this.dexterity = input.dexterity;
-		this.dexterityModifier = input.dexterityModifier;
-		this.dexteritySave = input.dexteritySave;
-		this.acrobatics = input.acrobatics;
-		this.sleightOfHand = input.sleightOfHand;
-		this.stealth = input.stealth;
-		this.constitution = input.constitution;
-		this.constitutionModifier = input.constitutionModifier;
-		this.constitutionSave = input.constitutionSave;
-		this.intelligence = input.intelligence;
-		this.intelligenceModifier = input.intelligenceModifier;
-		this.intelligenceSave = input.intelligenceSave;
-		this.arcana = input.arcana;
-		this.history = input.history;
-		this.investigation = input.investigation;
-		this.nature = input.nature;
-		this.religion = input.religion;
-		this.wisdom = input.wisdom;
-		this.wisdomModifier = input.wisdomModifier;
-		this.wisdomSave = input.wisdomSave;
-		this.animalHandling = input.animalHandling;
-		this.insight = input.insight;
-		this.medicine = input.medicine;
-		this.perception = input.perception;
-		this.survival = input.survival;
-		this.charisma = input.charisma;
-		this.charismaModifier = input.charismaModifier;
-		this.charismaSave = input.charismaSave;
-		this.deception = input.deception;
-		this.intimidation = input.intimidation;
-		this.performance = input.performance;
-		this.persuasion = input.persuasion;
-		this.spells = input.spells;
-		if(this.spells == 'yes') {
-			this.spellSlots = [];
-			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
-				this.spellSlots = input.spellSlots;
-			} else {
-				this.oneSpells = input.oneSpells;
-				if (isInteger(this.oneSpells)) {
-					this.addSpellSlots(1, this.oneSpells);
-				}
-				// this.oneSpellSlots = input.oneSpellSlots;
-				// if (! this.oneSpellSlots && this.oneSpells) {
-				// 	this.oneSpellSlots = this.addSpells(this.oneSpells);
-				// }
-				this.twoSpells = input.twoSpells;
-				if (isInteger(this.twoSpells)) {
-					this.addSpellSlots(2, this.twoSpells);
-				}
-				// this.twoSpellSlots = input.twoSpellSlots;
-				// if (! this.twoSpellSlots && this.twoSpells) {
-				// 	this.twoSpellSlots = this.addSpells(this.twoSpells);
-				// }
-				this.threeSpells = input.threeSpells;
-				if (isInteger(this.threeSpells)) {
-					this.addSpellSlots(3, this.threeSpells);
-				}
-				// this.threeSpellSlots = input.threeSpellSlots;
-				// if (! this.threeSpellSlots && this.threeSpells) {
-				// 	this.threeSpellSlots = this.addSpells(this.threeSpells);
-				// }
-				this.fourSpells = input.fourSpells;
-				if (isInteger(this.fourSpells)) {
-					this.addSpellSlots(4, this.fourSpells);
-				}
-				// this.fourSpellSlots = input.fourSpellSlots;
-				// if (! this.fourSpellSlots && this.fourSpells) {
-				// 	this.fourSpellSlots = this.addSpells(this.fourSpells);
-				// }
-				this.fiveSpells = input.fiveSpells;
-				if (isInteger(this.fiveSpells)) {
-					this.addSpellSlots(5, this.fiveSpells);
-				}
-				// this.fiveSpellSlots = input.fiveSpellSlots;
-				// if (! this.fiveSpellSlots && this.fiveSpells) {
-				// 	this.fiveSpellSlots = this.addSpells(this.fiveSpells);
-				// }
-				this.sixSpells = input.sixSpells;
-				if (isInteger(this.sixSpells)) {
-					this.addSpellSlots(6, this.sixSpells);
-				}
-				// this.sixSpellSlots = input.sixSpellSlots;
-				// if (! this.sixSpellSlots && this.sixSpells) {
-				// 	this.sixSpellSlots = this.addSpells(this.sixSpells);
-				// }
-				this.sevenSpells = input.sevenSpells;
-				if (isInteger(this.sevenSpells)) {
-					this.addSpellSlots(7, this.sevenSpells);
-				}
-				// this.sevenSpellSlots = input.sevenSpellSlots;
-				// if (! this.sevenSpellSlots && this.sevenSpells) {
-				// 	this.sevenSpellSlots = this.addSpells(this.sevenSpells);
-				// }
-				this.eightSpells = input.eightSpells;
-				if (isInteger(this.eightSpells)) {
-					this.addSpellSlots(8, this.eightSpells);
-				}
-				// this.eightSpellSlots = input.eightSpellSlots;
-				// if (! this.eightSpellSlots && this.eightSpells) {
-				// 	this.eightSpellSlots = this.addSpells(this.eightSpells);
-				// }
-				this.nineSpells = input.nineSpells;
-				if (isInteger(this.nineSpells)) {
-					this.addSpellSlots(9, this.nineSpells);
-				}
-				// this.nineSpellSlots = input.nineSpellSlots;
-				// if (! this.nineSpellSlots && this.nineSpells) {
-				// 	this.nineSpellSlots = this.addSpells(this.nineSpells);
-				// }
-			}
-		}
+		this.setStats(input);
 		this.attacks = [];
 		if (input.attacks) {
 			for (var j=0;j<input.attacks.length;j++) {
 				this.addAttack(input.attacks[j]);
 			}
 		}
+		this.modifiers = [];
+		if (input.modifiers) {
+			for (var j=0;j<input.modifiers.length;j++) {
+				this.addModifier(input.modifiers[j]);
+			}			
+		}
 		if (input.currentHp) {
 			this.currentHp = input.currentHp;
 		} else {
 			this.currentHp = this.maxHp;
 		}
-		console.log('Character ' + this.name + ' created!');
-
-		console.log(this.currentHp);
-
 	}
 
 	updateCharacter(input) {
+		this.setStats(input);
+	}
+
+	setStats(input) {
 		this.name = input.name;
 		this.level = input.level;
 		this.maxHp = input.maxHp;
 		this.ac = input.ac;
+		this.initiative = input.initiative;
 		this.strength = input.strength;
 		this.strengthModifier = input.strengthModifier;
 		this.strengthSave = input.strengthSave;
@@ -186,77 +74,41 @@ class Character {
 				this.spellSlots = input.spellSlots;
 			} else {
 				this.oneSpells = input.oneSpells;
-				if (isInteger(this.oneSpells)) {
+				if (isInteger(this.oneSpells) && this.oneSpells > 0) {
 					this.addSpellSlots(1, this.oneSpells);
 				}
-				// this.oneSpellSlots = input.oneSpellSlots;
-				// if (! this.oneSpellSlots && this.oneSpells) {
-				// 	this.oneSpellSlots = this.addSpells(this.oneSpells);
-				// }
 				this.twoSpells = input.twoSpells;
-				if (isInteger(this.twoSpells)) {
+				if (isInteger(this.twoSpells) && this.twoSpells > 0) {
 					this.addSpellSlots(2, this.twoSpells);
 				}
-				// this.twoSpellSlots = input.twoSpellSlots;
-				// if (! this.twoSpellSlots && this.twoSpells) {
-				// 	this.twoSpellSlots = this.addSpells(this.twoSpells);
-				// }
 				this.threeSpells = input.threeSpells;
-				if (isInteger(this.threeSpells)) {
+				if (isInteger(this.threeSpells) && this.threeSpells > 0) {
 					this.addSpellSlots(3, this.threeSpells);
 				}
-				// this.threeSpellSlots = input.threeSpellSlots;
-				// if (! this.threeSpellSlots && this.threeSpells) {
-				// 	this.threeSpellSlots = this.addSpells(this.threeSpells);
-				// }
 				this.fourSpells = input.fourSpells;
-				if (isInteger(this.fourSpells)) {
+				if (isInteger(this.fourSpells) && this.fourSpells > 0) {
 					this.addSpellSlots(4, this.fourSpells);
 				}
-				// this.fourSpellSlots = input.fourSpellSlots;
-				// if (! this.fourSpellSlots && this.fourSpells) {
-				// 	this.fourSpellSlots = this.addSpells(this.fourSpells);
-				// }
 				this.fiveSpells = input.fiveSpells;
-				if (isInteger(this.fiveSpells)) {
+				if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
 					this.addSpellSlots(5, this.fiveSpells);
 				}
-				// this.fiveSpellSlots = input.fiveSpellSlots;
-				// if (! this.fiveSpellSlots && this.fiveSpells) {
-				// 	this.fiveSpellSlots = this.addSpells(this.fiveSpells);
-				// }
 				this.sixSpells = input.sixSpells;
-				if (isInteger(this.sixSpells)) {
+				if (isInteger(this.sixSpells) && this.sixSpells > 0) {
 					this.addSpellSlots(6, this.sixSpells);
 				}
-				// this.sixSpellSlots = input.sixSpellSlots;
-				// if (! this.sixSpellSlots && this.sixSpells) {
-				// 	this.sixSpellSlots = this.addSpells(this.sixSpells);
-				// }
 				this.sevenSpells = input.sevenSpells;
-				if (isInteger(this.sevenSpells)) {
+				if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
 					this.addSpellSlots(7, this.sevenSpells);
 				}
-				// this.sevenSpellSlots = input.sevenSpellSlots;
-				// if (! this.sevenSpellSlots && this.sevenSpells) {
-				// 	this.sevenSpellSlots = this.addSpells(this.sevenSpells);
-				// }
 				this.eightSpells = input.eightSpells;
-				if (isInteger(this.eightSpells)) {
+				if (isInteger(this.eightSpells) && this.eightSpells > 0) {
 					this.addSpellSlots(8, this.eightSpells);
 				}
-				// this.eightSpellSlots = input.eightSpellSlots;
-				// if (! this.eightSpellSlots && this.eightSpells) {
-				// 	this.eightSpellSlots = this.addSpells(this.eightSpells);
-				// }
 				this.nineSpells = input.nineSpells;
-				if (isInteger(this.nineSpells)) {
+				if (isInteger(this.nineSpells) && this.nineSpells > 0) {
 					this.addSpellSlots(9, this.nineSpells);
 				}
-				// this.nineSpellSlots = input.nineSpellSlots;
-				// if (! this.nineSpellSlots && this.nineSpells) {
-				// 	this.nineSpellSlots = this.addSpells(this.nineSpells);
-				// }
 			}
 		}
 	}
@@ -268,24 +120,13 @@ class Character {
 		}
 	}
 
-	switchSlot(levelIndex, slotIndex) {
-		console.log('entering switchSlot in character');
-		if (this.spellSlots[levelIndex][slotIndex] == "\u26AA") {
-			this.spellSlots[levelIndex][slotIndex] = "\u26AB";
-			return "\u26AB";
-		} else if (this.spellSlots[levelIndex][slotIndex] == "\u26AB") {
-			this.spellSlots[levelIndex][slotIndex] = "\u26AA";
-			return "\u26AA";
-		}
-	}
-
-	addSpells(counter){
-		var spellSlots = [];
-		for (var i=0;i<counter;i++) {
-			spellSlots.push("\u26AA");
-		}
-		return spellSlots;
-	}
+	// addSpells(counter){
+	// 	var spellSlots = [];
+	// 	for (var i=0;i<counter;i++) {
+	// 		spellSlots.push("\u26AA");
+	// 	}
+	// 	return spellSlots;
+	// }
 
 	addAttack(attackData) {
 		this.attacks.push(new Attack(attackData));
@@ -306,9 +147,33 @@ class Character {
 		this.attacks = newArray;
 	}
 
-	attack(attack, type = 'normal'){
-		var output = attack.makeAttack(type);
-		app.addToFeed(output);
+	addModifier(modifierData) {
+		this.modifiers.push(new Modifier(modifierData));
+		this.modifiers.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+	}
+
+	deleteModifier(removingModifier) {
+		console.log(removingModifier);
+		var index = this.modifiers.indexOf(removingModifier);
+		console.log(index);
+		delete this.modifiers[index];
+		var newArray = [];
+		for (var i=0;i<this.modifiers.length;i++) {
+			if (this.modifiers[i]) {
+				newArray.push(this.modifiers[i]);
+			}
+		}
+		this.modifiers = newArray;
+	}
+
+	attack(attack, type = 'normal', modifiers = null){
+		var results = attack.makeAttack(type);
+		if (modifiers) {
+			for(var i=0;i<modifiers.length;i++) {
+				results.resultsArray = modifiers[i].makeAttack(results.roll);
+			}
+		}
+		app.addToFeed(results.resultsArray.join('\n'));
 	}
 
 	rollStat(stat, statModifier, rollModifier) {
@@ -340,7 +205,6 @@ class SpellSlot {
 	}
 
 	switchSlot() {
-		console.log('entering switchSlot in spell');
 		if (this.used) {
 			this.used = false;
 			this.value = "\u26AA";
@@ -356,11 +220,10 @@ class Attack {
 
 	constructor(attackData) {
 		this.name = attackData.name;
+		this.attackType = attackData.attackType;
 		if(attackData.attackType == 'roll') {
-			this.attackType = attackData.attackType;
 			this.attackModifier = attackData.attackModifier;
 		} else if (attackData.attackType == 'save' ) {
-			this.attackType = attackData.attackType;
 			this.saveDC = attackData.saveDC;
 			this.saveType = attackData.saveType;
 		}
@@ -384,7 +247,10 @@ class Attack {
 		results = this.rollDamage(results, attackRoll)
 
 		console.log(results.join('\n'));
-		return results.join('\n');
+		return {
+			resultsArray: results, 
+			roll: attackRoll
+		};
 	}
 
 	rollAttack(type) {
@@ -472,6 +338,71 @@ class Attack {
 	}
 }
 
+class Modifier {
+
+	constructor(modifierData) {
+		this.name = modifierData.name;
+		this.modifierType = modifierData.modifierType;
+		if(this.modifierType == 'auto') {
+			this.modifierType = modifierData.modifierType;
+		} else if (this.modifierType == 'save' ) {
+			this.saveDC = modifierData.saveDC;
+			this.saveType = modifierData.saveType;
+		}
+		this.damageDiceNum = modifierData.damageDiceNum;
+		this.damageDice = modifierData.damageDice;
+		console.log(this.name + " has been added");
+	}
+
+	makeAttack(results, roll = null) {
+		results.push(this.name + ':');
+		if (this.modifierType == 'auto') {
+			rollDamage(results, roll);
+		} else if (this.modifierType == 'save') {
+			rollDamage(results);
+			results.push('Your target(s) need(s) to make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
+		}
+		return results;
+	}
+
+	rollDamage(results, roll = null) {
+		var damageRoll = null
+		var damageTotal = 0;
+		var damageRollsArray = [];
+
+		if (roll == 20) {
+			for(var i=0;i<2;i++) {
+				for(var x=0;x<this.damageDiceNum;x++) { 
+					damageRoll = dice.roll(this.damageDice);
+					damageTotal += damageRoll;
+					damageRollsArray.push(damageRoll);
+				}
+			}
+		} else {
+			for(var i=0;i<this.damageDiceNum;i++) { 
+					damageRoll = dice.roll(this.damageDice);
+					damageTotal = damageTotal + damageRoll;
+					damageRollsArray.push(damageRoll);
+			}
+		}
+		results.push('Damage: [' + damageRollsArray + '] = ' + damageTotal);
+
+		return results;
+	}
+
+	editModifier(modifierData) {
+		this.name = modifierData.name;
+		this.modifierType = modifierData.modifierType;
+		if (modifierData.modifierType == 'save' ) {
+			this.saveDC = modifierData.saveDC;
+			this.saveType = modifierData.saveType;
+		}
+		this.damageDiceNum = modifierData.damageDiceNum;
+		this.damageDice = modifierData.damageDice;
+		console.log(this.name + " has been edited");
+	}
+}
+
 
 
 
@@ -538,27 +469,37 @@ Vue.component('nav-vue', {
 Vue.component('character-stats', {
 	template: `
 		<div v-if="character">
-			<div class="card-header border-left border-right">
-				<h2 class="d-inline-block">{{character.name}}</h2>
-				<span class="dropdown">
-				  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				  </a>
-				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-				    <a class="dropdown-item" @click="editCharacter" v-if="! edit">Edit {{character.name}}</a>
-				    <a class="dropdown-item" @click="editCharacter" v-if="edit == 'editing'">Cancel Edit</a>
-				    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
-				  </div>
-				</span>
-				<h3 class="float-right d-inline-block">
-					HP: <input type="number" class="hpInput" v-model.number="character.currentHp"> 
-					/ {{character.maxHp}}
-				</h3>
+			<div class="row m-auto card-header border-left border-right">
+				<div class="col-md-5 px-0">
+					<h2 class="d-inline-block">{{character.name}}</h2>
+					<span class="dropdown">
+					  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  </a>
+					  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					    <a class="dropdown-item" @click="editCharacter" v-if="! edit">Edit {{character.name}}</a>
+					    <a class="dropdown-item" @click="editCharacter" v-if="edit">Cancel Edit</a>
+					    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
+					  </div>
+					</span><br>
+					<span>Level {{character.level}}</span>
+				</div>
+				<div class="col-md-2 text-center">
+					<h5>AC: {{character.ac}}</h5>
+					<h5><a @click="rollStat('Initiative', character.initiative)">Initiative: {{character.initiative}}</a></h5>
+				</div>
+				<div class="col-md-5 px-0">
+					<div class="float-right">
+						<h5>HP: <input type="number" class="hpInput" v-model.number="character.currentHp"> / {{character.maxHp}}
+						</h5>
+						Calc: <input class="numInput" @keyup.enter="adjustCurrentHp()" v-model.number="hpCalculator"></input> 
+					</div>
+				</div>
 			</div>
 
-			<character-creator v-if="edit == 'editing'" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
+			<character-creator v-if="edit" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
 			</character-creator>
 
-			<div class="row m-auto" v-if="edit != 'editing'">
+			<div class="row m-auto" v-if="! edit">
 				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Strength check', character.strengthModifier)">
 						<b>Strength {{character.strength}}</b> 
@@ -751,7 +692,7 @@ Vue.component('character-stats', {
 					</ul>
 				</div>				
 			</div>
-			<div class="row m-auto" v-if="edit != 'editing'">
+			<div class="row m-auto" v-if="! edit">
 					<spells v-if="character.spells == 'yes'" v-bind:character="character"></spells>			
 					<attack v-bind:character="character"></attack>
 			</div>
@@ -761,7 +702,8 @@ Vue.component('character-stats', {
 	data() {
 		return {
 			rollModifier: 'normal',
-			edit: false
+			edit: false,
+			hpCalculator: null
 		}
 	},
 	methods: {
@@ -780,6 +722,10 @@ Vue.component('character-stats', {
 			if (confirm('Delete ' + this.character.name + '?')) {
 				app.deleteCharacter(this.character);
 			}
+		},
+		adjustCurrentHp() {
+			this.character.currentHp += this.hpCalculator;
+			this.hpCalculator = null;
 		}
 	}
 });
@@ -798,15 +744,19 @@ Vue.component('character-creator', {
 					    </div>
 					    <div class="form-group">
 					        <label for="characterLevel">Level:</label>
-					        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model="level">
+					        <input type="number" class="form-control" id="characterLevel" placeholder="0" v-model.number="level">
 					    </div>
 					    <div class="form-group">
 					        <label for="characterMaxHp">Max HP:</label>
-					        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model="maxHp">
+					        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model.number="maxHp">
 					    </div>
 					    <div class="form-group">
 					        <label for="ac">AC:</label>
-					        <input type="number" class="form-control" id="ac" placeholder="0" v-model="ac">
+					        <input type="number" class="form-control" id="ac" placeholder="0" v-model.number="ac">
+					    </div>
+					    <div class="form-group">
+					        <label for="initiative">Initiative:</label>
+					        <input type="number" class="form-control" id="initiative" placeholder="0" v-model.number="initiative">
 					    </div>
 					</div>
 				</div>
@@ -816,60 +766,60 @@ Vue.component('character-creator', {
 					<div class="col-md-4"> 
 					    <div class="form-group">
 					        <label for="characterStrength"><b>Strength:</b></label>
-					        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model="strength">
+					        <input type="number" class="form-control" id="characterStrength" placeholder="0" v-model.number="strength">
 					    </div>
 					    <div class="form-check">
 					        <label for="strengthModifier">Strength Modifier:</label>
-					        <input type="number" class="form-control" id="strengthModifier" placeholder="0" v-model="strengthModifier">
+					        <input type="number" class="form-control" id="strengthModifier" placeholder="0" v-model.number="strengthModifier">
 					    </div>			    
 					    <div class="form-check">
 						    <label for="strengthSave">Save</label>
-						    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model="strengthSave">
+						    <input type="number" class="form-control" id="strengthSave" placeholder="0" v-model.number="strengthSave">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="athletics">Athletics</label>
-						    <input type="number" class="form-control" id="athletics" placeholder="0" v-model="athletics">
+						    <input type="number" class="form-control" id="athletics" placeholder="0" v-model.number="athletics">
 						</div>
 					</div>
 					<div class="col-md-4">
 					    <div class="form-group">
 					        <label for="characterDexterity"><b>Dexterity:</b></label>
-					        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model="dexterity">
+					        <input type="number" class="form-control" id="characterDexterity" placeholder="0" v-model.number="dexterity">
 					    </div>		
 					    <div class="form-check">
 					        <label for="dexterityModifier">Dexterity Modifier:</label>
-					        <input type="number" class="form-control" id="dexterityModifier" placeholder="0" v-model="dexterityModifier">
+					        <input type="number" class="form-control" id="dexterityModifier" placeholder="0" v-model.number="dexterityModifier">
 					    </div>	
 					    <div class="form-check">
 						    <label class="form-check-label" for="dexteritySave">Save</label>
-						    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model="dexteritySave">
+						    <input type="number" class="form-control" id="dexteritySave" placeholder="0" v-model.number="dexteritySave">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="acrobatics">Acrobatics</label>
-						    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model="acrobatics">
+						    <input type="number" class="form-control" id="acrobatics" placeholder="0" v-model.number="acrobatics">
 						</div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="sleightOfHand">Sleight of Hand</label>
-						    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model="sleightOfHand">
+						    <input type="number" class="form-control" id="sleightOfHand" placeholder="0" v-model.number="sleightOfHand">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="stealth">Stealth</label>
-						    <input type="number" class="form-control" id="stealth" placeholder="0" v-model="stealth">
+						    <input type="number" class="form-control" id="stealth" placeholder="0" v-model.number="stealth">
 						</div>
 					</div>
 
 					<div class="col-md-4">
 					    <div class="form-group">
 					        <label for="characterConstitution"><b>Constitution:</b></label>
-					        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model="constitution">
+					        <input type="number" class="form-control" id="characterConstitution" placeholder="0" v-model.number="constitution">
 					    </div>
 					    <div class="form-check">
 					        <label for="constitutionModifier">Constitution Modifier:</label>
-					        <input type="number" class="form-control" id="constitutionModifier" placeholder="0" v-model="constitutionModifier">
+					        <input type="number" class="form-control" id="constitutionModifier" placeholder="0" v-model.number="constitutionModifier">
 					    </div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="constitutionSave">Save</label>
-						    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model="constitutionSave">
+						    <input type="number" class="form-control" id="constitutionSave" placeholder="0" v-model.number="constitutionSave">
 						</div>
 					</div>
 				</div>
@@ -878,99 +828,99 @@ Vue.component('character-creator', {
 					<div class="col-md-4">
 					    <div class="form-group">
 					        <label for="characterIntelligence"><b>Intelligence:</b></label>
-					        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model="intelligence">
+					        <input type="number" class="form-control" id="characterIntelligence" placeholder="0" v-model.number="intelligence">
 					    </div>
 					    <div class="form-check">
 					        <label for="intelligenceModifier">Intelligence Modifier:</label>
-					        <input type="number" class="form-control" id="intelligenceModifier" placeholder="0" v-model="intelligenceModifier">
+					        <input type="number" class="form-control" id="intelligenceModifier" placeholder="0" v-model.number="intelligenceModifier">
 					    </div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="intelligenceSave">Save</label>
-						    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model="intelligenceSave">
+						    <input type="number" class="form-control" id="intelligenceSave" placeholder="0" v-model.number="intelligenceSave">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="arcana">Arcana</label>
-						    <input type="number" class="form-control" id="arcana" placeholder="0" v-model="arcana">
+						    <input type="number" class="form-control" id="arcana" placeholder="0" v-model.number="arcana">
 						</div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="history">History</label>
-						    <input type="number" class="form-control" id="history" placeholder="0" v-model="history">
+						    <input type="number" class="form-control" id="history" placeholder="0" v-model.number="history">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="investigation">Investigation</label>
-						    <input type="number" class="form-control" id="investigation" placeholder="0" v-model="investigation">
+						    <input type="number" class="form-control" id="investigation" placeholder="0" v-model.number="investigation">
 						</div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="nature">Nature</label>
-						    <input type="number" class="form-control" id="nature" placeholder="0" v-model="nature">
+						    <input type="number" class="form-control" id="nature" placeholder="0" v-model.number="nature">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="religion">Religion</label>
-						    <input type="number" class="form-control" id="religion" placeholder="0" v-model="religion">
+						    <input type="number" class="form-control" id="religion" placeholder="0" v-model.number="religion">
 						</div>
 					</div>
 					<div class="col-md-4">
 					    <div class="form-group">
 					        <label for="characterWisdom"><b>Wisdom:</b></label>
-					        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model="wisdom">
+					        <input type="number" class="form-control" id="characterWisdom" placeholder="0" v-model.number="wisdom">
 					    </div>
 					    <div class="form-check">
 					        <label for="wisdomModifier">Wisdom Modifier:</label>
-					        <input type="number" class="form-control" id="wisdomModifier" placeholder="0" v-model="wisdomModifier">
+					        <input type="number" class="form-control" id="wisdomModifier" placeholder="0" v-model.number="wisdomModifier">
 					    </div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="wisdomSave">Save</label>
-						    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model="wisdomSave">
+						    <input type="number" class="form-control" id="wisdomSave" placeholder="0" v-model.number="wisdomSave">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="animalHandling">Animal Handling</label>
-						    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model="animalHandling">
+						    <input type="number" class="form-control" id="animalHandling" placeholder="0" v-model.number="animalHandling">
 						</div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="insight">Insight</label>
-						    <input type="number" class="form-control" id="insight" placeholder="0" v-model="insight">
+						    <input type="number" class="form-control" id="insight" placeholder="0" v-model.number="insight">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="medicine">Medicine</label>
-						    <input type="number" class="form-control" id="medicine" placeholder="0" v-model="medicine">
+						    <input type="number" class="form-control" id="medicine" placeholder="0" v-model.number="medicine">
 						</div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="perception">Perception</label>
-						    <input type="number" class="form-control" id="perception" placeholder="0" v-model="perception">
+						    <input type="number" class="form-control" id="perception" placeholder="0" v-model.number="perception">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="survival">Survival</label>
-						    <input type="number" class="form-control" id="survival" placeholder="0" v-model="survival">
+						    <input type="number" class="form-control" id="survival" placeholder="0" v-model.number="survival">
 						</div>			
 					</div>
 					<div class="col-md-4">
 					    <div class="form-group">
 					        <label for="characterCharisma"><b>Charisma:</b></label>
-					        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model="charisma">
+					        <input type="number" class="form-control" id="characterCharisma" placeholder="0" v-model.number="charisma">
 					    </div>
 					    <div class="form-check">
 					        <label for="charismaModifier">Charisma Modifier:</label>
-					        <input type="number" class="form-control" id="charismaModifier" placeholder="0" v-model="charismaModifier">
+					        <input type="number" class="form-control" id="charismaModifier" placeholder="0" v-model.number="charismaModifier">
 					    </div>
 					    <div class="form-check">
 						    <label class="form-check-label" for="charismaSave">Save</label>
-						    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model="charismaSave">
+						    <input type="number" class="form-control" id="charismaSave" placeholder="0" v-model.number="charismaSave">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="deception">Deception</label>
-						    <input type="number" class="form-control" id="deception" placeholder="0" v-model="deception">
+						    <input type="number" class="form-control" id="deception" placeholder="0" v-model.number="deception">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="intimidation">Intimidation</label>
-						    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model="intimidation">
+						    <input type="number" class="form-control" id="intimidation" placeholder="0" v-model.number="intimidation">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="performance">Performance</label>
-						    <input type="number" class="form-control" id="performance" placeholder="0" v-model="performance">
+						    <input type="number" class="form-control" id="performance" placeholder="0" v-model.number="performance">
 						</div>
 						<div class="form-check">
 						    <label class="form-check-label" for="persuasion">Persuasion</label>
-						    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model="persuasion">
+						    <input type="number" class="form-control" id="persuasion" placeholder="0" v-model.number="persuasion">
 						</div>
 					</div>
 				</div>
@@ -987,39 +937,39 @@ Vue.component('character-creator', {
 				<div v-if="spells == 'yes'">
 					<div class="form-group">
 				        <label for="oneSpells">1st Level Spells:</label>
-				        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model="oneSpells">
+				        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="twoSpells">2nd Level Spells:</label>
-				        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model="twoSpells">
+				        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model.number="twoSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="threeSpells">3rd Level Spells:</label>
-				        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model="threeSpells">
+				        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model.number="threeSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="fourSpells">4th Level Spells:</label>
-				        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model="fourSpells">
+				        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model.number="fourSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="fiveSpells">5th Level Spells:</label>
-				        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model="fiveSpells">
+				        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model.number="fiveSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="sixSpells">6th Level Spells:</label>
-				        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model="sixSpells">
+				        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model.number="sixSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="sevenSpells">7th Level Spells:</label>
-				        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model="sevenSpells">
+				        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model.number="sevenSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="eightSpells">8th Level Spells:</label>
-				        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model="eightSpells">
+				        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model.number="eightSpells">
 				    </div>
 				    <div class="form-group">
 				        <label for="nineSpells">9th Level Spells:</label>
-				        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model="nineSpells">
+				        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model.number="nineSpells">
 				    </div>
 				</div>
 
@@ -1038,6 +988,7 @@ Vue.component('character-creator', {
 			level: 0,
 			maxHp: 0,
 			ac: 0,
+			initiative: 0,
 			strength: 0,
 			strengthSave: 0,
 			strengthModifier: 0,
@@ -1096,6 +1047,7 @@ Vue.component('character-creator', {
 			this.level = this.character.level;
 			this.maxHp = this.character.maxHp;
 			this.ac = this.character.ac;
+			this.initiative = this.character.initiative;
 			this.strength = this.character.strength;
 			this.strengthModifier = this.character.strengthModifier;
 			this.strengthSave = this.character.strengthSave;
@@ -1162,60 +1114,61 @@ Vue.component('character-creator', {
 		updateCharacter() {
 			var characterData = this.prepareCharacterData();
 			this.character.updateCharacter(characterData);
-			this.$emit('edit', 'no');
+			this.$emit('edit', false);
 		},
 		prepareCharacterData() {
 			return {
 				name: this.name,
-				level: parseInt(this.level),
-				maxHp: parseInt(this.maxHp),
-				ac: parseInt(this.ac),
-				strength: parseInt(this.strength),
-				strengthModifier: parseInt(this.strengthModifier),
-				strengthSave: parseInt(this.strengthSave),
-				athletics: parseInt(this.athletics),
-				dexterity: parseInt(this.dexterity),
-				dexterityModifier: parseInt(this.dexterityModifier),
-				dexteritySave: parseInt(this.dexteritySave),
-				acrobatics: parseInt(this.acrobatics),
-				sleightOfHand: parseInt(this.sleightOfHand),
-				stealth: parseInt(this.stealth),
-				constitution: parseInt(this.constitution),
-				constitutionModifier: parseInt(this.constitutionModifier),
-				constitutionSave: parseInt(this.constitutionSave),
-				intelligence: parseInt(this.intelligence),
-				intelligenceModifier: parseInt(this.intelligenceModifier),
-				intelligenceSave: parseInt(this.intelligenceSave),
-				arcana: parseInt(this.arcana),
-				history: parseInt(this.history),
-				investigation: parseInt(this.investigation),
-				nature: parseInt(this.nature),
-				religion: parseInt(this.religion),
-				wisdom: parseInt(this.wisdom),
-				wisdomModifier: parseInt(this.wisdomModifier),
-				wisdomSave: parseInt(this.wisdomSave),
-				animalHandling: parseInt(this.animalHandling),
-				insight: parseInt(this.insight),
-				medicine: parseInt(this.medicine),
-				perception: parseInt(this.perception),
-				survival: parseInt(this.survival),
-				charisma: parseInt(this.charisma),
-				charismaModifier: parseInt(this.charismaModifier),
-				charismaSave: parseInt(this.charismaSave),
-				deception: parseInt(this.deception),
-				intimidation: parseInt(this.intimidation),
-				performance: parseInt(this.performance),
-				persuasion: parseInt(this.persuasion),
+				level: this.level,
+				maxHp: this.maxHp,
+				ac: this.ac,
+				initiative: this.initiative,
+				strength: this.strength,
+				strengthModifier: this.strengthModifier,
+				strengthSave: this.strengthSave,
+				athletics: this.athletics,
+				dexterity: this.dexterity,
+				dexterityModifier: this.dexterityModifier,
+				dexteritySave: this.dexteritySave,
+				acrobatics: this.acrobatics,
+				sleightOfHand: this.sleightOfHand,
+				stealth: this.stealth,
+				constitution: this.constitution,
+				constitutionModifier: this.constitutionModifier,
+				constitutionSave: this.constitutionSave,
+				intelligence: this.intelligence,
+				intelligenceModifier: this.intelligenceModifier,
+				intelligenceSave: this.intelligenceSave,
+				arcana: this.arcana,
+				history: this.history,
+				investigation: this.investigation,
+				nature: this.nature,
+				religion: this.religion,
+				wisdom: this.wisdom,
+				wisdomModifier: this.wisdomModifier,
+				wisdomSave: this.wisdomSave,
+				animalHandling: this.animalHandling,
+				insight: this.insight,
+				medicine: this.medicine,
+				perception: this.perception,
+				survival: this.survival,
+				charisma: this.charisma,
+				charismaModifier: this.charismaModifier,
+				charismaSave: this.charismaSave,
+				deception: this.deception,
+				intimidation: this.intimidation,
+				performance: this.performance,
+				persuasion: this.persuasion,
 				spells: this.spells,
-				oneSpells: parseInt(this.oneSpells),
-				twoSpells: parseInt(this.twoSpells),
-				threeSpells: parseInt(this.threeSpells),
-				fourSpells: parseInt(this.fourSpells),
-				fiveSpells: parseInt(this.fiveSpells),
-				sixSpells: parseInt(this.sixSpells),
-				sevenSpells: parseInt(this.sevenSpells),
-				eightSpells: parseInt(this.eightSpells),
-				nineSpells: parseInt(this.nineSpells)
+				oneSpells: this.oneSpells,
+				twoSpells: this.twoSpells,
+				threeSpells: this.threeSpells,
+				fourSpells: this.fourSpells,
+				fiveSpells: this.fiveSpells,
+				sixSpells: this.sixSpells,
+				sevenSpells: this.sevenSpells,
+				eightSpells: this.eightSpells,
+				nineSpells: this.nineSpells
 			};
 		}
 	}
@@ -1247,16 +1200,14 @@ Vue.component('spells', {
 	props: ["character"],
 	methods: {
 		switchSlot(spellSlot) {
-		if (spellSlot.used) {
-			spellSlot.used = false;
-			spellSlot.value = "\u26AA";
-		} else {
-			spellSlot.used = true;
-			spellSlot.value = "\u26AB";
-		}	
-			console.log(spellSlot);
+			if (spellSlot.used) {
+				spellSlot.used = false;
+				spellSlot.value = "\u26AA";
+			} else {
+				spellSlot.used = true;
+				spellSlot.value = "\u26AB";
+			}	
 			Vue.set(this.character);
-			//this.character.switchSlot(levelIndex, slotIndex);
 		}
 	}
 });
@@ -1268,6 +1219,7 @@ Vue.component('attack', {
 				<div class="card-header p-2">
 					<h3 class="d-inline-block align-middle">Attacks</h3>
 					<attack-field class="d-inline-block float-right .align-bottom" v-bind:character="character"></attack-field>
+					<modifier-field class="d-inline-block float-right" v-bind:character="character"></modifier-field>
 				</div>
 				<div class="card-body p-2">
 					<ul class="list-group" v-if="character.attacks" v-for="attack in character.attacks">
@@ -1333,11 +1285,11 @@ Vue.component('attack-field', {
 				<div class="my-2">
 				<span v-if="attackType == 'roll'">
 					Attack Modifier: 
-					<input class="numInput" type="number" v-model="attackModifier">
+					<input class="numInput" type="number" v-model.number="attackModifier">
 				</span>
 				<span v-if="attackType == 'save'">
 					DC: 
-					<input class="numInput" type="number" v-model="saveDC">
+					<input class="numInput" type="number" v-model.number="saveDC">
 					Save type:
 					<select v-model="saveType">
 						<option>STR</option>
@@ -1351,9 +1303,9 @@ Vue.component('attack-field', {
 				</div>
 				<div class="my-2">
 				Damage:
-				<input class="numInput" type="number" v-model="damageDiceNum">
+				<input class="numInput" type="number" v-model.number="damageDiceNum">
 				d
-				<select v-model="damageDice">
+				<select v-model.number="damageDice">
 					<option>4</option>
 					<option>6</option>
 					<option>8</option>
@@ -1361,7 +1313,7 @@ Vue.component('attack-field', {
 					<option>12</option>
 				</select>
 				+ 
-				<input class="numInput" type="number" v-model="damageModifier">
+				<input class="numInput" type="number" v-model.number="damageModifier">
 				</div>
 				<button class="btn btn-primary btn-sm" @click="addAttack" v-if="newAttack">Add Attack</button>
 				<button class="btn btn-primary btn-sm" @click="editAttack" v-if="changeAttack">Edit Attack</button>
@@ -1401,17 +1353,16 @@ Vue.component('attack-field', {
 			this.reset();
 		},
 		prepareAttackData() {
-			var output = {
+			return {
 				name: this.name,
 				attackType: this.attackType,
-				attackModifier: parseInt(this.attackModifier),
-				saveDC: parseInt(this.saveDC),
+				attackModifier: this.attackModifier,
+				saveDC: this.saveDC,
 				saveType: this.saveType,
-				damageDiceNum: parseInt(this.damageDiceNum),
-				damageDice: parseInt(this.damageDice),
-				damageModifier: parseInt(this.damageModifier)
+				damageDiceNum: this.damageDiceNum,
+				damageDice: this.damageDice,
+				damageModifier: this.damageModifier
 				};
-			return output;
 		},
 		deleteAttack() {
 			if (confirm('Delete ' + this.attack.name + '?')) {
@@ -1443,6 +1394,136 @@ Vue.component('attack-field', {
 				this.damageModifier = 0;
 				this.newAttack = true;
 				this.changeAttack = false;
+			}
+		}
+
+	}
+});
+
+Vue.component('modifier-field', {
+	template:`
+		<div>
+			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newModifier && show == false">Add Modifier</button>
+			<a class="badge badge-light" @click="show = true" v-if="changeModifier && show == false">Edit Modifier</a>
+
+			<div class="my-2" v-if="show">
+				<div v-if="newModifier">
+					<h6>Adding Modifier</h6>
+				</div>
+				<div v-if="changeModifier">
+					<hr>
+					<h6>Editing:</h6>
+				</div>
+				<div class="my-2">
+				Name:
+				<input type="text" v-model="name">
+				</div>
+				<div class="my-2">
+					Modifier Type: 
+					<select v-model="modifierType">
+						<option>auto</option>
+						<option>save</option>
+					</select>
+				</div>
+				<div class="my-2">
+					<span v-if="modifierType == 'save'">
+						DC: 
+						<input class="numInput" type="number" v-model.number="saveDC">
+						Save type:
+						<select v-model="saveType">
+							<option>STR</option>
+							<option>DEX</option>
+							<option>CON</option>
+							<option>INT</option>
+							<option>WIS</option>
+							<option>CHA</option>
+						</select>					
+					</span>
+				</div>
+				<div class="my-2">
+				Damage:
+				<input class="numInput" type="number" v-model.number="damageDiceNum">
+				d
+				<select v-model.number="damageDice">
+					<option>4</option>
+					<option>6</option>
+					<option>8</option>
+					<option>10</option>
+					<option>12</option>
+				</select>
+				</div>
+				<button class="btn btn-primary btn-sm" @click="addModifier" v-if="newModifier">Add Modifier</button>
+				<button class="btn btn-primary btn-sm" @click="editModifier" v-if="changeModifier">Edit Modifier</button>
+				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+				<button class="btn btn-danger btn-sm" @click="deleteModifier" v-if="changeModifier">Delete Modifier</button>
+			</div>
+		</div>
+	`,
+	props: ["character", "modifier"],
+	created() {
+		this.reset();
+	},
+	data() {
+		return {
+			show: false,
+			name: '',
+			modifierType: '',
+			saveDC: 0,
+			saveType: '',
+			damageDiceNum: 0,
+			damageDice: 0,
+			newModifier: false,
+			changeModifier: false
+		};
+	},
+	methods: {
+		addModifier() {
+			var modifierData = this.prepareModifierData();
+			this.character.addModifier(modifierData);
+			this.reset();
+		},
+		editModifier() {
+			var modifierData = this.prepareModifierData();
+			this.modifier.editModifier(modifierData);
+			this.reset();
+		},
+		prepareModifierData() {
+			return {
+				name: this.name,
+				modifierType: this.modifierType,
+				saveDC: this.saveDC,
+				saveType: this.saveType,
+				damageDiceNum: this.damageDiceNum,
+				damageDice: this.damageDice,
+				damageModifier: this.damageModifier
+				};
+		},
+		deleteModifier() {
+			if (confirm('Delete ' + this.modifier.name + '?')) {
+				this.character.deleteModifier(this.modifier);
+				this.reset();
+			}
+		},
+		reset() {
+			if (this.modifier) {
+				this.show = false;
+				this.name = this.modifier.name;			
+				this.modifierType = this.modifier.modifierType;
+				this.saveDC = this.modifier.saveDC;
+				this.saveType = this.modifier.saveType;
+				this.damageDiceNum = this.modifier.damageDiceNum;
+				this.damageDice = this.modifier.damageDice;
+				this.changeModifier = true;
+			} else {
+				this.show = false;
+				this.name = '';			
+				this.modifierType = '';
+				this.saveDC = 0;
+				this.saveType = '';
+				this.damageDiceNum = 0;
+				this.damageDice = 0;
+				this.newModifier = true;
+				this.changeModifier = false;
 			}
 		}
 
