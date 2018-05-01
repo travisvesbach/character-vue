@@ -166,11 +166,11 @@ class Character {
 		this.modifiers = newArray;
 	}
 
-	attack(attack, type = 'normal', modifiers = null){
+	attack(attack, type = 'normal', modifiersIndexArray = null){
 		var results = attack.makeAttack(type);
-		if (modifiers) {
-			for(var i=0;i<modifiers.length;i++) {
-				results.resultsArray = modifiers[i].makeAttack(results.roll);
+		if (modifiersIndexArray) {
+			for(var i=0;i<modifiersIndexArray.length;i++) {
+				results.resultsArray = this.modifiers[modifiersIndexArray[i]].makeAttack(results.resultsArray, results.roll);
 			}
 		}
 		app.addToFeed(results.resultsArray.join('\n'));
@@ -220,10 +220,10 @@ class Attack {
 
 	constructor(attackData) {
 		this.name = attackData.name;
-		this.attackType = attackData.attackType;
-		if(attackData.attackType == 'roll') {
+		this.type = attackData.type;
+		if(attackData.type == 'roll') {
 			this.attackModifier = attackData.attackModifier;
-		} else if (attackData.attackType == 'save' ) {
+		} else if (attackData.type == 'save' ) {
 			this.saveDC = attackData.saveDC;
 			this.saveType = attackData.saveType;
 		}
@@ -236,12 +236,12 @@ class Attack {
 	makeAttack(type = 'normal') {
 		var attackRoll = null;
 		var results = [];
-		if (this.attackType == 'roll') {
+		if (this.type == 'roll') {
 			var fromRollAttack = this.rollAttack(type);
 			attackRoll = fromRollAttack[0];
 			fromRollAttack.shift();
 			results = fromRollAttack;
-		} else if (this.attackType == 'save') {
+		} else if (this.type == 'save') {
 			results = this.rollSave();
 		}
 		results = this.rollDamage(results, attackRoll)
@@ -321,13 +321,13 @@ class Attack {
 		return results;
 	}
 
-	editAttack(attackData) {
+	edit(attackData) {
 		this.name = attackData.name;
-		if(attackData.attackType == 'roll') {
-			this.attackType = attackData.attackType;
+		if(attackData.type == 'roll') {
+			this.type = attackData.type;
 			this.attackModifier = attackData.attackModifier;
-		} else if (attackData.attackType == 'save' ) {
-			this.attackType = attackData.attackType;
+		} else if (attackData.type == 'save' ) {
+			this.type = attackData.type;
 			this.saveDC = attackData.saveDC;
 			this.saveType = attackData.saveType;
 		}
@@ -342,25 +342,26 @@ class Modifier {
 
 	constructor(modifierData) {
 		this.name = modifierData.name;
-		this.modifierType = modifierData.modifierType;
-		if(this.modifierType == 'auto') {
-			this.modifierType = modifierData.modifierType;
-		} else if (this.modifierType == 'save' ) {
+		this.type = modifierData.type;
+		if(this.type == 'auto') {
+			this.type = modifierData.type;
+		} else if (this.type == 'save' ) {
 			this.saveDC = modifierData.saveDC;
 			this.saveType = modifierData.saveType;
 		}
 		this.damageDiceNum = modifierData.damageDiceNum;
 		this.damageDice = modifierData.damageDice;
-		console.log(this.name + " has been added");
+		console.log(this.name + ' has been added');
 	}
 
 	makeAttack(results, roll = null) {
+		console.log(results);
 		results.push(this.name + ':');
-		if (this.modifierType == 'auto') {
-			rollDamage(results, roll);
-		} else if (this.modifierType == 'save') {
-			rollDamage(results);
+		if (this.type == 'auto') {
+			this.rollDamage(results, roll);
+		} else if (this.type == 'save') {
 			results.push('Your target(s) need(s) to make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
+			this.rollDamage(results);
 		}
 		return results;
 	}
@@ -390,10 +391,10 @@ class Modifier {
 		return results;
 	}
 
-	editModifier(modifierData) {
+	edit(modifierData) {
 		this.name = modifierData.name;
-		this.modifierType = modifierData.modifierType;
-		if (modifierData.modifierType == 'save' ) {
+		this.type = modifierData.type;
+		if (modifierData.type == 'save' ) {
 			this.saveDC = modifierData.saveDC;
 			this.saveType = modifierData.saveType;
 		}
@@ -1218,12 +1219,19 @@ Vue.component('attack', {
 			<div class="card rounded-0">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block align-middle">Attacks</h3>
-					<attack-field class="d-inline-block float-right .align-bottom" v-bind:character="character"></attack-field>
-					<modifier-field class="d-inline-block float-right" v-bind:character="character"></modifier-field>
+					<attack-modifier-field class="d-inline-block float-right .align-bottom" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
+					<attack-modifier-field class="d-inline-block float-right pr-4" v-bind:character="character"  v-bind:targetType="'Modifier'"></attack-modifier-field>
 				</div>
 				<div class="card-body p-2">
-					<ul class="list-group" v-if="character.attacks" v-for="attack in character.attacks">
-						<li class="list-group-item">
+					<ul class="list-inline list-group-item" v-if="character.modifiers.length > 0">
+						<li class="list-inline-item pr-4" v-for="(modifier, index) in character.modifiers">
+							<input type="checkbox" :value="index" v-model="checkedModifiers">
+							<label>{{modifier.name}}</label>
+							<attack-modifier-field v-bind:character="character" v-bind:target="modifier" v-bind:targetType="'Modifier'"></attack-modifier-field>
+						</li>
+					</ul>
+					<ul class="list-group" v-if="character.attacks">
+						<li class="list-group-item" v-for="attack in character.attacks">
 							<span>
 								{{attack.name}} |
 								<span v-if="attack.attackModifier && attack.attackModifier != 0 ">
@@ -1235,27 +1243,197 @@ Vue.component('attack', {
 								</span> 
 							</span>
 							<span class="float-right">
-								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.attackType == 'roll'">Roll with disadvantage!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.type == 'roll'">Roll with disadvantage!</button>
 								<button class="btn btn-primary btn-sm" @click="rollAttack(attack)">Roll!</button>
-								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'advantage')" v-if="attack.attackType == 'roll'">Roll with advantage!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'advantage')" v-if="attack.type == 'roll'">Roll with advantage!</button>
 							</span>
-							<attack-field v-bind:character="character" v-bind:attack="attack"></attack-field>
+							<attack-modifier-field v-bind:character="character" v-bind:target="attack" v-bind:targetType="'Attack'"></attack-modifier-field>
 						</li>
 					</ul>
 				</div>
 	<!--			<div class="card-footer">
-					<attack-field v-bind:character="character"></attack-field>
+					<attack-modifier-field v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
 				</div> -->
 			</div>
 		</div>
 	`,
 	props: ["character"],
+	data() {
+		return {
+			checkedModifiers: []
+		}
+	},
 	methods: {
 		rollAttack(attack, type) {
-			this.character.attack(attack, type);
+			if (this.checkedModifiers.length > 0) {
+				this.character.attack(attack, type, this.checkedModifiers);
+			} else {
+				this.character.attack(attack, type);
+			}
 		}
 	}
 });
+
+Vue.component('attack-modifier-field', {
+	template: `
+		<div>
+			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add {{targetType}}</button>
+			<a class="badge badge-light" @click="show = true" v-if="task == 'Edit'">Edit {{targetType}}</a>
+			<div v-if="show" class="modal-mask">
+				<transition name="modal">
+				  	<div class="modal-dialog" role="document">
+				    	<div class="modal-content">
+					      	<div class="modal-header card-header">
+					        	<h5 class="modal-title">{{task}} {{targetType}}</h5>
+					      	</div>
+					      	<div class="modal-body">
+								<div class="my-2">
+									Name:
+									<input type="text" v-model="name">
+								</div>
+								<div class="my-2">
+									Attack Type: 
+									<select v-model="type">
+										<option v-if="targetType == 'Modifier'">auto</option>
+										<option v-if="targetType == 'Attack'">roll</option>
+										<option>save</option>
+									</select>
+								</div>
+								<div class="my-2">
+									<span v-if="type == 'roll'">
+										Attack Modifier: 
+										<input class="numInput" type="number" v-model.number="attackModifier">
+									</span>
+									<span v-if="type == 'save'">
+										DC: 
+										<input class="numInput" type="number" v-model.number="saveDC">
+										Save type:
+										<select v-model="saveType">
+											<option>STR</option>
+											<option>DEX</option>
+											<option>CON</option>
+											<option>INT</option>
+											<option>WIS</option>
+											<option>CHA</option>
+										</select>					
+									</span>
+								</div>
+								<div class="my-2">
+									Damage:
+									<input class="numInput" type="number" v-model.number="damageDiceNum">
+									d
+									<select v-model.number="damageDice">
+										<option>4</option>
+										<option>6</option>
+										<option>8</option>
+										<option>10</option>
+										<option>12</option>
+									</select>
+									+ 
+									<input class="numInput" type="number" v-model.number="damageModifier">
+								</div>
+					      	</div>
+					      	<div class="modal-footer">
+					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{targetType}}</button>
+								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{targetType}}</button>
+								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{targetType}}</button>
+					      	</div>
+				    	</div>
+				  	</div>
+				</transition>
+			</div>
+		</div>
+	`,
+	props: ["character", "target", "targetType"],
+	created() {
+		this.reset();
+	},
+	data() {
+		return {
+			show: false,
+			name: '',
+			type: '',
+			attackModifier: 0,
+			saveDC: 0,
+			saveType: '',
+			damageDiceNum: 0,
+			damageDice: 0,
+			damageModifier: 0,
+			object: '',
+			task: false
+		};
+	},
+	methods: {
+		add() {
+			var data = this.prepareData();
+			if(this.targetType == 'Attack') {
+				this.character.addAttack(data);
+			} else {
+				this.character.addModifier(data);
+			}
+			this.reset();
+		},
+		edit() {
+			var data = this.prepareData();
+			this.target.edit(data);
+			this.reset();
+		},
+		prepareData() {
+			return {
+				name: this.name,
+				type: this.type,
+				attackModifier: this.attackModifier,
+				saveDC: this.saveDC,
+				saveType: this.saveType,
+				damageDiceNum: this.damageDiceNum,
+				damageDice: this.damageDice,
+				damageModifier: this.damageModifier
+				};
+		},
+		deleteTarget() {
+			if (confirm('Delete ' + this.target.name + '?')) {
+			if(this.targetType == 'Attack') {
+				this.character.deleteAttack(this.target);
+			} else {
+				this.character.deleteModifier(this.target);
+			}
+				this.reset();
+			}
+		},
+		reset() {
+			if (this.target) {
+				this.show = false;
+				this.name = this.target.name;	
+				if(this.targetType == 'Attack') {
+					this.type = this.target.type;					
+				} else {
+					this.type = this.target.type;
+				}		
+				this.attackModifier = this.target.attackModifier;
+				this.saveDC = this.target.saveDC;
+				this.saveType = this.target.saveType;
+				this.damageDiceNum = this.target.damageDiceNum;
+				this.damageDice = this.target.damageDice;
+				this.damageModifier = this.target.damageModifier;
+				this.task = 'Edit';
+			} else {
+				this.show = false;
+				this.name = '';			
+				this.type = '';
+				this.attackModifier = 0;
+				this.saveDC = 0;
+				this.saveType = '';
+				this.damageDiceNum = 0;
+				this.damageDice = 0;
+				this.damageModifier = 0;
+				this.task = 'New';
+			}
+		}
+
+	}	
+});
+
 
 Vue.component('attack-field', {
 	template:`
@@ -1277,17 +1455,17 @@ Vue.component('attack-field', {
 				</div>
 				<div class="my-2">
 				Attack Type: 
-				<select v-model="attackType">
+				<select v-model="type">
 					<option>roll</option>
 					<option>save</option>
 				</select>
 				</div>
 				<div class="my-2">
-				<span v-if="attackType == 'roll'">
+				<span v-if="type == 'roll'">
 					Attack Modifier: 
 					<input class="numInput" type="number" v-model.number="attackModifier">
 				</span>
-				<span v-if="attackType == 'save'">
+				<span v-if="type == 'save'">
 					DC: 
 					<input class="numInput" type="number" v-model.number="saveDC">
 					Save type:
@@ -1330,7 +1508,7 @@ Vue.component('attack-field', {
 		return {
 			show: false,
 			name: '',
-			attackType: '',
+			type: '',
 			attackModifier: 0,
 			saveDC: 0,
 			saveType: '',
@@ -1355,7 +1533,7 @@ Vue.component('attack-field', {
 		prepareAttackData() {
 			return {
 				name: this.name,
-				attackType: this.attackType,
+				type: this.type,
 				attackModifier: this.attackModifier,
 				saveDC: this.saveDC,
 				saveType: this.saveType,
@@ -1374,7 +1552,7 @@ Vue.component('attack-field', {
 			if (this.attack) {
 				this.show = false;
 				this.name = this.attack.name;			
-				this.attackType = this.attack.attackType;
+				this.type = this.attack.type;
 				this.attackModifier = this.attack.attackModifier;
 				this.saveDC = this.attack.saveDC;
 				this.saveType = this.attack.saveType;
@@ -1385,7 +1563,7 @@ Vue.component('attack-field', {
 			} else {
 				this.show = false;
 				this.name = '';			
-				this.attackType = '';
+				this.type = '';
 				this.attackModifier = 0;
 				this.saveDC = 0;
 				this.saveType = '';
@@ -1420,13 +1598,13 @@ Vue.component('modifier-field', {
 				</div>
 				<div class="my-2">
 					Modifier Type: 
-					<select v-model="modifierType">
+					<select v-model="type">
 						<option>auto</option>
 						<option>save</option>
 					</select>
 				</div>
 				<div class="my-2">
-					<span v-if="modifierType == 'save'">
+					<span v-if="type == 'save'">
 						DC: 
 						<input class="numInput" type="number" v-model.number="saveDC">
 						Save type:
@@ -1467,7 +1645,7 @@ Vue.component('modifier-field', {
 		return {
 			show: false,
 			name: '',
-			modifierType: '',
+			type: '',
 			saveDC: 0,
 			saveType: '',
 			damageDiceNum: 0,
@@ -1490,7 +1668,7 @@ Vue.component('modifier-field', {
 		prepareModifierData() {
 			return {
 				name: this.name,
-				modifierType: this.modifierType,
+				type: this.type,
 				saveDC: this.saveDC,
 				saveType: this.saveType,
 				damageDiceNum: this.damageDiceNum,
@@ -1508,7 +1686,7 @@ Vue.component('modifier-field', {
 			if (this.modifier) {
 				this.show = false;
 				this.name = this.modifier.name;			
-				this.modifierType = this.modifier.modifierType;
+				this.type = this.modifier.type;
 				this.saveDC = this.modifier.saveDC;
 				this.saveType = this.modifier.saveType;
 				this.damageDiceNum = this.modifier.damageDiceNum;
@@ -1517,7 +1695,7 @@ Vue.component('modifier-field', {
 			} else {
 				this.show = false;
 				this.name = '';			
-				this.modifierType = '';
+				this.type = '';
 				this.saveDC = 0;
 				this.saveType = '';
 				this.damageDiceNum = 0;
