@@ -19,6 +19,11 @@ class Character {
 		} else {
 			this.currentHp = this.maxHp;
 		}
+		if (this.spells == 'points' && input.currentSpellPoints) {
+			this.currentSpellPoints = input.currentSpellPoints;
+		} else if (this.spells == 'points') {
+			this.currentSpellPoints = this.maxSpellPoints;
+		}
 	}
 
 	updateCharacter(input) {
@@ -68,7 +73,7 @@ class Character {
 		this.performance = input.performance;
 		this.persuasion = input.persuasion;
 		this.spells = input.spells;
-		if(this.spells == 'yes') {
+		if(this.spells == 'slots') {
 			this.spellSlots = [];
 			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
 				this.spellSlots = input.spellSlots;
@@ -110,6 +115,9 @@ class Character {
 					this.addSpellSlots(9, this.nineSpells);
 				}
 			}
+		} else if (this.spells == 'points') {
+			this.maxSpellPoints = input.maxSpellPoints;
+			this.maxSpellLevel = input.maxSpellLevel;
 		}
 	}
 
@@ -497,10 +505,26 @@ Vue.component('character-stats', {
 				</div>
 			</div>
 
-			<character-creator v-if="edit" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
-			</character-creator>
+			<div v-if="edit" class="modal-scroll" role="dialog" aria-hidden="true">
+				<transition name="modal">
+				  	<div class="modal-dialog modal-lg" role="document">
+				    	<div class="modal-content card">
+							<div class="modal-header card-header">
+						        <h5 class="modal-title">Editing {{character.name}}</h5>
+						        <button type="button" class="close" @click="editCharacter">
+						          	<span aria-hidden="true">&times;</span>
+						        </button>
+						    </div>
+							<character-creator class="modal-body card-body" v-if="edit" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
+							</character-creator>
+						
+						</div>
+					</div>
+				</transition>
+			</div>
 
-			<div class="row m-auto" v-if="! edit">
+
+			<div class="row m-auto" >
 				<div class="card d-inline-block col-md rounded-0">
 					<a @click="rollStat('Strength check', character.strengthModifier)">
 						<b>Strength {{character.strength}}</b> 
@@ -693,8 +717,8 @@ Vue.component('character-stats', {
 					</ul>
 				</div>				
 			</div>
-			<div class="row m-auto" v-if="! edit">
-					<spells v-if="character.spells == 'yes'" v-bind:character="character"></spells>			
+			<div class="row m-auto" >
+					<spells v-if="character.spells != 'no'" v-bind:character="character"></spells>			
 					<attack v-bind:character="character"></attack>
 			</div>
 		</div>
@@ -928,14 +952,28 @@ Vue.component('character-creator', {
 
 				<h4>Spells</h4>
 				<div class="form-check form-check-inline">
-				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpells" value="yes" v-model="spells">
-				    <label class="form-check-label" for="yesSpells">Yes</label>
+				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellSlots" value="slots" v-model="spells">
+				    <label class="form-check-label" for="yesSpellSlots">Slots</label>
+				</div>
+				<div class="form-check form-check-inline">
+				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellPoints" value="points" v-model="spells">
+				    <label class="form-check-label" for="yesSpellPoints">Points (DMG Variant)</label>
 				</div>
 				<div class="form-check form-check-inline">
 				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spells">
 				    <label class="form-check-label" for="noSpells">No</label>
 				</div>
-				<div v-if="spells == 'yes'">
+				<div v-if="spells == 'points'">
+					<div class="form-group">
+				        <label for="spellPoints">Total Spell Points:</label>
+				        <input type="number" class="form-control" id="spellPoints" placeholder="0" v-model.number="maxSpellPoints">
+				    </div>		
+					<div class="form-group">
+				        <label for="maxSpellLevel">Max Spell Level Avaibale:</label>
+				        <input type="number" class="form-control" id="maxSpellLevel" placeholder="0" v-model.number="maxSpellLevel">
+				    </div>					    
+				</div>			
+				<div v-if="spells == 'slots'">
 					<div class="form-group">
 				        <label for="oneSpells">1st Level Spells:</label>
 				        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
@@ -976,7 +1014,7 @@ Vue.component('character-creator', {
 
 			    <button type="button" class="btn btn-primary" @click="createCharacter" v-if="edit != 'editing'">Create Character</button>
 			    <button type="button" class="btn btn-primary" @click="updateCharacter" v-if="edit == 'editing'">Update Character</button>
-			    <button type="button" class="btn btn-danger" @click="$emit('edit', 'no')" v-if="edit == 'editing'">Cancel</button>			    
+			    <button type="button" class="btn btn-danger" @click="$emit('edit', false)" v-if="edit == 'editing'">Cancel</button>			    
 			</form>
 		</div>
 	`,
@@ -1026,7 +1064,9 @@ Vue.component('character-creator', {
 			intimidation: 0,
 			performance: 0,
 			persuasion: 0,
-			spells: null,
+			spells: 'no',
+			maxSpellPoints: null,
+			maxSpellLevel: null,
 			oneSpells: null,
 			twoSpells: null,
 			threeSpells: null,
@@ -1086,7 +1126,7 @@ Vue.component('character-creator', {
 			this.performance = this.character.performance;
 			this.persuasion = this.character.persuasion;
 			this.spells = this.character.spells;
-			if(this.spells == 'yes') {
+			if(this.spells == 'slots') {
 				this.oneSpells = this.character.spellSlots[1].length;
 				this.twoSpells = this.character.spellSlots[2].length;
 				this.threeSpells = this.character.spellSlots[3].length;
@@ -1096,6 +1136,9 @@ Vue.component('character-creator', {
 				this.sevenSpells = this.character.spellSlots[7].length;
 				this.eightSpells = this.character.spellSlots[8].length;
 				this.nineSpells = this.character.spellSlots[9].length;
+			} else if(this.spells == 'points') {
+				this.maxSpellPoints = this.character.maxSpellPoints;
+				this.maxSpellLevel = this.character.maxSpellLevel;
 			}
 		}
 	},
@@ -1169,7 +1212,9 @@ Vue.component('character-creator', {
 				sixSpells: this.sixSpells,
 				sevenSpells: this.sevenSpells,
 				eightSpells: this.eightSpells,
-				nineSpells: this.nineSpells
+				nineSpells: this.nineSpells,
+				maxSpellPoints: this.maxSpellPoints,
+				maxSpellLevel: this.maxSpellLevel
 			};
 		}
 	}
@@ -1184,7 +1229,7 @@ Vue.component('spells', {
 				<div class="card-header p-2">
 					<h3>Spells</h3>
 				</div>
-				<div class="card-body p-2">
+				<div class="card-body p-2" v-if="character.spells == 'slots'">
 					<ul class="list-group list-group-flush">
 						<li v-for="(level, levelIndex) in character.spellSlots" v-if="levelIndex != 0">
 							{{levelIndex}}: 
@@ -1195,10 +1240,38 @@ Vue.component('spells', {
 						
 					</ul>
 				</div>
+				<div class="card-body p-2" v-if="character.spells == 'points'">
+					<span>
+						Points:
+						<input type="number" class="numInput" v-model="character.currentSpellPoints"></input>
+						/ {{character.maxSpellPoints}}
+					</span>
+					<ul class="list-group list-group-flush">
+						<li v-for="(cost, level) in spellPointsCosts" v-if="level != 0 && level <= character.maxSpellLevel">
+							<a @click="usePoints(cost)">
+								{{level}}: {{cost}} points
+							</a>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	`,
 	props: ["character"],
+	data() {
+		return {
+			spellPointsCosts: [0,2,3,5,6,7,9,10,11,13],
+			onePoints: 2,
+			twoPoints: 3,
+			threePoints: 5,
+			fourPoints: 6,
+			fivePoints: 7,
+			sixPoints: 9,
+			sevenPoints: 10,
+			eightPoints: 11,
+			ninePoints: 13
+		}
+	},
 	methods: {
 		switchSlot(spellSlot) {
 			if (spellSlot.used) {
@@ -1209,6 +1282,11 @@ Vue.component('spells', {
 				spellSlot.value = "\u26AB";
 			}	
 			Vue.set(this.character);
+		},
+		usePoints(cost) {
+			if (this.character.currentSpellPoints >= cost) {
+				this.character.currentSpellPoints -= cost;
+			}
 		}
 	}
 });
@@ -1285,6 +1363,9 @@ Vue.component('attack-modifier-field', {
 				    	<div class="modal-content">
 					      	<div class="modal-header card-header">
 					        	<h5 class="modal-title">{{task}} {{targetType}}</h5>
+					        	<button type="button" class="close" @click="reset">
+						          	<span aria-hidden="true">&times;</span>
+						        </button>
 					      	</div>
 					      	<div class="modal-body">
 								<div class="my-2">
@@ -1435,278 +1516,278 @@ Vue.component('attack-modifier-field', {
 });
 
 
-Vue.component('attack-field', {
-	template:`
-		<div>
-			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newAttack && show == false">Add Attack</button>
-			<a class="badge badge-light" @click="show = true" v-if="changeAttack && show == false">Edit Attack</a>
+// Vue.component('attack-field', {
+// 	template:`
+// 		<div>
+// 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newAttack && show == false">Add Attack</button>
+// 			<a class="badge badge-light" @click="show = true" v-if="changeAttack && show == false">Edit Attack</a>
 
-			<div class="my-2" v-if="show">
-				<div v-if="newAttack">
-					<h6>Adding Attack</h6>
-				</div>
-				<div v-if="changeAttack">
-					<hr>
-					<h6>Editing:</h6>
-				</div>
-				<div class="my-2">
-				Name:
-				<input type="text" v-model="name">
-				</div>
-				<div class="my-2">
-				Attack Type: 
-				<select v-model="type">
-					<option>roll</option>
-					<option>save</option>
-				</select>
-				</div>
-				<div class="my-2">
-				<span v-if="type == 'roll'">
-					Attack Modifier: 
-					<input class="numInput" type="number" v-model.number="attackModifier">
-				</span>
-				<span v-if="type == 'save'">
-					DC: 
-					<input class="numInput" type="number" v-model.number="saveDC">
-					Save type:
-					<select v-model="saveType">
-						<option>STR</option>
-						<option>DEX</option>
-						<option>CON</option>
-						<option>INT</option>
-						<option>WIS</option>
-						<option>CHA</option>
-					</select>					
-				</span>
-				</div>
-				<div class="my-2">
-				Damage:
-				<input class="numInput" type="number" v-model.number="damageDiceNum">
-				d
-				<select v-model.number="damageDice">
-					<option>4</option>
-					<option>6</option>
-					<option>8</option>
-					<option>10</option>
-					<option>12</option>
-				</select>
-				+ 
-				<input class="numInput" type="number" v-model.number="damageModifier">
-				</div>
-				<button class="btn btn-primary btn-sm" @click="addAttack" v-if="newAttack">Add Attack</button>
-				<button class="btn btn-primary btn-sm" @click="editAttack" v-if="changeAttack">Edit Attack</button>
-				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-				<button class="btn btn-danger btn-sm" @click="deleteAttack" v-if="changeAttack">Delete Attack</button>
-			</div>
-		</div>
-	`,
-	props: ["character", "attack"],
-	created() {
-		this.reset();
-	},
-	data() {
-		return {
-			show: false,
-			name: '',
-			type: '',
-			attackModifier: 0,
-			saveDC: 0,
-			saveType: '',
-			damageDiceNum: 0,
-			damageDice: 0,
-			damageModifier: 0,
-			newAttack: false,
-			changeAttack: false
-		};
-	},
-	methods: {
-		addAttack() {
-			var attackData = this.prepareAttackData();
-			this.character.addAttack(attackData);
-			this.reset();
-		},
-		editAttack() {
-			var attackData = this.prepareAttackData();
-			this.attack.editAttack(attackData);
-			this.reset();
-		},
-		prepareAttackData() {
-			return {
-				name: this.name,
-				type: this.type,
-				attackModifier: this.attackModifier,
-				saveDC: this.saveDC,
-				saveType: this.saveType,
-				damageDiceNum: this.damageDiceNum,
-				damageDice: this.damageDice,
-				damageModifier: this.damageModifier
-				};
-		},
-		deleteAttack() {
-			if (confirm('Delete ' + this.attack.name + '?')) {
-				this.character.deleteAttack(this.attack);
-				this.reset();
-			}
-		},
-		reset() {
-			if (this.attack) {
-				this.show = false;
-				this.name = this.attack.name;			
-				this.type = this.attack.type;
-				this.attackModifier = this.attack.attackModifier;
-				this.saveDC = this.attack.saveDC;
-				this.saveType = this.attack.saveType;
-				this.damageDiceNum = this.attack.damageDiceNum;
-				this.damageDice = this.attack.damageDice;
-				this.damageModifier = this.attack.damageModifier;
-				this.changeAttack = true;
-			} else {
-				this.show = false;
-				this.name = '';			
-				this.type = '';
-				this.attackModifier = 0;
-				this.saveDC = 0;
-				this.saveType = '';
-				this.damageDiceNum = 0;
-				this.damageDice = 0;
-				this.damageModifier = 0;
-				this.newAttack = true;
-				this.changeAttack = false;
-			}
-		}
+// 			<div class="my-2" v-if="show">
+// 				<div v-if="newAttack">
+// 					<h6>Adding Attack</h6>
+// 				</div>
+// 				<div v-if="changeAttack">
+// 					<hr>
+// 					<h6>Editing:</h6>
+// 				</div>
+// 				<div class="my-2">
+// 				Name:
+// 				<input type="text" v-model="name">
+// 				</div>
+// 				<div class="my-2">
+// 				Attack Type: 
+// 				<select v-model="type">
+// 					<option>roll</option>
+// 					<option>save</option>
+// 				</select>
+// 				</div>
+// 				<div class="my-2">
+// 				<span v-if="type == 'roll'">
+// 					Attack Modifier: 
+// 					<input class="numInput" type="number" v-model.number="attackModifier">
+// 				</span>
+// 				<span v-if="type == 'save'">
+// 					DC: 
+// 					<input class="numInput" type="number" v-model.number="saveDC">
+// 					Save type:
+// 					<select v-model="saveType">
+// 						<option>STR</option>
+// 						<option>DEX</option>
+// 						<option>CON</option>
+// 						<option>INT</option>
+// 						<option>WIS</option>
+// 						<option>CHA</option>
+// 					</select>					
+// 				</span>
+// 				</div>
+// 				<div class="my-2">
+// 				Damage:
+// 				<input class="numInput" type="number" v-model.number="damageDiceNum">
+// 				d
+// 				<select v-model.number="damageDice">
+// 					<option>4</option>
+// 					<option>6</option>
+// 					<option>8</option>
+// 					<option>10</option>
+// 					<option>12</option>
+// 				</select>
+// 				+ 
+// 				<input class="numInput" type="number" v-model.number="damageModifier">
+// 				</div>
+// 				<button class="btn btn-primary btn-sm" @click="addAttack" v-if="newAttack">Add Attack</button>
+// 				<button class="btn btn-primary btn-sm" @click="editAttack" v-if="changeAttack">Edit Attack</button>
+// 				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+// 				<button class="btn btn-danger btn-sm" @click="deleteAttack" v-if="changeAttack">Delete Attack</button>
+// 			</div>
+// 		</div>
+// 	`,
+// 	props: ["character", "attack"],
+// 	created() {
+// 		this.reset();
+// 	},
+// 	data() {
+// 		return {
+// 			show: false,
+// 			name: '',
+// 			type: '',
+// 			attackModifier: 0,
+// 			saveDC: 0,
+// 			saveType: '',
+// 			damageDiceNum: 0,
+// 			damageDice: 0,
+// 			damageModifier: 0,
+// 			newAttack: false,
+// 			changeAttack: false
+// 		};
+// 	},
+// 	methods: {
+// 		addAttack() {
+// 			var attackData = this.prepareAttackData();
+// 			this.character.addAttack(attackData);
+// 			this.reset();
+// 		},
+// 		editAttack() {
+// 			var attackData = this.prepareAttackData();
+// 			this.attack.editAttack(attackData);
+// 			this.reset();
+// 		},
+// 		prepareAttackData() {
+// 			return {
+// 				name: this.name,
+// 				type: this.type,
+// 				attackModifier: this.attackModifier,
+// 				saveDC: this.saveDC,
+// 				saveType: this.saveType,
+// 				damageDiceNum: this.damageDiceNum,
+// 				damageDice: this.damageDice,
+// 				damageModifier: this.damageModifier
+// 				};
+// 		},
+// 		deleteAttack() {
+// 			if (confirm('Delete ' + this.attack.name + '?')) {
+// 				this.character.deleteAttack(this.attack);
+// 				this.reset();
+// 			}
+// 		},
+// 		reset() {
+// 			if (this.attack) {
+// 				this.show = false;
+// 				this.name = this.attack.name;			
+// 				this.type = this.attack.type;
+// 				this.attackModifier = this.attack.attackModifier;
+// 				this.saveDC = this.attack.saveDC;
+// 				this.saveType = this.attack.saveType;
+// 				this.damageDiceNum = this.attack.damageDiceNum;
+// 				this.damageDice = this.attack.damageDice;
+// 				this.damageModifier = this.attack.damageModifier;
+// 				this.changeAttack = true;
+// 			} else {
+// 				this.show = false;
+// 				this.name = '';			
+// 				this.type = '';
+// 				this.attackModifier = 0;
+// 				this.saveDC = 0;
+// 				this.saveType = '';
+// 				this.damageDiceNum = 0;
+// 				this.damageDice = 0;
+// 				this.damageModifier = 0;
+// 				this.newAttack = true;
+// 				this.changeAttack = false;
+// 			}
+// 		}
 
-	}
-});
+// 	}
+// });
 
-Vue.component('modifier-field', {
-	template:`
-		<div>
-			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newModifier && show == false">Add Modifier</button>
-			<a class="badge badge-light" @click="show = true" v-if="changeModifier && show == false">Edit Modifier</a>
+// Vue.component('modifier-field', {
+// 	template:`
+// 		<div>
+// 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="newModifier && show == false">Add Modifier</button>
+// 			<a class="badge badge-light" @click="show = true" v-if="changeModifier && show == false">Edit Modifier</a>
 
-			<div class="my-2" v-if="show">
-				<div v-if="newModifier">
-					<h6>Adding Modifier</h6>
-				</div>
-				<div v-if="changeModifier">
-					<hr>
-					<h6>Editing:</h6>
-				</div>
-				<div class="my-2">
-				Name:
-				<input type="text" v-model="name">
-				</div>
-				<div class="my-2">
-					Modifier Type: 
-					<select v-model="type">
-						<option>auto</option>
-						<option>save</option>
-					</select>
-				</div>
-				<div class="my-2">
-					<span v-if="type == 'save'">
-						DC: 
-						<input class="numInput" type="number" v-model.number="saveDC">
-						Save type:
-						<select v-model="saveType">
-							<option>STR</option>
-							<option>DEX</option>
-							<option>CON</option>
-							<option>INT</option>
-							<option>WIS</option>
-							<option>CHA</option>
-						</select>					
-					</span>
-				</div>
-				<div class="my-2">
-				Damage:
-				<input class="numInput" type="number" v-model.number="damageDiceNum">
-				d
-				<select v-model.number="damageDice">
-					<option>4</option>
-					<option>6</option>
-					<option>8</option>
-					<option>10</option>
-					<option>12</option>
-				</select>
-				</div>
-				<button class="btn btn-primary btn-sm" @click="addModifier" v-if="newModifier">Add Modifier</button>
-				<button class="btn btn-primary btn-sm" @click="editModifier" v-if="changeModifier">Edit Modifier</button>
-				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-				<button class="btn btn-danger btn-sm" @click="deleteModifier" v-if="changeModifier">Delete Modifier</button>
-			</div>
-		</div>
-	`,
-	props: ["character", "modifier"],
-	created() {
-		this.reset();
-	},
-	data() {
-		return {
-			show: false,
-			name: '',
-			type: '',
-			saveDC: 0,
-			saveType: '',
-			damageDiceNum: 0,
-			damageDice: 0,
-			newModifier: false,
-			changeModifier: false
-		};
-	},
-	methods: {
-		addModifier() {
-			var modifierData = this.prepareModifierData();
-			this.character.addModifier(modifierData);
-			this.reset();
-		},
-		editModifier() {
-			var modifierData = this.prepareModifierData();
-			this.modifier.editModifier(modifierData);
-			this.reset();
-		},
-		prepareModifierData() {
-			return {
-				name: this.name,
-				type: this.type,
-				saveDC: this.saveDC,
-				saveType: this.saveType,
-				damageDiceNum: this.damageDiceNum,
-				damageDice: this.damageDice,
-				damageModifier: this.damageModifier
-				};
-		},
-		deleteModifier() {
-			if (confirm('Delete ' + this.modifier.name + '?')) {
-				this.character.deleteModifier(this.modifier);
-				this.reset();
-			}
-		},
-		reset() {
-			if (this.modifier) {
-				this.show = false;
-				this.name = this.modifier.name;			
-				this.type = this.modifier.type;
-				this.saveDC = this.modifier.saveDC;
-				this.saveType = this.modifier.saveType;
-				this.damageDiceNum = this.modifier.damageDiceNum;
-				this.damageDice = this.modifier.damageDice;
-				this.changeModifier = true;
-			} else {
-				this.show = false;
-				this.name = '';			
-				this.type = '';
-				this.saveDC = 0;
-				this.saveType = '';
-				this.damageDiceNum = 0;
-				this.damageDice = 0;
-				this.newModifier = true;
-				this.changeModifier = false;
-			}
-		}
+// 			<div class="my-2" v-if="show">
+// 				<div v-if="newModifier">
+// 					<h6>Adding Modifier</h6>
+// 				</div>
+// 				<div v-if="changeModifier">
+// 					<hr>
+// 					<h6>Editing:</h6>
+// 				</div>
+// 				<div class="my-2">
+// 				Name:
+// 				<input type="text" v-model="name">
+// 				</div>
+// 				<div class="my-2">
+// 					Modifier Type: 
+// 					<select v-model="type">
+// 						<option>auto</option>
+// 						<option>save</option>
+// 					</select>
+// 				</div>
+// 				<div class="my-2">
+// 					<span v-if="type == 'save'">
+// 						DC: 
+// 						<input class="numInput" type="number" v-model.number="saveDC">
+// 						Save type:
+// 						<select v-model="saveType">
+// 							<option>STR</option>
+// 							<option>DEX</option>
+// 							<option>CON</option>
+// 							<option>INT</option>
+// 							<option>WIS</option>
+// 							<option>CHA</option>
+// 						</select>					
+// 					</span>
+// 				</div>
+// 				<div class="my-2">
+// 				Damage:
+// 				<input class="numInput" type="number" v-model.number="damageDiceNum">
+// 				d
+// 				<select v-model.number="damageDice">
+// 					<option>4</option>
+// 					<option>6</option>
+// 					<option>8</option>
+// 					<option>10</option>
+// 					<option>12</option>
+// 				</select>
+// 				</div>
+// 				<button class="btn btn-primary btn-sm" @click="addModifier" v-if="newModifier">Add Modifier</button>
+// 				<button class="btn btn-primary btn-sm" @click="editModifier" v-if="changeModifier">Edit Modifier</button>
+// 				<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+// 				<button class="btn btn-danger btn-sm" @click="deleteModifier" v-if="changeModifier">Delete Modifier</button>
+// 			</div>
+// 		</div>
+// 	`,
+// 	props: ["character", "modifier"],
+// 	created() {
+// 		this.reset();
+// 	},
+// 	data() {
+// 		return {
+// 			show: false,
+// 			name: '',
+// 			type: '',
+// 			saveDC: 0,
+// 			saveType: '',
+// 			damageDiceNum: 0,
+// 			damageDice: 0,
+// 			newModifier: false,
+// 			changeModifier: false
+// 		};
+// 	},
+// 	methods: {
+// 		addModifier() {
+// 			var modifierData = this.prepareModifierData();
+// 			this.character.addModifier(modifierData);
+// 			this.reset();
+// 		},
+// 		editModifier() {
+// 			var modifierData = this.prepareModifierData();
+// 			this.modifier.editModifier(modifierData);
+// 			this.reset();
+// 		},
+// 		prepareModifierData() {
+// 			return {
+// 				name: this.name,
+// 				type: this.type,
+// 				saveDC: this.saveDC,
+// 				saveType: this.saveType,
+// 				damageDiceNum: this.damageDiceNum,
+// 				damageDice: this.damageDice,
+// 				damageModifier: this.damageModifier
+// 				};
+// 		},
+// 		deleteModifier() {
+// 			if (confirm('Delete ' + this.modifier.name + '?')) {
+// 				this.character.deleteModifier(this.modifier);
+// 				this.reset();
+// 			}
+// 		},
+// 		reset() {
+// 			if (this.modifier) {
+// 				this.show = false;
+// 				this.name = this.modifier.name;			
+// 				this.type = this.modifier.type;
+// 				this.saveDC = this.modifier.saveDC;
+// 				this.saveType = this.modifier.saveType;
+// 				this.damageDiceNum = this.modifier.damageDiceNum;
+// 				this.damageDice = this.modifier.damageDice;
+// 				this.changeModifier = true;
+// 			} else {
+// 				this.show = false;
+// 				this.name = '';			
+// 				this.type = '';
+// 				this.saveDC = 0;
+// 				this.saveType = '';
+// 				this.damageDiceNum = 0;
+// 				this.damageDice = 0;
+// 				this.newModifier = true;
+// 				this.changeModifier = false;
+// 			}
+// 		}
 
-	}
-});
+// 	}
+// });
 
 Vue.component('feed', {
 	template:`
@@ -1870,3 +1951,5 @@ $(document).ready(function() {
 	getData();
 	saveData();
 });
+
+
