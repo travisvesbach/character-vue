@@ -24,6 +24,12 @@ class Character {
 		} else if (this.spells == 'points') {
 			this.currentSpellPoints = this.maxSpellPoints;
 		}
+		this.resources = [];
+		if (input.resources) {
+			for (var j=0;j<input.resources.length;j++) {
+				this.addResource(input.resources[j]);
+			}
+		}
 	}
 
 	updateCharacter(input) {
@@ -119,12 +125,13 @@ class Character {
 			this.maxSpellPoints = input.maxSpellPoints;
 			this.maxSpellLevel = input.maxSpellLevel;
 		}
+
 	}
 
 	addSpellSlots(level, counter) {
 		this.spellSlots[level] = [];
 		for (var i=0;i<counter;i++) {
-			this.spellSlots[level].push(new SpellSlot);
+			this.spellSlots[level].push(new Slot);
 		}
 	}
 
@@ -174,6 +181,25 @@ class Character {
 		this.modifiers = newArray;
 	}
 
+	addResource(resourceData) {
+		this.resources.push(new Resource(resourceData));
+		this.resources.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+	}
+
+	deleteResource(removingResource) {
+		console.log(removingResource);
+		var index = this.resources.indexOf(removingResource);
+		console.log(index);
+		delete this.resources[index];
+		var newArray = [];
+		for (var i=0;i<this.resources.length;i++) {
+			if (this.resources[i]) {
+				newArray.push(this.resources[i]);
+			}
+		}
+		this.resources = newArray;
+	}
+
 	attack(attack, type = 'normal', modifiersIndexArray = null){
 		var results = attack.makeAttack(type);
 		if (modifiersIndexArray) {
@@ -202,7 +228,7 @@ class Character {
 }
 
 
-class SpellSlot {
+class Slot {
 
 	constructor(used = false) {
 		this.used = false;
@@ -210,16 +236,6 @@ class SpellSlot {
 		if (this.used) {
 			this.value = "\u26AB";
 		}
-	}
-
-	switchSlot() {
-		if (this.used) {
-			this.used = false;
-			this.value = "\u26AA";
-		} else {
-			this.used = true;
-			this.value = "\u26AB";
-		}		
 	}
 }
 
@@ -411,6 +427,53 @@ class Modifier {
 		console.log(this.name + " has been edited");
 	}
 }
+
+class Resource {
+
+	constructor(resourceData) {
+		this.name = resourceData.name;
+		this.type = resourceData.type;
+		this.total = resourceData.total;
+		if(this.type == 'slots') {
+			this.slots = [];
+			if (Array.isArray(resourceData.slots) && resourceData.slots.length > 0) {
+				this.slots = resourceData.slots;
+			} else {
+				for(var j=0;j<this.total;j++) {
+					this.slots.push(new Slot);
+				}
+			}
+		} else if(this.type == 'points') {
+			if(resourceData.current) {
+				this.current = resourceData.current;
+			} else {
+				this.current = this.total;
+			}
+		}
+		console.log(this.name + " has been added");
+	}
+
+	switchSlot(index) {
+		if (this.slots[index] == '\u26AA') {
+			this.slots[index] = '\u26AB';
+		} else {
+			this.slots[index] = '\u26AA';
+		}
+	}
+
+	edit(resourceData) {
+		this.name = resourceData.name;
+		this.type = resourceData.type;
+		this.total = resourceData.total;
+		if(this.type == 'slots') {
+			for(var j=this.slots.length;j<this.total;j++) {
+				this.slots.push(new Slot);
+			}
+		} 
+		console.log(this.name + " has been added");
+	}
+}
+
 
 
 
@@ -720,6 +783,7 @@ Vue.component('character-stats', {
 			<div class="row m-auto" >
 					<spells v-if="character.spells != 'no'" v-bind:character="character"></spells>			
 					<attack v-bind:character="character"></attack>
+					<resources v-bind:character="character"></resources>
 			</div>
 		</div>
 	`,
@@ -1296,8 +1360,8 @@ Vue.component('attack', {
 		<div class="col-md px-0">
 			<div class="card rounded-0">
 				<div class="card-header p-2">
-					<h3 class="d-inline-block align-middle">Attacks</h3>
-					<attack-modifier-field class="d-inline-block float-right .align-bottom" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
+					<h3 class="d-inline-block">Attacks</h3>
+					<attack-modifier-field class="d-inline-block float-right" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
 					<attack-modifier-field class="d-inline-block float-right pr-4" v-bind:character="character"  v-bind:targetType="'Modifier'"></attack-modifier-field>
 				</div>
 				<div class="card-body p-2">
@@ -1788,6 +1852,152 @@ Vue.component('attack-modifier-field', {
 
 // 	}
 // });
+
+Vue.component('resources', {
+	template: `
+		<div class="col-md-2 px-0">
+			<div class="card rounded-0">
+				<div class="card-header p-2">
+					<h3 class="d-inline-block">Resources</h3>
+					<resource-field class="d-inline-block float-right" v-bind:character="character"></resource-field>
+				</div>
+				<div class="card-body p-2">
+					<ul class="list-group list-group-flush">
+						<li v-if="character.resources" v-for="resource in character.resources">
+							{{resource.name}}: 
+							<a v-if="resource.type == 'slots'" v-for="slot in resource.slots" @click="switchSlot(slot)">
+								{{slot.value}}
+							</a>
+							<span v-if="resource.type == 'points'">
+								<input type="number" class="numInput" v-model="resource.current">
+								/ {{resource.total}}
+							</span>
+							<resource-field v-bind:character="character" v-bind:resource="resource"></resource-field>
+						</li>
+						
+					</ul>
+				</div>
+			</div>
+		</div>			
+	`,
+	props: ["character"],
+	methods: {
+		switchSlot(slot) {
+			if (slot.used) {
+				slot.used = false;
+				slot.value = "\u26AA";
+			} else {
+				slot.used = true;
+				slot.value = "\u26AB";
+			}	
+			Vue.set(this.character);
+		},
+	}
+});
+
+Vue.component('resource-field', {
+	template: `
+		<div>
+			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add</button>
+			<a class="badge badge-light" @click="show = true" v-if="task == 'Edit'">Edit</a>
+			<div v-if="show" class="modal-mask">
+				<transition name="modal">
+				  	<div class="modal-dialog" role="document">
+				    	<div class="modal-content">
+					      	<div class="modal-header card-header">
+					        	<h5 class="modal-title">{{task}} Resource</h5>
+					        	<button type="button" class="close" @click="reset">
+						          	<span aria-hidden="true">&times;</span>
+						        </button>
+					      	</div>
+					      	<div class="modal-body">
+								<div class="my-2">
+									Name:
+									<input type="text" v-model="name">
+								</div>
+								<div class="my-2">
+									Total:
+									<input class="numInput" type="number" v-model.number="total">
+								</div>
+								<div class="my-2">
+									Points or Slots:
+									<div class="form-check form-check-inline">
+									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="slots" value="slots" v-model="type">
+									    <label class="form-check-label" for="slots">Slots</label>
+									</div>
+									<div class="form-check form-check-inline">
+									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="points" value="points" v-model="type">
+									    <label class="form-check-label" for="points">Points</label>
+									</div>
+								</div>							
+					      	</div>
+					      	<div class="modal-footer">
+					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add Resource</button>
+								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit Resource</button>
+								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete Resource</button>
+					      	</div>
+				    	</div>
+				  	</div>
+				</transition>
+			</div>
+		</div>
+	`,
+	props: ["character", "resource"],
+	created() {
+		this.reset();
+	},
+	data() {
+		return {
+			show: false,
+			name: '',
+			type: '',
+			total: 0,
+			task: false
+		};
+	},
+	methods: {
+		add() {
+			var data = this.prepareData();
+			this.character.addResource(data);			
+			this.reset();
+		},
+		edit() {
+			var data = this.prepareData();
+			this.resource.edit(data);
+			this.reset();
+		},
+		prepareData() {
+			return {
+				name: this.name,
+				type: this.type,
+				total: this.total
+				};
+		},
+		deleteTarget() {
+			if (confirm('Delete ' + this.resource.name + '?')) {
+				this.character.deleteResource(this.resource);
+				this.reset();
+			}
+		},
+		reset() {
+			if (this.resource) {
+				this.show = false;
+				this.name = this.resource.name;	
+				this.type = this.resource.type;
+				this.total = this.resource.total;
+				this.task = 'Edit';
+			} else {
+				this.show = false;
+				this.name = '';			
+				this.type = '';
+				this.total = 0;
+				this.task = 'New';
+			}
+		}
+
+	}	
+});
 
 Vue.component('feed', {
 	template:`
