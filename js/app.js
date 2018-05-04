@@ -30,6 +30,10 @@ class Character {
 				this.addResource(input.resources[j]);
 			}
 		}
+		this.showResources = 'Show';
+		if (input.showResources) {
+			this.showResources = input.showResources
+		}
 	}
 
 	updateCharacter(input) {
@@ -512,7 +516,10 @@ Vue.component('nav-vue', {
 			    <li class="nav-item" v-if="characterList" v-for="character in characterList" @click="select(character)">
 			        <a class="nav-link">{{character.name}}</a>
 			    </li>
-			    <li class="nav-item ml-auto" @click="select('dice-roller')">
+			    <li class="nav-item ml-auto" @click="select('home')">
+			    	<a class="nav-link active">Home</a>
+			    </li>
+			    <li class="nav-item" @click="select('dice-roller')">
 			    	<a class="nav-link">Dice Roller</a>
 			    </li>			    
 			    <li class="nav-item" @click="select('create-character')">
@@ -548,6 +555,7 @@ Vue.component('character-stats', {
 					  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					  </a>
 					  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					  <a class="dropdown-item" @click="toggleResources">Toggle Resources</a>
 					    <a class="dropdown-item" @click="editCharacter" v-if="! edit">Edit {{character.name}}</a>
 					    <a class="dropdown-item" @click="editCharacter" v-if="edit">Cancel Edit</a>
 					    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
@@ -783,7 +791,7 @@ Vue.component('character-stats', {
 			<div class="row m-auto" >
 					<spells v-if="character.spells != 'no'" v-bind:character="character"></spells>			
 					<attack v-bind:character="character"></attack>
-					<resources v-bind:character="character"></resources>
+					<resources v-if="character.showResources == 'Show'" v-bind:character="character"></resources>
 			</div>
 		</div>
 	`,
@@ -815,6 +823,13 @@ Vue.component('character-stats', {
 		adjustCurrentHp() {
 			this.character.currentHp += this.hpCalculator;
 			this.hpCalculator = null;
+		},
+		toggleResources() {
+			if (this.character.showResources == 'Show') {
+				this.character.showResources = 'Hide';
+			} else {
+				this.character.showResources = 'Show';
+			}
 		}
 	}
 });
@@ -1208,15 +1223,9 @@ Vue.component('character-creator', {
 	},
 	methods: {
 		createCharacter() {
-			console.log('entering createCharacter');
 			var characterData = this.prepareCharacterData();
-			console.log(characterData);
 			if(newCharacter = new Character(characterData)) {
-				app.characters.push(newCharacter);
-				app.selected = newCharacter;
-				$(".nav").find(".active").removeClass("active");
-				//$(".nav-link:contains(this.name)").tab('show');
-    			$(".nav-link:contains(this.name)").addClass("active");
+				app.createCharacter(newCharacter);
 			}
 		},
 		updateCharacter() {
@@ -1859,7 +1868,6 @@ Vue.component('resources', {
 			<div class="card rounded-0">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Resources</h3>
-					<resource-field class="d-inline-block float-right" v-bind:character="character"></resource-field>
 				</div>
 				<div class="card-body p-2">
 					<ul class="list-group list-group-flush">
@@ -1874,8 +1882,12 @@ Vue.component('resources', {
 							</span>
 							<resource-field v-bind:character="character" v-bind:resource="resource"></resource-field>
 						</li>
+						<li v-if="character.resources.length <= 0">
+							If you don't have any resources to add, you can hide this section be clicking 'Toggle Resources' from the dropdown menu next to the character's name.
+						</li>
 						
 					</ul>
+					<resource-field class="d-inline-block float-right" v-bind:character="character"></resource-field>
 				</div>
 			</div>
 		</div>			
@@ -2002,14 +2014,78 @@ Vue.component('resource-field', {
 Vue.component('feed', {
 	template:`
 	<div class="card col px-0 rounded-0" v-if="feed.length > 0">
-		<h3 class="card-header p-2">Feed</h3>
+		<div class="card-header p-2">
+			<h3 class="d-inline-block">Feed</h3>
+			<button type="button" class="close" @click="clearFeed">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
 		<ul class="list-group">
 			<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
 		</ul>
 	</div>
 	`,
-	props: ['feed']
+	props: ['feed'],
+	methods: {
+		clearFeed() {
+			app.feed = [];
+		}
+	}
 });
+
+Vue.component('home', {
+	template: `
+		<div>
+			<h1 class="card-header border-left border-right">
+				Character Manager
+			</h1>
+			<div class="row m-auto" >
+				<div class="card d-inline-block col-md rounded-0">
+					<div class="card-body">
+
+						Welcome to my D&D Character Manager! This web app will help you manage your characters' attacks, spells, resources, dice rolls, etc.  In order to get started, 'Create a Character' in the navbar.  Once your character is created, you can add attacks, modifiers, and resources on that character's page.<br><br>
+						  If you need to change your character's stats, select 'Edit (character name)' from the dropdown next to the character's name on that character's page. <br><br>
+						  Any stat can be rolled by clicking on it.
+					</div>
+				</div>
+			</div>
+			<div class="row m-auto">
+				<div class="card d-inline-block col-12 rounded-0 p-0">
+					<h3 class="card-header">
+						Saving and Loading
+					</h3>
+					<div class="card-body">
+						Your character data is automatically saved in local storage on your browser.  This means that as long as you don't clear your browser data, your character data will always be here ready for your next session. <br><br>
+						This is only true for this browser and the computer that you are using now.  For example, say you are using Chrome now, but if you return on Firefox next time, your data will not be here, because it is saved in Chrome's local storage.  The same is true if you use a different computer.  The data is only stored on the browser you are using now for the computer you are using now.<br><br>
+						Should you feel the need to clear your browser data, use a different browser, or use a different computer, you can download your character data and upload it next time you on whatever browser (and computer) next time you visit.
+					</div>
+				</div>
+				<div class="card d-inline-block col-md-6 rounded-0 p-0">
+					<h3 class="card-header">
+						Export Data
+					</h3>
+					<div class="card-body">
+						<button class="btn btn-primary btn-sm" id="export">Export Data</button>
+					</div>
+				</div>
+				<div class="card d-inline-block col-md-6 rounded-0 p-0">
+					<h3 class="card-header">
+						Import Data
+					</h3>
+					<div class="card-body">
+						<input type="file" id="selectFiles" value="Import" /><br />
+						<button class="btn btn-primary btn-sm my-2" id="import">Import Data</button><br>	
+						Note: importing will overwrite any locally stored characters.
+
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	`,
+
+})
 
 Vue.component('dice-roller',{
 	template: `
@@ -2097,16 +2173,13 @@ const app = new Vue({
 		
 	},
 	created() {
-		// tom = new Character({name: 'tom', level: 7, maxHp: 56});
-		// this.characters.push(tom);
-		// bob = new Character({name: 'bob', level: 9, maxHp: 66});
-		// this.characters.push(bob);
-		// steve = new Character({name: 'steve', level: 9, maxHp: 66});
-		// this.characters.push(steve);		
+		this.selected = 'home';		
 	},
 	methods: {
-		createCharacter() {
-
+		createCharacter(newCharacter) {
+			this.characters.push(newCharacter);
+			this.characters.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+			this.selected = newCharacter;
 		},
 		deleteCharacter(removingCharacter) {
 			var index = this.characters.indexOf(removingCharacter);
@@ -2152,6 +2225,43 @@ function saveData() {
 		}, 10000);
 }
 
+function exportData() {
+
+    if(!app.characters) {
+        alert('error : No data')
+        return;
+    }
+
+    var jsonCharacters = JSON.stringify(app.characters);
+
+  	var a = document.createElement('a');
+  	a.setAttribute('href', 'data:text/plain;charset=utf-u,'+encodeURIComponent(jsonCharacters));
+  	a.setAttribute('download', 'characterData.json');
+  	a.click()
+ }
+
+function importData() {
+	var files = $('#selectFiles').prop('files')[0];
+	console.log(files);
+	if (files.length <= 0) {
+		return false;
+	}
+
+	var fr = new FileReader();
+
+	fr.onload = function(retrievedObject) { 
+		var jsonCharacters = JSON.parse(retrievedObject.target.result);
+		app.characters = [];
+		for (var i=0;i<jsonCharacters.length;i++) {
+			console.log(i + '/' + jsonCharacters.length);
+			app.characters.push(new Character(jsonCharacters[i]));
+		}
+	}
+
+	fr.readAsText(files);
+}
+
+
 function isInteger(x) {
     return x % 1 === 0;
 }
@@ -2160,6 +2270,10 @@ function isInteger(x) {
 $(document).ready(function() {
 	getData();
 	saveData();
+
+	$('#export').click(exportData);
+	$('#import').click(importData);
 });
+
 
 

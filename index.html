@@ -19,8 +19,11 @@
 		 
 
 
-		<character-stats v-bind:character="selected" v-if="selected != 'create-character' && selected != 'dice-roller'">
+		<character-stats v-bind:character="selected" v-if="selected != 'create-character' && selected != 'dice-roller' && selected != 'home'">
 		</character-stats>
+
+		<home v-if="selected == 'home'">
+		</home>
 
 		<dice-roller v-if="selected == 'dice-roller'">
 		</dice-roller>
