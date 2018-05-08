@@ -18,9 +18,28 @@
 		<nav-vue v-bind:characters="characters"></nav-vue>
 		 
 
+		<div v-if="selected && selected != 'create-character' && selected != 'dice-roller' && selected != 'home'">
 
-		<character-stats v-bind:character="selected" v-if="selected != 'create-character' && selected != 'dice-roller' && selected != 'home'">
-		</character-stats>
+			<character-stats v-bind:character="selected" >
+			</character-stats>
+
+			<div class="row m-auto">
+				<spells v-if="selected.spells != 'no'" v-bind:character="selected"></spells>
+
+				<attack v-bind:character="selected"></attack>
+
+				<resources v-if="selected.showResources == 'Show'" v-bind:character="selected"></resources>
+			</div>
+
+			<div class="row m-auto">
+				<notepad v-bind:character="selected">
+				</notepad>
+
+				<feed v-bind:feed="feed">
+				</feed>
+			</div>
+
+		</div>
 
 		<home v-if="selected == 'home'">
 		</home>
@@ -30,18 +49,6 @@
 
 		<character-creator v-if="selected == 'create-character'">
 		</character-creator>
-
-		<feed v-bind:feed="feed" v-if="selected != 'create-character' && selected != 'dice-roller'">
-		</feed>
-
-
-		<!-- <div class="card-footer" v-if="feed.length > 0">
-			<ul class="list-group" v-for="item in feed">
-				<li class="list-group-item feed-item">
-					{{ item }}
-				</li>
-			</ul>
-		</div> -->
 
 
 	</div>

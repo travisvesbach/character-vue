@@ -51,3 +51,10 @@ a:hover {
   display: table;
   transition: opacity .3s ease;
 }
+
+textarea {
+  min-height: 200px;
+  resize: vertical;
+  overflow: auto;
+  height: 100%;
+}
