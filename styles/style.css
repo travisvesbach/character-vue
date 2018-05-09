@@ -1,23 +1,23 @@
 .feed-item {
-	white-space: pre-line;
+  white-space: pre-line;
 }
 
 
 
 .numInput {
-	width: 50px;
+  width: 50px;
 }
 
 .hpInput {
-	width: 70px;
+  width: 70px;
 }
 
 a:hover {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .list-group li {
-	list-style: none;
+  list-style: none;
 }
 
 .as-text {
@@ -57,4 +57,13 @@ textarea {
   resize: vertical;
   overflow: auto;
   height: 100%;
+}
+
+.feed-div {
+  overflow-y: scroll!important;
+  position: relative;
+}
+
+.feed-body {
+  position: absolute;
 }

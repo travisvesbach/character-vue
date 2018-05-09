@@ -260,7 +260,7 @@ class Character {
 	}
 
 	addResource(resourceData) {
-		this.resources.push(new Resource(resourceData));
+		this.resources.push(new Counter(resourceData));
 		this.resources.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
@@ -285,6 +285,7 @@ class Character {
 				results.resultsArray = this.modifiers[modifiersIndexArray[i]].makeAttack(results.resultsArray, results.roll);
 			}
 		}
+		console.log(results);
 		app.addToFeed(results.resultsArray.join('\n'));
 	}
 
@@ -323,6 +324,7 @@ class Spells {
 		this.maxSpellPoints = 0;
 		this.maxSpellLevel = 0;
 		this.currentSpellPoints = 0;
+		this.spellCounters = [];
 		// this.oneSpells = 0;
 		// this.twoSpells = 0;
 		// this.threeSpells = 0;
@@ -338,8 +340,14 @@ class Spells {
 				this.spellSlots[i] = [];
 			}
 		}
+
 		if (input) {
 			this.setSpells(input);
+			if (input.spellCounters) {
+				for (var j=0;j<input.spellCounters.length;j++) {
+					this.addCounter(input.spellCounters[j]);
+				}
+			}
 		} 
 	}
 
@@ -401,6 +409,25 @@ class Spells {
 				this.spellSlots[level].push(new Slot);
 			}
 		}
+	}
+
+	addCounter(input) {
+		this.spellCounters.push(new Counter(input));
+		this.spellCounters.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
+	}
+
+	deleteCounter(removingCounter) {
+		console.log(removingCounter);
+		var index = this.spellCounters.indexOf(removingCounter);
+		console.log(index);
+		delete this.spellCounters[index];
+		var newArray = [];
+		for (var i=0;i<this.spellCounters.length;i++) {
+			if (this.spellCounters[i]) {
+				newArray.push(this.spellCounters[i]);
+			}
+		}
+		this.spellCounters = newArray;
 	}
 }
 
@@ -592,24 +619,24 @@ class Modifier {
 	}
 }
 
-class Resource {
+class Counter {
 
-	constructor(resourceData) {
-		this.name = resourceData.name;
-		this.type = resourceData.type;
-		this.total = resourceData.total;
+	constructor(input) {
+		this.name = input.name;
+		this.type = input.type;
+		this.total = input.total;
 		this.slots = [];
 		if(this.type == 'slots') {
-			if (Array.isArray(resourceData.slots) && resourceData.slots.length > 0) {
-				this.slots = resourceData.slots;
+			if (Array.isArray(input.slots) && input.slots.length > 0) {
+				this.slots = input.slots;
 			} else {
 				for(var j=0;j<this.total;j++) {
 					this.slots.push(new Slot);
 				}
 			}
 		} else if(this.type == 'points') {
-			if(resourceData.current) {
-				this.current = resourceData.current;
+			if(input.current) {
+				this.current = input.current;
 			} else {
 				this.current = this.total;
 			}
@@ -625,10 +652,10 @@ class Resource {
 		}
 	}
 
-	edit(resourceData) {
-		this.name = resourceData.name;
-		this.type = resourceData.type;
-		this.total = resourceData.total;
+	edit(input) {
+		this.name = input.name;
+		this.type = input.type;
+		this.total = input.total;
 		if(this.type == 'slots') {
 			if(this.total > this.slots.length) {
 				for(var j=this.slots.length;j<this.total;j++) {
@@ -677,22 +704,22 @@ Vue.component('nav-vue', {
 		<nav>
 			<ul class="nav nav-tabs">
 			    <li class="nav-item" v-if="characterList" v-for="character in characterList" @click="select(character)">
-			        <a class="nav-link">{{character.name}}</a>
+			        <a class="nav-link" v-bind:class="{active: selected == character}">{{character.name}}</a>
 			    </li>
 			    <li class="nav-item ml-auto" @click="select('home')">
-			    	<a class="nav-link active">Home</a>
+			    	<a class="nav-link" v-bind:class="{active: selected == 'home'}">Home</a>
 			    </li>
 			    <li class="nav-item" @click="select('dice-roller')">
-			    	<a class="nav-link">Dice Roller</a>
+			    	<a class="nav-link" v-bind:class="{active: selected == 'dice-roller'}">Dice Roller</a>
 			    </li>			    
 			    <li class="nav-item" @click="select('create-character')">
-			    	<a class="nav-link">Create a Character</a>
+			    	<a class="nav-link" v-bind:class="{active: selected == 'create-character'}">Create a Character</a>
 			    </li>
 
 			</ul>
 		</nav>
 	`,
-	props: ["characters"],
+	props: ["characters", "selected"],
 	computed: {
 		characterList() {
 			return this.characters;
@@ -703,8 +730,6 @@ Vue.component('nav-vue', {
 			app.selected = selected;
 		}
 	}
-
-
 });
 
 
@@ -1368,41 +1393,43 @@ Vue.component('character-creator', {
 			};
 		}
 	}
-
 });
 
 
 Vue.component('spells', {
 	template: `
-		<div class="col-md-2 px-0 "  v-if="character.showSpells == 'Show'">
+		<div class="px-0" v-bind:class="{'col-md-3': character.showNotepad == 'Show', 'col-md': character.showNotepad != 'Show'}"  v-if="character.showSpells == 'Show'">
 			<div class="card rounded-0 h-100">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Spells</h3>
 					<spells-field v-bind:spells="character.spells"></spells-field>
 				</div>
-				<div class="card-body p-2" v-if="character.spells.spellType == 'slots'">
-					<ul class="list-group list-group-flush">
-						<li v-for="(level, levelIndex) in character.spells.spellSlots" v-if="levelIndex != 0 && level.length > 0">
-							{{levelIndex}}: 
-							<a v-for="spellSlot in level" @click="switchSlot(spellSlot)" v-text="spellSlot.value">
-							</a>
-						</li>
-						
-					</ul>
-				</div>
-				<div class="card-body p-2" v-if="character.spells.spellType == 'points'">
-					<span>
-						Points:
-						<input type="number" class="numInput" v-model.number="character.spells.currentSpellPoints"></input>
-						/ {{character.spells.maxSpellPoints}}
-					</span>
-					<ul class="list-group list-group-flush">
-						<li v-for="(cost, level) in spellPointsCosts" v-if="level != 0 && level <= character.spells.maxSpellLevel">
-							<a @click="usePoints(cost)">
-								{{level}}: {{cost}} points
-							</a>
-						</li>
-					</ul>
+				<div class="card-body p-2 d-flex flex-column">
+					<div class="mb-1" v-if="character.spells.spellType == 'slots'">
+						<ul class="list-group list-group-flush">
+							<li v-for="(level, levelIndex) in character.spells.spellSlots" v-if="levelIndex != 0 && level.length > 0">
+								{{levelIndex}}: 
+								<a v-for="spellSlot in level" @click="switchSlot(spellSlot)" v-text="spellSlot.value">
+								</a>
+							</li>
+							
+						</ul>
+					</div>
+					<div class="mb-1"  v-if="character.spells.spellType == 'points'">
+						<span>
+							Points:
+							<input type="number" class="numInput" v-model.number="character.spells.currentSpellPoints"></input>
+							/ {{character.spells.maxSpellPoints}}
+						</span>
+						<ul class="list-group list-group-flush">
+							<li v-for="(cost, level) in spellPointsCosts" v-if="level != 0 && level <= character.spells.maxSpellLevel">
+								<a @click="usePoints(cost)">
+									{{level}}: {{cost}} points
+								</a>
+							</li>
+						</ul>
+					</div>
+					<counters v-bind:character="character" v-bind:counterArray="character.spells.spellCounters" v-bind:counterType="'Spell Counter'"></counters>
 				</div>
 				<div class="card-body p-2" v-if="character.spells.spellType == 'no'">
 					If your character is not a spellcaster, you can hide this section by clicking 'Toggle Spells' from the dropdown menu next to the character's name.
@@ -1439,7 +1466,6 @@ Vue.component('spells', {
 				spellSlot.used = true;
 				spellSlot.value = "\u26AB";
 			}	
-			//Vue.set(this.character);
 		},
 		usePoints(cost) {
 			if (this.character.spells.currentSpellPoints >= cost) {
@@ -1625,7 +1651,6 @@ Vue.component('spells-field', {
 		}
 
 	}	
-
 });
 
 Vue.component('attack', {
@@ -1634,8 +1659,8 @@ Vue.component('attack', {
 			<div class="card rounded-0  h-100">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Attacks</h3>
-					<attack-modifier-field class="d-inline-block float-right" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
-					<attack-modifier-field class="d-inline-block float-right pr-4" v-bind:character="character"  v-bind:targetType="'Modifier'"></attack-modifier-field>
+					<attack-modifier-field class="d-inline-block float-right px-2" v-bind:character="character"  v-bind:targetType="'Modifier'"></attack-modifier-field>
+					<attack-modifier-field class="d-inline-block float-right px-2" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
 				</div>
 				<div class="card-body p-2">
 					<ul class="list-inline list-group-item" v-if="character.modifiers.length > 0">
@@ -1855,35 +1880,44 @@ Vue.component('attack-modifier-field', {
 
 Vue.component('resources', {
 	template: `
-		<div class="col-md-2 px-0" v-if="character.showResources == 'Show'">
+		<div class="px-0" v-bind:class="{'col-md-3': character.showNotepad == 'Show', 'col-md': character.showNotepad != 'Show'}" v-if="character.showResources == 'Show'">
 			<div class="card rounded-0  h-100">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Resources</h3>
 				</div>
-				<div class="card-body p-2">
-					<ul class="list-group list-group-flush">
-						<li v-if="character.resources" v-for="resource in character.resources">
-							{{resource.name}}: 
-							<a class="col-2 p-0" v-if="resource.type == 'slots'" v-for="slot in resource.slots" @click="switchSlot(slot)">
-								{{slot.value}}
-							</a>
-							<span v-if="resource.type == 'points'">
-								<input type="number" class="numInput" v-model="resource.current">
-								/ {{resource.total}}
-							</span>
-							<resource-field v-bind:character="character" v-bind:resource="resource"></resource-field>
-						</li>
-						<li v-if="character.resources.length <= 0">
-							If you don't have any resources to add, you can hide this section by clicking 'Toggle Resources' from the dropdown menu next to the character's name.
-						</li>
-						
-					</ul>
-					<resource-field class="d-inline-block float-right" v-bind:character="character"></resource-field>
+				<div class="card-body p-2 d-flex flex-column">
+					<span v-if="character.resources.length <= 0">
+						If you don't have any resources to add, you can hide this section by clicking 'Toggle Resources' from the dropdown menu next to the character's name.
+					</span>
+					<counters v-bind:character="character" v-bind:counterArray="character.resources" v-bind:counterType="'Resource'"></counters>
 				</div>
 			</div>
 		</div>			
 	`,
-	props: ["character"],
+	props: ["character"]
+});
+
+
+Vue.component('counters', {
+	template: `
+		<div class="d-flex flex-column" style="flex: 1;">
+			<ul class="list-group list-group-flush">
+				<li class="pb-2" v-if="counterArray" v-for="counter in counterArray">
+					{{counter.name}}: 
+					<a class="col-2 p-0" v-if="counter.type == 'slots'" v-for="slot in counter.slots" @click="switchSlot(slot)">
+						{{slot.value}}
+					</a>
+					<span v-if="counter.type == 'points'">
+						<input type="number" class="numInput" v-model="counter.current">
+						/ {{counter.total}}
+					</span>
+					<counter-field v-bind:character="character" v-bind:counter="counter" v-bind:counterType="counterType"></counter-field>
+				</li>
+			</ul>
+			<counter-field v-bind:character="character" v-bind:counterType="counterType"></counter-field>		
+		</div>
+	`,
+	props: ["character", "counterArray", "counterType"],
 	methods: {
 		switchSlot(slot) {
 			if (slot.used) {
@@ -1893,22 +1927,21 @@ Vue.component('resources', {
 				slot.used = true;
 				slot.value = "\u26AB";
 			}	
-			//Vue.set(this.character);
-		},
+		}
 	}
 });
 
-Vue.component('resource-field', {
+Vue.component('counter-field', {
 	template: `
-		<div>
-			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add</button>
+		<div class="d-flex" style="flex: 1;">
+			<button class="btn btn-primary btn-sm mt-auto mx-auto" @click="show = true" v-if="task == 'New'">Add {{counterType}}</button>
 			<a class="badge badge-light" @click="startEdit" v-if="task == 'Edit'">Edit</a>
 			<div v-if="show" class="modal-mask">
 				<transition name="modal">
 				  	<div class="modal-dialog" role="document">
 				    	<div class="modal-content">
 					      	<div class="modal-header card-header">
-					        	<h5 class="modal-title">{{task}} Resource</h5>
+					        	<h5 class="modal-title">{{task}} {{counterType}}</h5>
 					        	<button type="button" class="close" @click="reset">
 						          	<span aria-hidden="true">&times;</span>
 						        </button>
@@ -1919,7 +1952,8 @@ Vue.component('resource-field', {
 									<input type="text" v-model="name">
 								</div>
 								<div class="my-2">
-									Total:
+									<span v-if="counterType == 'Spell Counter'">Number of Rounds:</span>
+									<span v-if="counterType == 'Resource'">Total:</span>
 									<input class="numInput" type="number" v-model.number="total">
 								</div>
 								<div class="my-2">
@@ -1935,10 +1969,10 @@ Vue.component('resource-field', {
 								</div>							
 					      	</div>
 					      	<div class="modal-footer">
-					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add Resource</button>
-								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit Resource</button>
+					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{counterType}}</button>
+								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{counterType}}</button>
 								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete Resource</button>
+								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{counterType}}</button>
 					      	</div>
 				    	</div>
 				  	</div>
@@ -1946,7 +1980,7 @@ Vue.component('resource-field', {
 			</div>
 		</div>
 	`,
-	props: ["character", "resource"],
+	props: ["character", "counter", "counterType"],
 	created() {
 		this.reset();
 	},
@@ -1962,18 +1996,22 @@ Vue.component('resource-field', {
 	methods: {
 		add() {
 			var data = this.prepareData();
-			this.character.addResource(data);			
+			if (this.counterType == 'Resource') {
+				this.character.addResource(data);
+			} else if (this.counterType == 'Spell Counter') {
+				this.character.spells.addCounter(data);
+			}
 			this.reset();
 		},
 		startEdit() {
 			this.show = true;
-			this.name = this.resource.name;	
-			this.type = this.resource.type;
-			this.total = this.resource.total;
+			this.name = this.counter.name;	
+			this.type = this.counter.type;
+			this.total = this.counter.total;
 		},
 		edit() {
 			var data = this.prepareData();
-			this.resource.edit(data);
+			this.counter.edit(data);
 			this.reset();
 		},
 		prepareData() {
@@ -1984,17 +2022,21 @@ Vue.component('resource-field', {
 			};
 		},
 		deleteTarget() {
-			if (confirm('Delete ' + this.resource.name + '?')) {
-				this.character.deleteResource(this.resource);
+			if (confirm('Delete ' + this.counter.name + '?')) {
+				if (this.counterType == 'Resource') {
+					this.character.deleteResource(this.counter);
+				} else if (this.counterType == 'Spell Counter') {
+					this.character.spells.deleteCounter(this.counter);
+				}
 				this.reset();
 			}
 		},
 		reset() {
 			this.show = false;
 			this.name = '';			
-			this.type = '';
+			this.type = 'slots';
 			this.total = 0;
-			if (this.resource) {
+			if (this.counter) {
 				this.task = 'Edit';
 			} else {
 				this.task = 'New';
@@ -2029,8 +2071,8 @@ Vue.component('feed', {
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
-		<div class="card-body p-2">
-			<ul class="list-group">
+		<div class="card-body p-2 feed-div">
+			<ul class="list-group feed-body">
 				<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
 			</ul>
 		</div>
@@ -2256,10 +2298,10 @@ const app = new Vue({
 });
 
 
-$('.nav').on('click', '.nav-link', function(){
-   $('.nav').find('.active').removeClass('active');
-   $(this).addClass('active');
-});
+// $('.nav').on('click', '.nav-link', function(){
+//    $('.nav').find('.active').removeClass('active');
+//    $(this).addClass('active');
+// });
 
 function getData() {
 	console.log('getting data');

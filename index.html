@@ -17,7 +17,7 @@
 
 	<div class="py-4 container" id="app">
 
-		<nav-vue v-bind:characters="characters"></nav-vue>
+		<nav-vue v-bind:characters="characters" v-bind:selected="selected"></nav-vue>
 		 
 
 		<div v-if="selected && selected != 'create-character' && selected != 'dice-roller' && selected != 'home'">
@@ -25,6 +25,42 @@
 			<character-stats v-bind:character="selected" ></character-stats>
 
 			<div class="row m-auto">
+
+				<div class="col-md-8">
+					
+					<div class="row">
+				
+						<attack v-bind:character="selected"></attack>
+
+					</div>
+
+					<div class="row">
+
+						<spells v-bind:character="selected"></spells>
+
+						<resources v-bind:character="selected"></resources>	
+
+						<notepad v-bind:character="selected"></notepad>					
+
+					</div>
+
+				</div>
+
+				<div class="col-md-4">
+
+					<div class="row h-100">
+
+						<feed v-bind:feed="feed"></feed>
+
+					</div>
+
+				</div>
+				
+
+			</div>
+
+
+<!-- 			<div class="row m-auto">
 
 				<spells v-bind:character="selected"></spells>
 
@@ -40,7 +76,7 @@
 
 				<feed v-bind:feed="feed"></feed>
 
-			</div>
+			</div> -->
 
 		</div>
 
