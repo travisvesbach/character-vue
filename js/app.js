@@ -19,24 +19,35 @@ class Character {
 		} else {
 			this.currentHp = this.maxHp;
 		}
-		if (this.spells == 'points' && input.currentSpellPoints) {
-			this.currentSpellPoints = input.currentSpellPoints;
-		} else if (this.spells == 'points') {
-			this.currentSpellPoints = this.maxSpellPoints;
+
+		// if (this.spells == 'points' && input.currentSpellPoints) {
+		// 	this.currentSpellPoints = input.currentSpellPoints;
+		// } else if (this.spells == 'points') {
+		// 	this.currentSpellPoints = this.maxSpellPoints;
+		// }
+
+		this.spells = new Spells;
+		if (input.spells) {
+			this.addSpells(input.spells);
 		}
+
 		this.resources = [];
 		if (input.resources) {
 			for (var j=0;j<input.resources.length;j++) {
 				this.addResource(input.resources[j]);
 			}
 		}
-		this.showResources = 'Show';
-		if (input.showResources) {
-			this.showResources = input.showResources
-		}
 		this.showNotepad = 'Show';
 		if (input.showNotepad) {
-			this.showNotepad = input.showNotepad
+			this.showNotepad = input.showNotepad;
+		}
+		this.showResources = 'Show';
+		if (input.showResources) {
+			this.showResources = input.showResources;
+		}
+		this.showSpells = 'Show';
+		if (input.showSpells) {
+			this.showSpells = input.showSpells;
 		}
 		this.notes = (input.notes) ? input.notes : '';
 	}
@@ -87,62 +98,115 @@ class Character {
 		this.intimidation = input.intimidation;
 		this.performance = input.performance;
 		this.persuasion = input.persuasion;
-		this.spells = input.spells;
-		if(this.spells == 'slots') {
-			this.spellSlots = [];
-			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
-				this.spellSlots = input.spellSlots;
-			} else {
-				this.oneSpells = input.oneSpells;
-				if (isInteger(this.oneSpells) && this.oneSpells > 0) {
-					this.addSpellSlots(1, this.oneSpells);
-				}
-				this.twoSpells = input.twoSpells;
-				if (isInteger(this.twoSpells) && this.twoSpells > 0) {
-					this.addSpellSlots(2, this.twoSpells);
-				}
-				this.threeSpells = input.threeSpells;
-				if (isInteger(this.threeSpells) && this.threeSpells > 0) {
-					this.addSpellSlots(3, this.threeSpells);
-				}
-				this.fourSpells = input.fourSpells;
-				if (isInteger(this.fourSpells) && this.fourSpells > 0) {
-					this.addSpellSlots(4, this.fourSpells);
-				}
-				this.fiveSpells = input.fiveSpells;
-				if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
-					this.addSpellSlots(5, this.fiveSpells);
-				}
-				this.sixSpells = input.sixSpells;
-				if (isInteger(this.sixSpells) && this.sixSpells > 0) {
-					this.addSpellSlots(6, this.sixSpells);
-				}
-				this.sevenSpells = input.sevenSpells;
-				if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
-					this.addSpellSlots(7, this.sevenSpells);
-				}
-				this.eightSpells = input.eightSpells;
-				if (isInteger(this.eightSpells) && this.eightSpells > 0) {
-					this.addSpellSlots(8, this.eightSpells);
-				}
-				this.nineSpells = input.nineSpells;
-				if (isInteger(this.nineSpells) && this.nineSpells > 0) {
-					this.addSpellSlots(9, this.nineSpells);
-				}
-			}
-		} else if (this.spells == 'points') {
-			this.maxSpellPoints = input.maxSpellPoints;
-			this.maxSpellLevel = input.maxSpellLevel;
-		}
+		// this.spells = input.spells;
+		// if(this.spells == 'slots') {
+		// 	this.spellSlots = [];
+		// 	if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
+		// 		this.spellSlots = input.spellSlots;
+		// 	} else {
+		// 		this.oneSpells = input.oneSpells;
+		// 		if (isInteger(this.oneSpells) && this.oneSpells > 0) {
+		// 			this.addSpellSlots(1, this.oneSpells);
+		// 		}
+		// 		this.twoSpells = input.twoSpells;
+		// 		if (isInteger(this.twoSpells) && this.twoSpells > 0) {
+		// 			this.addSpellSlots(2, this.twoSpells);
+		// 		}
+		// 		this.threeSpells = input.threeSpells;
+		// 		if (isInteger(this.threeSpells) && this.threeSpells > 0) {
+		// 			this.addSpellSlots(3, this.threeSpells);
+		// 		}
+		// 		this.fourSpells = input.fourSpells;
+		// 		if (isInteger(this.fourSpells) && this.fourSpells > 0) {
+		// 			this.addSpellSlots(4, this.fourSpells);
+		// 		}
+		// 		this.fiveSpells = input.fiveSpells;
+		// 		if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
+		// 			this.addSpellSlots(5, this.fiveSpells);
+		// 		}
+		// 		this.sixSpells = input.sixSpells;
+		// 		if (isInteger(this.sixSpells) && this.sixSpells > 0) {
+		// 			this.addSpellSlots(6, this.sixSpells);
+		// 		}
+		// 		this.sevenSpells = input.sevenSpells;
+		// 		if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
+		// 			this.addSpellSlots(7, this.sevenSpells);
+		// 		}
+		// 		this.eightSpells = input.eightSpells;
+		// 		if (isInteger(this.eightSpells) && this.eightSpells > 0) {
+		// 			this.addSpellSlots(8, this.eightSpells);
+		// 		}
+		// 		this.nineSpells = input.nineSpells;
+		// 		if (isInteger(this.nineSpells) && this.nineSpells > 0) {
+		// 			this.addSpellSlots(9, this.nineSpells);
+		// 		}
+		// 	}
+		// } else if (this.spells == 'points') {
+		// 	this.maxSpellPoints = input.maxSpellPoints;
+		// 	this.maxSpellLevel = input.maxSpellLevel;
+		// }
 
 	}
 
-	addSpellSlots(level, counter) {
-		this.spellSlots[level] = [];
-		for (var i=0;i<counter;i++) {
-			this.spellSlots[level].push(new Slot);
-		}
-	}
+	// addSpellSlots(level, counter) {
+	// 	this.spellSlots[level] = [];
+	// 	for (var i=0;i<counter;i++) {
+	// 		this.spellSlots[level].push(new Slot);
+	// 	}
+	// }
+
+	// editSpells(input) {
+	// 	console.log('entered editSpells');
+	// 	console.log(input);
+	// 	this.spells = input.spells;
+	// 	if(this.spells == 'slots') {
+	// 		this.spellSlots = [];
+	// 		if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
+	// 			this.spellSlots = input.spellSlots;
+	// 		} else {
+	// 			this.oneSpells = input.oneSpells;
+	// 			if (isInteger(this.oneSpells) && this.oneSpells > 0) {
+	// 				this.addSpellSlots(1, this.oneSpells);
+	// 			}
+	// 			this.twoSpells = input.twoSpells;
+	// 			if (isInteger(this.twoSpells) && this.twoSpells > 0) {
+	// 				this.addSpellSlots(2, this.twoSpells);
+	// 			}
+	// 			this.threeSpells = input.threeSpells;
+	// 			if (isInteger(this.threeSpells) && this.threeSpells > 0) {
+	// 				this.addSpellSlots(3, this.threeSpells);
+	// 			}
+	// 			this.fourSpells = input.fourSpells;
+	// 			if (isInteger(this.fourSpells) && this.fourSpells > 0) {
+	// 				this.addSpellSlots(4, this.fourSpells);
+	// 			}
+	// 			this.fiveSpells = input.fiveSpells;
+	// 			if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
+	// 				this.addSpellSlots(5, this.fiveSpells);
+	// 			}
+	// 			this.sixSpells = input.sixSpells;
+	// 			if (isInteger(this.sixSpells) && this.sixSpells > 0) {
+	// 				this.addSpellSlots(6, this.sixSpells);
+	// 			}
+	// 			this.sevenSpells = input.sevenSpells;
+	// 			if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
+	// 				this.addSpellSlots(7, this.sevenSpells);
+	// 			}
+	// 			this.eightSpells = input.eightSpells;
+	// 			if (isInteger(this.eightSpells) && this.eightSpells > 0) {
+	// 				this.addSpellSlots(8, this.eightSpells);
+	// 			}
+	// 			this.nineSpells = input.nineSpells;
+	// 			if (isInteger(this.nineSpells) && this.nineSpells > 0) {
+	// 				this.addSpellSlots(9, this.nineSpells);
+	// 			}
+	// 		}
+	// 	} else if (this.spells == 'points') {
+	// 		this.maxSpellPoints = input.maxSpellPoints;
+	// 		this.maxSpellLevel = input.maxSpellLevel;
+	// 	}
+
+	// }
 
 	// addSpells(counter){
 	// 	var spellSlots = [];
@@ -151,6 +215,11 @@ class Character {
 	// 	}
 	// 	return spellSlots;
 	// }
+
+	addSpells(input) {
+		this.spells = new Spells(input);
+
+	}
 
 	addAttack(attackData) {
 		this.attacks.push(new Attack(attackData));
@@ -248,6 +317,92 @@ class Slot {
 	}
 }
 
+class Spells {
+	constructor(input = false) {
+		this.spellType = 'no';
+		this.maxSpellPoints = 0;
+		this.maxSpellLevel = 0;
+		this.currentSpellPoints = 0;
+		// this.oneSpells = 0;
+		// this.twoSpells = 0;
+		// this.threeSpells = 0;
+		// this.fourSpells = 0;
+		// this.fiveSpells = 0;
+		// this.sixSpells = 0;
+		// this.sevenSpells = 0;
+		// this.eightSpells = 0;
+		// this.nineSpells = 0;
+		if(! this.spellSlots) {
+			this.spellSlots = [];
+			for(var i=1;i<10;i++) {
+				this.spellSlots[i] = [];
+			}
+		}
+		if (input) {
+			this.setSpells(input);
+		} 
+	}
+
+	setSpells(input) {
+		this.spellType = input.spellType;
+		if(this.spellType == 'slots') {
+			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
+				this.spellSlots = input.spellSlots;
+			} else {
+				// this.oneSpells = input.oneSpells;
+				this.addSpellSlots(1, input.oneSpells);
+				// this.twoSpells = input.twoSpells;
+				this.addSpellSlots(2, input.twoSpells);
+				// this.threeSpells = input.threeSpells;
+				this.addSpellSlots(3, input.threeSpells);
+				// this.fourSpells = input.fourSpells;
+				this.addSpellSlots(4, input.fourSpells);
+				// this.fiveSpells = input.fiveSpells;
+				this.addSpellSlots(5, input.fiveSpells);
+				// this.sixSpells = input.sixSpells;
+				this.addSpellSlots(6, input.sixSpells);
+				// this.sevenSpells = input.sevenSpells;
+				this.addSpellSlots(7, input.sevenSpells);
+				// this.eightSpells = input.eightSpells;
+				this.addSpellSlots(8, input.eightSpells);
+				// this.nineSpells = input.nineSpells;
+				this.addSpellSlots(9, input.nineSpells);
+			}
+		} else if (this.spellType == 'points') {
+			this.maxSpellPoints = input.maxSpellPoints;
+			this.maxSpellLevel = input.maxSpellLevel;
+			if (input.currentSpellPoints) {
+				this.currentSpellPoints = input.currentSpellPoints;
+			} else if (! this.currentSpellPoints) {
+				this.currentSpellPoints = this.maxSpellPoints;
+			}
+		}
+	}
+
+	edit(input) {
+		this.setSpells(input);
+	}
+
+	addSpellSlots(level, counter) {
+		if(this.spellSlots && this.spellSlots[level]) {
+			if(counter > this.spellSlots[level].length) {
+				for(var j=this.spellSlots[level].length;j<counter;j++) {
+					this.spellSlots[level].push(new Slot);
+				}
+			} else if(counter < this.spellSlots[level].length) {
+				for(var j=this.spellSlots[level].length;j>counter;j--) {
+					this.spellSlots[level].pop();
+				}
+			}
+
+		} else {
+			this.spellSlots[level] = [];
+			for (var i=0;i<counter;i++) {
+				this.spellSlots[level].push(new Slot);
+			}
+		}
+	}
+}
 
 class Attack {
 
@@ -443,8 +598,8 @@ class Resource {
 		this.name = resourceData.name;
 		this.type = resourceData.type;
 		this.total = resourceData.total;
+		this.slots = [];
 		if(this.type == 'slots') {
-			this.slots = [];
 			if (Array.isArray(resourceData.slots) && resourceData.slots.length > 0) {
 				this.slots = resourceData.slots;
 			} else {
@@ -475,16 +630,19 @@ class Resource {
 		this.type = resourceData.type;
 		this.total = resourceData.total;
 		if(this.type == 'slots') {
-			for(var j=this.slots.length;j<this.total;j++) {
-				this.slots.push(new Slot);
+			if(this.total > this.slots.length) {
+				for(var j=this.slots.length;j<this.total;j++) {
+					this.slots.push(new Slot);
+				}
+			} else if(this.total < this.slots.length) {
+				for(var j=this.slots.length;j>this.total;j--) {
+					this.slots.pop();
+				}
 			}
 		} 
 		console.log(this.name + " has been added");
 	}
 }
-
-
-
 
 
 var dice = {
@@ -562,6 +720,7 @@ Vue.component('character-stats', {
 					  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 					  	<a class="dropdown-item" @click="toggleNotepad">Toggle Notepad</a>
 					  	<a class="dropdown-item" @click="toggleResources">Toggle Resources</a>
+					  	<a class="dropdown-item" @click="toggleSpells">Toggle Spells</a>
 					    <a class="dropdown-item" @click="editCharacter" v-if="! edit">Edit {{character.name}}</a>
 					    <a class="dropdown-item" @click="editCharacter" v-if="edit">Cancel Edit</a>
 					    <a class="dropdown-item" @click="deleteCharacter">Delete {{character.name}}</a>
@@ -793,6 +952,7 @@ Vue.component('character-stats', {
 					</ul>
 				</div>				
 			</div>
+
 		</div>
 	`,
 	props: ["character"],
@@ -836,6 +996,13 @@ Vue.component('character-stats', {
 				this.character.showNotepad = 'Hide';
 			} else {
 				this.character.showNotepad = 'Show';
+			}
+		},
+		toggleSpells() {
+			if (this.character.showSpells == 'Show') {
+				this.character.showSpells = 'Hide';
+			} else {
+				this.character.showSpells = 'Show';
 			}
 		}
 	}
@@ -1035,72 +1202,14 @@ Vue.component('character-creator', {
 						</div>
 					</div>
 				</div>
-
-				<h4>Spells</h4>
-				<div class="form-check form-check-inline">
-				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellSlots" value="slots" v-model="spells">
-				    <label class="form-check-label" for="yesSpellSlots">Slots</label>
-				</div>
-				<div class="form-check form-check-inline">
-				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellPoints" value="points" v-model="spells">
-				    <label class="form-check-label" for="yesSpellPoints">Points (DMG Variant)</label>
-				</div>
-				<div class="form-check form-check-inline">
-				    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spells">
-				    <label class="form-check-label" for="noSpells">No</label>
-				</div>
-				<div v-if="spells == 'points'">
-					<div class="form-group">
-				        <label for="spellPoints">Total Spell Points:</label>
-				        <input type="number" class="form-control" id="spellPoints" placeholder="0" v-model.number="maxSpellPoints">
-				    </div>		
-					<div class="form-group">
-				        <label for="maxSpellLevel">Max Spell Level Avaibale:</label>
-				        <input type="number" class="form-control" id="maxSpellLevel" placeholder="0" v-model.number="maxSpellLevel">
-				    </div>					    
-				</div>			
-				<div v-if="spells == 'slots'">
-					<div class="form-group">
-				        <label for="oneSpells">1st Level Spells:</label>
-				        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="twoSpells">2nd Level Spells:</label>
-				        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model.number="twoSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="threeSpells">3rd Level Spells:</label>
-				        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model.number="threeSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="fourSpells">4th Level Spells:</label>
-				        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model.number="fourSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="fiveSpells">5th Level Spells:</label>
-				        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model.number="fiveSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="sixSpells">6th Level Spells:</label>
-				        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model.number="sixSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="sevenSpells">7th Level Spells:</label>
-				        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model.number="sevenSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="eightSpells">8th Level Spells:</label>
-				        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model.number="eightSpells">
-				    </div>
-				    <div class="form-group">
-				        <label for="nineSpells">9th Level Spells:</label>
-				        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model.number="nineSpells">
-				    </div>
-				</div>
-
-			    <button type="button" class="btn btn-primary" @click="createCharacter" v-if="edit != 'editing'">Create Character</button>
-			    <button type="button" class="btn btn-primary" @click="updateCharacter" v-if="edit == 'editing'">Update Character</button>
-			    <button type="button" class="btn btn-danger" @click="$emit('edit', false)" v-if="edit == 'editing'">Cancel</button>			    
+				<hr>
+				<div class="row">
+					<div class="col">
+					    <button type="button" class="btn btn-primary mx-2" @click="createCharacter" v-if="edit != 'editing'">Create Character</button>
+					    <button type="button" class="btn btn-primary mx-2" @click="updateCharacter" v-if="edit == 'editing'">Update Character</button>
+					    <button type="button" class="btn btn-danger mx-2" @click="$emit('edit', false)" v-if="edit == 'editing'">Cancel</button>
+					</div>
+				</div>			    
 			</form>
 		</div>
 	`,
@@ -1149,19 +1258,7 @@ Vue.component('character-creator', {
 			deception: 0,
 			intimidation: 0,
 			performance: 0,
-			persuasion: 0,
-			spells: 'no',
-			maxSpellPoints: null,
-			maxSpellLevel: null,
-			oneSpells: null,
-			twoSpells: null,
-			threeSpells: null,
-			fourSpells: null,
-			fiveSpells: null,
-			sixSpells: null,
-			sevenSpells: null,
-			eightSpells: null,
-			nineSpells: null
+			persuasion: 0
 
 			
 		};
@@ -1211,21 +1308,6 @@ Vue.component('character-creator', {
 			this.intimidation = this.character.intimidation;
 			this.performance = this.character.performance;
 			this.persuasion = this.character.persuasion;
-			this.spells = this.character.spells;
-			if(this.spells == 'slots') {
-				this.oneSpells = this.character.spellSlots[1].length;
-				this.twoSpells = this.character.spellSlots[2].length;
-				this.threeSpells = this.character.spellSlots[3].length;
-				this.fourSpells = this.character.spellSlots[4].length;
-				this.fiveSpells = this.character.spellSlots[5].length;
-				this.sixSpells = this.character.spellSlots[6].length;
-				this.sevenSpells = this.character.spellSlots[7].length;
-				this.eightSpells = this.character.spellSlots[8].length;
-				this.nineSpells = this.character.spellSlots[9].length;
-			} else if(this.spells == 'points') {
-				this.maxSpellPoints = this.character.maxSpellPoints;
-				this.maxSpellLevel = this.character.maxSpellLevel;
-			}
 		}
 	},
 	methods: {
@@ -1282,19 +1364,7 @@ Vue.component('character-creator', {
 				deception: this.deception,
 				intimidation: this.intimidation,
 				performance: this.performance,
-				persuasion: this.persuasion,
-				spells: this.spells,
-				oneSpells: this.oneSpells,
-				twoSpells: this.twoSpells,
-				threeSpells: this.threeSpells,
-				fourSpells: this.fourSpells,
-				fiveSpells: this.fiveSpells,
-				sixSpells: this.sixSpells,
-				sevenSpells: this.sevenSpells,
-				eightSpells: this.eightSpells,
-				nineSpells: this.nineSpells,
-				maxSpellPoints: this.maxSpellPoints,
-				maxSpellLevel: this.maxSpellLevel
+				persuasion: this.persuasion
 			};
 		}
 	}
@@ -1304,40 +1374,48 @@ Vue.component('character-creator', {
 
 Vue.component('spells', {
 	template: `
-		<div class="col-md-2 px-0">
-			<div class="card rounded-0">
+		<div class="col-md-2 px-0 "  v-if="character.showSpells == 'Show'">
+			<div class="card rounded-0 h-100">
 				<div class="card-header p-2">
-					<h3>Spells</h3>
+					<h3 class="d-inline-block">Spells</h3>
+					<spells-field v-bind:spells="character.spells"></spells-field>
 				</div>
-				<div class="card-body p-2" v-if="character.spells == 'slots'">
+				<div class="card-body p-2" v-if="character.spells.spellType == 'slots'">
 					<ul class="list-group list-group-flush">
-						<li v-for="(level, levelIndex) in character.spellSlots" v-if="levelIndex != 0">
+						<li v-for="(level, levelIndex) in character.spells.spellSlots" v-if="levelIndex != 0 && level.length > 0">
 							{{levelIndex}}: 
-							<a v-for="spellSlot in level" @click="switchSlot(spellSlot)">
-								{{spellSlot.value}}
+							<a v-for="spellSlot in level" @click="switchSlot(spellSlot)" v-text="spellSlot.value">
 							</a>
 						</li>
 						
 					</ul>
 				</div>
-				<div class="card-body p-2" v-if="character.spells == 'points'">
+				<div class="card-body p-2" v-if="character.spells.spellType == 'points'">
 					<span>
 						Points:
-						<input type="number" class="numInput" v-model="character.currentSpellPoints"></input>
-						/ {{character.maxSpellPoints}}
+						<input type="number" class="numInput" v-model.number="character.spells.currentSpellPoints"></input>
+						/ {{character.spells.maxSpellPoints}}
 					</span>
 					<ul class="list-group list-group-flush">
-						<li v-for="(cost, level) in spellPointsCosts" v-if="level != 0 && level <= character.maxSpellLevel">
+						<li v-for="(cost, level) in spellPointsCosts" v-if="level != 0 && level <= character.spells.maxSpellLevel">
 							<a @click="usePoints(cost)">
 								{{level}}: {{cost}} points
 							</a>
 						</li>
 					</ul>
 				</div>
+				<div class="card-body p-2" v-if="character.spells.spellType == 'no'">
+					If your character is not a spellcaster, you can hide this section by clicking 'Toggle Spells' from the dropdown menu next to the character's name.
+				</div>
 			</div>
 		</div>
 	`,
 	props: ["character"],
+	computed: {
+		spells() {
+			return this.character.spells;
+		}
+	},
 	data() {
 		return {
 			spellPointsCosts: [0,2,3,5,6,7,9,10,11,13],
@@ -1361,20 +1439,199 @@ Vue.component('spells', {
 				spellSlot.used = true;
 				spellSlot.value = "\u26AB";
 			}	
-			Vue.set(this.character);
+			//Vue.set(this.character);
 		},
 		usePoints(cost) {
-			if (this.character.currentSpellPoints >= cost) {
-				this.character.currentSpellPoints -= cost;
+			if (this.character.spells.currentSpellPoints >= cost) {
+				this.character.spells.currentSpellPoints -= cost;
 			}
 		}
 	}
 });
 
+Vue.component('spells-field', {
+	template: `
+		<div class="d-inline-block float-right">
+			<button class="btn btn-primary btn-sm" @click="startEdit">Edit</button>
+			<div v-if="show" class="modal-mask">
+				<transition name="modal">
+				  	<div class="modal-dialog" role="document">
+				    	<div class="modal-content">
+					      	<div class="modal-header card-header">
+					        	<h5 class="modal-title">Edit Spells</h5>
+					        	<button type="button" class="close" @click="reset">
+						          	<span aria-hidden="true">&times;</span>
+						        </button>
+					      	</div>
+					      	<div class="modal-body">
+								<div class="form-check form-check-inline">
+								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellSlots" value="slots" v-model="spellType">
+								    <label class="form-check-label" for="yesSpellSlots">Slots</label>
+								</div>
+								<div class="form-check form-check-inline">
+								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellPoints" value="points" v-model="spellType">
+								    <label class="form-check-label" for="yesSpellPoints">Points (DMG Variant)</label>
+								</div>
+								<div class="form-check form-check-inline">
+								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spellType">
+								    <label class="form-check-label" for="noSpells">No</label>
+								</div>
+								<div v-if="spellType == 'points'">
+									<div class="form-group">
+								        <label for="spellPoints">Total Spell Points:</label>
+								        <input type="number" class="form-control" id="spellPoints" placeholder="0" v-model.number="maxSpellPoints">
+								    </div>		
+									<div class="form-group">
+								        <label for="maxSpellLevel">Max Spell Level Avaibale:</label>
+								        <input type="number" class="form-control" id="maxSpellLevel" placeholder="0" v-model.number="maxSpellLevel">
+								    </div>					    
+								</div>			
+								<div v-if="spellType == 'slots'">
+									<div class="form-row">
+										<div class="form-group col-6">
+									        <label for="oneSpells">1st Level Spells:</label>
+									        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
+									    </div>
+									    <div class="form-group col-6">
+									        <label for="twoSpells">2nd Level Spells:</label>
+									        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model.number="twoSpells">
+									    </div>
+									</div>
+									<div class="form-row">
+									    <div class="form-group col-6">
+									        <label for="threeSpells">3rd Level Spells:</label>
+									        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model.number="threeSpells">
+									    </div>
+									    <div class="form-group col-6">
+									        <label for="fourSpells">4th Level Spells:</label>
+									        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model.number="fourSpells">
+									    </div>
+									</div>
+									<div class="form-row">
+									    <div class="form-group col-6">
+									        <label for="fiveSpells">5th Level Spells:</label>
+									        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model.number="fiveSpells">
+									    </div>
+									    <div class="form-group col-6">
+									        <label for="sixSpells">6th Level Spells:</label>
+									        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model.number="sixSpells">
+									    </div>
+									</div>
+									<div class="form-row">
+									    <div class="form-group col-6">
+									        <label for="sevenSpells">7th Level Spells:</label>
+									        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model.number="sevenSpells">
+									    </div>
+									    <div class="form-group col-6">
+									        <label for="eightSpells">8th Level Spells:</label>
+									        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model.number="eightSpells">
+									    </div>
+									</div>
+									<div class="form-row">
+									    <div class="form-group col-6">
+									        <label for="nineSpells">9th Level Spells:</label>
+									        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model.number="nineSpells">
+									    </div>
+									</div>
+								</div>
+					      	</div>
+					      	<div class="modal-footer">
+								<button class="btn btn-primary btn-sm" @click="edit">Edit Spells</button>
+								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+					      	</div>
+				    	</div>
+				  	</div>
+				</transition>
+			</div>
+		</div>
+	`,
+	props: ["spells"],
+	created() {
+		this.reset();
+	},
+	data() {
+		return {
+			show: false,
+			spellType: 'no',
+			maxSpellPoints: 0,
+			maxSpellLevel: 0,
+			oneSpells: 0,
+			twoSpells: 0,
+			threeSpells: 0,
+			fourSpells: 0,
+			fiveSpells: 0,
+			sixSpells: 0,
+			sevenSpells: 0,
+			eightSpells: 0,
+			nineSpells: 0
+		};
+	},
+	methods: {
+		startEdit() {
+			this.show = true;
+			if (this.spells.spellType) {
+				this.spellType = this.spells.spellType;
+				if(this.spellType == 'slots') {
+					this.oneSpells = this.spells.spellSlots[1] && this.spells.spellSlots[1].length;
+					this.twoSpells = this.spells.spellSlots[2] && this.spells.spellSlots[2].length;
+					this.threeSpells = this.spells.spellSlots[3] && this.spells.spellSlots[3].length;
+					this.fourSpells = this.spells.spellSlots[4] && this.spells.spellSlots[4].length;
+					this.fiveSpells = this.spells.spellSlots[5] && this.spells.spellSlots[5].length;
+					this.sixSpells = this.spells.spellSlots[6] && this.spells.spellSlots[6].length;
+					this.sevenSpells = this.spells.spellSlots[7] && this.spells.spellSlots[7].length;
+					this.eightSpells = this.spells.spellSlots[8] && this.spells.spellSlots[8].length;
+					this.nineSpells = this.spells.spellSlots[9] && this.spells.spellSlots[9].length;
+				} else if(this.spellType == 'points') {
+					this.maxSpellPoints = this.spells.maxSpellPoints;
+					this.maxSpellLevel = this.spells.maxSpellLevel;
+				}
+			}
+		},
+		edit() {
+			var data = this.prepareData();
+			this.spells.edit(data);
+			this.reset();
+		},
+		prepareData() {
+			return {
+				spellType: this.spellType,
+				oneSpells: this.oneSpells,
+				twoSpells: this.twoSpells,
+				threeSpells: this.threeSpells,
+				fourSpells: this.fourSpells,
+				fiveSpells: this.fiveSpells,
+				sixSpells: this.sixSpells,
+				sevenSpells: this.sevenSpells,
+				eightSpells: this.eightSpells,
+				nineSpells: this.nineSpells,
+				maxSpellPoints: this.maxSpellPoints,
+				maxSpellLevel: this.maxSpellLevel
+			};
+		},
+		reset() {
+			this.show = false;
+			this.spellType = 'no';
+			this.maxSpellPoints = 0;
+			this.maxSpellLevel = 0;
+			this.oneSpells = 0;
+			this.twoSpells = 0;
+			this.threeSpells = 0;
+			this.fourSpells = 0;
+			this.fiveSpells = 0;
+			this.sixSpells = 0;
+			this.sevenSpells = 0;
+			this.eightSpells = 0;
+			this.nineSpells = 0;
+		}
+
+	}	
+
+});
+
 Vue.component('attack', {
 	template: `
 		<div class="col-md px-0">
-			<div class="card rounded-0">
+			<div class="card rounded-0  h-100">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Attacks</h3>
 					<attack-modifier-field class="d-inline-block float-right" v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
@@ -1407,6 +1664,9 @@ Vue.component('attack', {
 							</span>
 							<attack-modifier-field v-bind:character="character" v-bind:target="attack" v-bind:targetType="'Attack'"></attack-modifier-field>
 						</li>
+						<li class="list-group-item" v-if="character.attacks.length < 1">
+							Click on 'Add Attack' to add a new attack (ex. 'Longsword') and 'Add Modifier' to add a new attack modifier (ex. 'Sneak Attack').
+						</li>
 					</ul>
 				</div>
 	<!--			<div class="card-footer">
@@ -1436,7 +1696,7 @@ Vue.component('attack-modifier-field', {
 	template: `
 		<div>
 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add {{targetType}}</button>
-			<a class="badge badge-light" @click="show = true" v-if="task == 'Edit'">Edit {{targetType}}</a>
+			<a class="badge badge-light" @click="startEdit" v-if="task == 'Edit'">Edit {{targetType}}</a>
 			<div v-if="show" class="modal-mask">
 				<transition name="modal">
 				  	<div class="modal-dialog" role="document">
@@ -1535,6 +1795,17 @@ Vue.component('attack-modifier-field', {
 			}
 			this.reset();
 		},
+		startEdit() {
+			this.show = true;
+			this.name = this.target.name;	
+			this.type = this.target.type;	
+			this.attackModifier = this.target.attackModifier;
+			this.saveDC = this.target.saveDC;
+			this.saveType = this.target.saveType;
+			this.damageDiceNum = this.target.damageDiceNum;
+			this.damageDice = this.target.damageDice;
+			this.damageModifier = this.target.damageModifier;
+		},
 		edit() {
 			var data = this.prepareData();
 			this.target.edit(data);
@@ -1563,31 +1834,18 @@ Vue.component('attack-modifier-field', {
 			}
 		},
 		reset() {
+			this.show = false;
+			this.name = '';			
+			this.type = '';
+			this.attackModifier = 0;
+			this.saveDC = 0;
+			this.saveType = '';
+			this.damageDiceNum = 0;
+			this.damageDice = 0;
+			this.damageModifier = 0;
 			if (this.target) {
-				this.show = false;
-				this.name = this.target.name;	
-				if(this.targetType == 'Attack') {
-					this.type = this.target.type;					
-				} else {
-					this.type = this.target.type;
-				}		
-				this.attackModifier = this.target.attackModifier;
-				this.saveDC = this.target.saveDC;
-				this.saveType = this.target.saveType;
-				this.damageDiceNum = this.target.damageDiceNum;
-				this.damageDice = this.target.damageDice;
-				this.damageModifier = this.target.damageModifier;
 				this.task = 'Edit';
 			} else {
-				this.show = false;
-				this.name = '';			
-				this.type = '';
-				this.attackModifier = 0;
-				this.saveDC = 0;
-				this.saveType = '';
-				this.damageDiceNum = 0;
-				this.damageDice = 0;
-				this.damageModifier = 0;
 				this.task = 'New';
 			}
 		}
@@ -1597,8 +1855,8 @@ Vue.component('attack-modifier-field', {
 
 Vue.component('resources', {
 	template: `
-		<div class="col-md-2 px-0">
-			<div class="card rounded-0">
+		<div class="col-md-2 px-0" v-if="character.showResources == 'Show'">
+			<div class="card rounded-0  h-100">
 				<div class="card-header p-2">
 					<h3 class="d-inline-block">Resources</h3>
 				</div>
@@ -1606,7 +1864,7 @@ Vue.component('resources', {
 					<ul class="list-group list-group-flush">
 						<li v-if="character.resources" v-for="resource in character.resources">
 							{{resource.name}}: 
-							<a v-if="resource.type == 'slots'" v-for="slot in resource.slots" @click="switchSlot(slot)">
+							<a class="col-2 p-0" v-if="resource.type == 'slots'" v-for="slot in resource.slots" @click="switchSlot(slot)">
 								{{slot.value}}
 							</a>
 							<span v-if="resource.type == 'points'">
@@ -1635,7 +1893,7 @@ Vue.component('resources', {
 				slot.used = true;
 				slot.value = "\u26AB";
 			}	
-			Vue.set(this.character);
+			//Vue.set(this.character);
 		},
 	}
 });
@@ -1644,7 +1902,7 @@ Vue.component('resource-field', {
 	template: `
 		<div>
 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add</button>
-			<a class="badge badge-light" @click="show = true" v-if="task == 'Edit'">Edit</a>
+			<a class="badge badge-light" @click="startEdit" v-if="task == 'Edit'">Edit</a>
 			<div v-if="show" class="modal-mask">
 				<transition name="modal">
 				  	<div class="modal-dialog" role="document">
@@ -1707,6 +1965,12 @@ Vue.component('resource-field', {
 			this.character.addResource(data);			
 			this.reset();
 		},
+		startEdit() {
+			this.show = true;
+			this.name = this.resource.name;	
+			this.type = this.resource.type;
+			this.total = this.resource.total;
+		},
 		edit() {
 			var data = this.prepareData();
 			this.resource.edit(data);
@@ -1717,7 +1981,7 @@ Vue.component('resource-field', {
 				name: this.name,
 				type: this.type,
 				total: this.total
-				};
+			};
 		},
 		deleteTarget() {
 			if (confirm('Delete ' + this.resource.name + '?')) {
@@ -1726,17 +1990,13 @@ Vue.component('resource-field', {
 			}
 		},
 		reset() {
+			this.show = false;
+			this.name = '';			
+			this.type = '';
+			this.total = 0;
 			if (this.resource) {
-				this.show = false;
-				this.name = this.resource.name;	
-				this.type = this.resource.type;
-				this.total = this.resource.total;
 				this.task = 'Edit';
 			} else {
-				this.show = false;
-				this.name = '';			
-				this.type = '';
-				this.total = 0;
 				this.task = 'New';
 			}
 		}
@@ -1746,7 +2006,7 @@ Vue.component('resource-field', {
 
 Vue.component('notepad', {
 	template: `
-		<div class="card col-6 px-0 rounded-0" v-if="character.showNotepad == 'Show'">
+		<div class="card col-md px-0 rounded-0" v-if="character.showNotepad == 'Show'">
 			<div class="card-header p-2">
 				<h3 class="d-inline-block">Notepad</h3>
 			</div>
@@ -1762,16 +2022,18 @@ Vue.component('notepad', {
 
 Vue.component('feed', {
 	template:`
-	<div class="card col px-0 rounded-0">
+	<div class="card col-md px-0 rounded-0">
 		<div class="card-header p-2">
 			<h3 class="d-inline-block">Feed</h3>
 			<button type="button" class="close" @click="clearFeed">
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
-		<ul class="list-group">
-			<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
-		</ul>
+		<div class="card-body p-2">
+			<ul class="list-group">
+				<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
+			</ul>
+		</div>
 	</div>
 	`,
 	props: ['feed'],
@@ -1814,7 +2076,7 @@ Vue.component('home', {
 						Export Data
 					</h3>
 					<div class="card-body">
-						<button class="btn btn-primary btn-sm" id="export">Export Data</button>
+						<button class="btn btn-primary btn-sm" id="export" @click="exportData">Export Data</button>
 					</div>
 				</div>
 				<div class="card d-inline-block col-md-6 rounded-0 p-0">
@@ -1823,7 +2085,7 @@ Vue.component('home', {
 					</h3>
 					<div class="card-body">
 						<input type="file" id="selectFiles" value="Import" /><br />
-						<button class="btn btn-primary btn-sm my-2" id="import">Import Data</button><br>	
+						<button class="btn btn-primary btn-sm my-2" id="import" @click="importData">Import Data</button><br>	
 						Note: importing will overwrite any locally stored characters.
 
 					</div>
@@ -1833,8 +2095,48 @@ Vue.component('home', {
 
 		</div>
 	`,
+	methods: {
+		exportData() {
+			console.log('entered export');
 
-})
+		    if(!app.characters) {
+		        alert('error : No data')
+		        return;
+		    }
+
+		    var jsonCharacters = JSON.stringify(app.characters);
+
+		  	var a = document.createElement('a');
+		  	document.body.appendChild(a);
+		  	a.setAttribute('href', 'data:text/plain;charset=utf-u,'+encodeURIComponent(jsonCharacters));
+		  	a.setAttribute('download', 'characterData.json');
+		  	a.click()
+		  	console.log(a);
+		 },
+
+		importData() {
+			var files = $('#selectFiles').prop('files')[0];
+			console.log(files);
+			if (files.length <= 0) {
+				return false;
+			}
+
+			var fr = new FileReader();
+
+			fr.onload = function(retrievedObject) { 
+				var jsonCharacters = JSON.parse(retrievedObject.target.result);
+				app.characters = [];
+				for (var i=0;i<jsonCharacters.length;i++) {
+					console.log(i + '/' + jsonCharacters.length);
+					app.characters.push(new Character(jsonCharacters[i]));
+				}
+			}
+
+			fr.readAsText(files);
+		}	
+	}
+
+});
 
 Vue.component('dice-roller',{
 	template: `
@@ -1944,6 +2246,9 @@ const app = new Vue({
 			$('.nav').find('.active').removeClass('active');
 		},
 		addToFeed(input) {
+			if(this.feed.length >=10) {
+				this.feed.pop();
+			}
 			this.feed.unshift(input);
 		}
 	}
@@ -1975,54 +2280,57 @@ function saveData() {
 		}, 10000);
 }
 
-function exportData() {
+// function exportData() {
+// 	console.log('entered export');
 
-    if(!app.characters) {
-        alert('error : No data')
-        return;
-    }
+//     if(!app.characters) {
+//         alert('error : No data')
+//         return;
+//     }
 
-    var jsonCharacters = JSON.stringify(app.characters);
+//     var jsonCharacters = JSON.stringify(app.characters);
 
-  	var a = document.createElement('a');
-  	a.setAttribute('href', 'data:text/plain;charset=utf-u,'+encodeURIComponent(jsonCharacters));
-  	a.setAttribute('download', 'characterData.json');
-  	a.click()
- }
+//   	var a = document.createElement('a');
+//   	document.body.appendChild(a);
+//   	a.setAttribute('href', 'data:text/plain;charset=utf-u,'+encodeURIComponent(jsonCharacters));
+//   	a.setAttribute('download', 'characterData.json');
+//   	a.click()
+//   	console.log(a);
+//  }
 
-function importData() {
-	var files = $('#selectFiles').prop('files')[0];
-	console.log(files);
-	if (files.length <= 0) {
-		return false;
-	}
+// function importData() {
+// 	var files = $('#selectFiles').prop('files')[0];
+// 	console.log(files);
+// 	if (files.length <= 0) {
+// 		return false;
+// 	}
 
-	var fr = new FileReader();
+// 	var fr = new FileReader();
 
-	fr.onload = function(retrievedObject) { 
-		var jsonCharacters = JSON.parse(retrievedObject.target.result);
-		app.characters = [];
-		for (var i=0;i<jsonCharacters.length;i++) {
-			console.log(i + '/' + jsonCharacters.length);
-			app.characters.push(new Character(jsonCharacters[i]));
-		}
-	}
+// 	fr.onload = function(retrievedObject) { 
+// 		var jsonCharacters = JSON.parse(retrievedObject.target.result);
+// 		app.characters = [];
+// 		for (var i=0;i<jsonCharacters.length;i++) {
+// 			console.log(i + '/' + jsonCharacters.length);
+// 			app.characters.push(new Character(jsonCharacters[i]));
+// 		}
+// 	}
 
-	fr.readAsText(files);
-}
+// 	fr.readAsText(files);
+// }
 
 
-function isInteger(x) {
-    return x % 1 === 0;
-}
+// function isInteger(x) {
+//     return x % 1 === 0;
+// }
 
 
 $(document).ready(function() {
 	getData();
 	saveData();
 
-	$('#export').click(exportData);
-	$('#import').click(importData);
+	// $('#export').click(exportData);
+	// $('#import').click(importData);
 });
 
 
