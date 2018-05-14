@@ -1,9 +1,3 @@
-.feed-item {
-  white-space: pre-line;
-}
-
-
-
 .numInput {
   width: 50px;
 }
@@ -60,10 +54,16 @@ textarea {
 }
 
 .feed-div {
-  overflow-y: scroll!important;
+  overflow-y: auto!important;
   position: relative;
 }
 
 .feed-body {
   position: absolute;
 }
+
+.feed-item {
+  white-space: pre-line;
+  padding: .75rem .6rem;
+}
+

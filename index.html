@@ -83,7 +83,7 @@
 		<home v-if="selected == 'home'">
 		</home>
 
-		<dice-roller v-if="selected == 'dice-roller'">
+		<dice-roller v-if="selected == 'dice-roller'" v-bind:feed="diceRollerFeed">
 		</dice-roller>
 
 		<character-creator v-if="selected == 'create-character'">

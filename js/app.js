@@ -280,13 +280,13 @@ class Character {
 
 	attack(attack, type = 'normal', modifiersIndexArray = null){
 		var results = attack.makeAttack(type);
-		if (modifiersIndexArray) {
+		if (modifiersIndexArray && results.roll != 1) {
 			for(var i=0;i<modifiersIndexArray.length;i++) {
 				results.resultsArray = this.modifiers[modifiersIndexArray[i]].makeAttack(results.resultsArray, results.roll);
 			}
 		}
 		console.log(results);
-		app.addToFeed(results.resultsArray.join('\n'));
+		app.addToFeed(results.resultsArray, results.roll);
 	}
 
 	rollStat(stat, statModifier, rollModifier) {
@@ -294,14 +294,15 @@ class Character {
 		if (rollModifier == 'advantage') {
 			var rollTwo = dice.d20();
 			var winningRoll = (( roll > rollTwo ) ? roll : rollTwo);
-			return stat + ' with advantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
+			var output = stat + ' with advantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
 		} else if (rollModifier == 'disadvantage') {
 			var rollTwo = dice.d20();
 			var winningRoll = (( roll < rollTwo ) ? roll : rollTwo);
-			return stat + ' with disadvantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
+			var output = stat + ' with disadvantage: [' + roll + ', ' + rollTwo + '] + ' + statModifier + ' = ' + (winningRoll + statModifier);
 		} else {
-			return stat + ': [' + roll + '] + ' + statModifier + ' = ' + (roll + statModifier);
+			var output = stat + ': [' + roll + '] + ' + statModifier + ' = ' + (roll + statModifier);
 		}
+		app.addToFeed(output);
 	}
 
 }
@@ -434,17 +435,7 @@ class Spells {
 class Attack {
 
 	constructor(attackData) {
-		this.name = attackData.name;
-		this.type = attackData.type;
-		if(attackData.type == 'roll') {
-			this.attackModifier = attackData.attackModifier;
-		} else if (attackData.type == 'save' ) {
-			this.saveDC = attackData.saveDC;
-			this.saveType = attackData.saveType;
-		}
-		this.damageDiceNum = attackData.damageDiceNum;
-		this.damageDice = attackData.damageDice;
-		this.damageModifier = attackData.damageModifier;
+		this.setStats(attackData);
 		console.log(this.name + " has been added");
 	}
 
@@ -459,7 +450,10 @@ class Attack {
 		} else if (this.type == 'save') {
 			results = this.rollSave();
 		}
-		results = this.rollDamage(results, attackRoll)
+		results = this.rollDamage(this.damageOne, results, attackRoll);
+		if (this.secondDamage == 'yes' && attackRoll != 1) {
+			results = this.rollDamage(this.damageTwo, results, attackRoll);
+		}
 
 		console.log(results.join('\n'));
 		return {
@@ -506,50 +500,85 @@ class Attack {
 	rollSave(){
 		var output = [];
 		output.push(this.name + ':');
-		output.push('Your target(s) need(s) to make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
+		output.push('Target(s) make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
 		return output;
 	}
 
-	rollDamage(results, attackRoll = null) {
+	rollDamage(damageObject, results, attackRoll = null) {
 		var damageRoll = null
-		var damageTotal = this.damageModifier;
+		var damageTotal = damageObject.damageModifier;
 		var damageRollsArray = [];
 		if (attackRoll == 20) {
 			results.push('You crit!');
 			for(var i=0;i<2;i++) {
 				console.log(i + ' time through crit loop');
-				for(var x=0;x<this.damageDiceNum;x++) { 
-					damageRoll = dice.roll(this.damageDice);
+				for(var x=0;x<damageObject.damageDiceNum;x++) { 
+					damageRoll = dice.roll(damageObject.damageDice);
 					damageTotal = damageTotal + damageRoll;
 					damageRollsArray.push(damageRoll);
 				}
 			}
+		} else if (attackRoll == 1) {
+			results.push('You critically failed...');
+			return results;
 		} else {
-			for(var i=0;i<this.damageDiceNum;i++) { 
-					damageRoll = dice.roll(this.damageDice);
+			for(var i=0;i<damageObject.damageDiceNum;i++) { 
+					damageRoll = dice.roll(damageObject.damageDice);
 					damageTotal = damageTotal + damageRoll;
 					damageRollsArray.push(damageRoll);
 			}
 		}
-		results.push('Damage roll: [' + damageRollsArray + '] + ' + this.damageModifier + ' = ' + damageTotal);
+		var resultArray = [];
+		resultArray.push(damageObject.damageType + ' Damage: [' + damageRollsArray.join(', ') + ']');
+		if (damageObject.damageModifier != 0) {
+			resultArray.push('+ ' + damageObject.damageModifier);
+		}
+		resultArray.push('= ' + damageTotal);
+
+		results.push(resultArray.join(' ')); 
+		//results.push(damageObject.damageType + ' Damage: [' + damageRollsArray.join(', ') + '] + ' + damageObject.damageModifier + ' = ' + damageTotal);
 
 		return results;
 	}
 
 	edit(attackData) {
+		this.setStats(attackData);
+		
+		console.log(this.name + " has been edited");
+	}
+
+	setStats(attackData) {
 		this.name = attackData.name;
+		this.type = attackData.type;
 		if(attackData.type == 'roll') {
-			this.type = attackData.type;
 			this.attackModifier = attackData.attackModifier;
 		} else if (attackData.type == 'save' ) {
-			this.type = attackData.type;
 			this.saveDC = attackData.saveDC;
 			this.saveType = attackData.saveType;
 		}
-		this.damageDiceNum = attackData.damageDiceNum;
-		this.damageDice = attackData.damageDice;
-		this.damageModifier = attackData.damageModifier;
-		console.log(this.name + " has been edited");
+		if (attackData.damageOne) {
+			this.damageOne = attackData.damageOne;
+		} else {
+			this.damageOne = {
+				damageDiceNum: attackData.damageDiceNum,
+				damageDice: attackData.damageDice,
+				damageModifier: attackData.damageModifier,
+				damageType: attackData.damageType
+			}
+		}
+		this.secondDamage = attackData.secondDamage;
+		if(this.secondDamage == 'yes') {
+			if (attackData.damageTwo) {
+				this.damageTwo = attackData.damageTwo;
+			} else {
+				this.damageTwo = {
+					damageDiceNum: attackData.secondDamageDiceNum,
+					damageDice: attackData.secondDamageDice,
+					damageModifier: attackData.secondDamageModifier,
+					damageType: attackData.secondDamageType
+				}
+			}
+		}
 	}
 }
 
@@ -668,6 +697,22 @@ class Counter {
 			}
 		} 
 		console.log(this.name + " has been added");
+	}
+}
+
+class FeedItem {
+
+	constructor(feedText, roll = false) {
+		this.feedText = feedText;
+		if (Array.isArray(this.feedText)) {
+			this.feedText = this.feedText.join('\n');
+		}
+		this.critical = false;
+		if(roll == 20) {
+			this.critical = 'critSuccess';
+		} else if (roll == 1) {
+			this.critical = 'critFail';
+		}
 	}
 }
 
@@ -990,8 +1035,7 @@ Vue.component('character-stats', {
 	},
 	methods: {
 		rollStat(stat, statModifier) {
-			var result = this.character.rollStat(stat, statModifier, this.rollModifier);
-			app.feed.unshift(result)
+			this.character.rollStat(stat, statModifier, this.rollModifier);
 		},
 		editCharacter(){
 			if (this.edit != 'editing') {
@@ -1429,10 +1473,10 @@ Vue.component('spells', {
 							</li>
 						</ul>
 					</div>
+					<div v-if="character.spells.spellType == 'no' && character.spells.spellCounters.length == 0">
+						If your character is not a spellcaster, you can hide this section by clicking 'Toggle Spells' from the dropdown menu next to the character's name.
+					</div>
 					<counters v-bind:character="character" v-bind:counterArray="character.spells.spellCounters" v-bind:counterType="'Spell Counter'"></counters>
-				</div>
-				<div class="card-body p-2" v-if="character.spells.spellType == 'no'">
-					If your character is not a spellcaster, you can hide this section by clicking 'Toggle Spells' from the dropdown menu next to the character's name.
 				</div>
 			</div>
 		</div>
@@ -1674,13 +1718,24 @@ Vue.component('attack', {
 						<li class="list-group-item" v-for="attack in character.attacks">
 							<span>
 								{{attack.name}} |
-								<span v-if="attack.attackModifier && attack.attackModifier != 0 ">
+								<span v-if="attack.attackModifier && attack.attackModifier != 0 && attack.type == 'roll'">
 									+{{attack.attackModifier}} |
 								</span>
-								{{attack.damageDiceNum}}d{{attack.damageDice}}
-								<span v-if="attack.damageModifier && attack.damageModifier != 0 ">
-									+{{attack.damageModifier}}
+								<span v-if="attack.type == 'save'">
+									DC {{attack.saveDC}} {{attack.saveType}} |
+								</span>
+								{{attack.damageOne.damageDiceNum}}d{{attack.damageOne.damageDice}}
+								<span v-if="attack.damageOne.damageModifier && attack.damageOne.damageModifier != 0 ">
+									+ {{attack.damageOne.damageModifier}}
 								</span> 
+								{{attack.damageOne.damageType}} damage
+								<span v-if="attack.secondDamage == 'yes' && attack.damageTwo">
+									& {{attack.damageTwo.damageDiceNum}}d{{attack.damageTwo.damageDice}}
+									<span v-if="attack.damageTwo.damageModifier && attack.damageTwo.damageModifier != 0 ">
+										+ {{attack.damageTwo.damageModifier}}
+									</span> 
+									{{attack.damageTwo.damageType}} damage
+								</span>
 							</span>
 							<span class="float-right">
 								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.type == 'roll'">Roll with disadvantage!</button>
@@ -1777,6 +1832,61 @@ Vue.component('attack-modifier-field', {
 									</select>
 									+ 
 									<input class="numInput" type="number" v-model.number="damageModifier">
+									<select v-model="damageType">
+										<option>Acid</option>
+										<option>Bludgeoning</option>
+										<option>Cold</option>
+										<option>Fire</option>
+										<option>Force</option>
+										<option>Lightning</option>
+										<option>Necrotic</option>
+										<option>Piercing</option>
+										<option>Poison</option>
+										<option>Psychic</option>
+										<option>Radiant</option>
+										<option>Slashing</option>
+										<option>Thunder</option>
+									</select>
+								</div>
+								<div class="my-2">
+									Second damage type? 
+									<div class="form-check form-check-inline">
+									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSecondDamage" value="yes" v-model="secondDamage">
+									    <label class="form-check-label" for="yesSecondDamage">Yes</label>
+									</div>
+									<div class="form-check form-check-inline">
+									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSecondDamage" value="no" v-model="secondDamage">
+									    <label class="form-check-label" for="noSecondDamage">No</label>
+									</div>
+								</div>
+								<div class="my-2" v-if="secondDamage == 'yes'">
+									Second Damage:
+									<input class="numInput" type="number" v-model.number="secondDamageDiceNum">
+									d
+									<select v-model.number="secondDamageDice">
+										<option>4</option>
+										<option>6</option>
+										<option>8</option>
+										<option>10</option>
+										<option>12</option>
+									</select>
+									+ 
+									<input class="numInput" type="number" v-model.number="secondDamageModifier">
+									<select v-model="secondDamageType">
+										<option>Acid</option>
+										<option>Bludgeoning</option>
+										<option>Cold</option>
+										<option>Fire</option>
+										<option>Force</option>
+										<option>Lightning</option>
+										<option>Necrotic</option>
+										<option>Piercing</option>
+										<option>Poison</option>
+										<option>Psychic</option>
+										<option>Radiant</option>
+										<option>Slashing</option>
+										<option>Thunder</option>
+									</select>
 								</div>
 					      	</div>
 					      	<div class="modal-footer">
@@ -1806,8 +1916,15 @@ Vue.component('attack-modifier-field', {
 			damageDiceNum: 0,
 			damageDice: 0,
 			damageModifier: 0,
+			damageType: null,
 			object: '',
-			task: false
+			task: false,
+			secondDamage: 'no',
+			secondDamageDiceNum: 0,
+			secondDamageDice: 0,
+			secondDamageModifier: 0,
+			secondDamageType: null
+
 		};
 	},
 	methods: {
@@ -1827,9 +1944,17 @@ Vue.component('attack-modifier-field', {
 			this.attackModifier = this.target.attackModifier;
 			this.saveDC = this.target.saveDC;
 			this.saveType = this.target.saveType;
-			this.damageDiceNum = this.target.damageDiceNum;
-			this.damageDice = this.target.damageDice;
-			this.damageModifier = this.target.damageModifier;
+			this.damageDiceNum = this.target.damageOne.damageDiceNum;
+			this.damageDice = this.target.damageOne.damageDice;
+			this.damageModifier = this.target.damageOne.damageModifier;
+			this.damageType = this.target.damageOne.damageType;
+			this.secondDamage = this.target.secondDamage;
+			if (this.secondDamage == 'yes') {
+				this.secondDamageDiceNum = this.target.damageTwo.damageDiceNum;
+				this.secondDamageDice = this.target.damageTwo.damageDice;
+				this.secondDamageModifier = this.target.damageTwo.damageModifier;
+				this.secondDamageType = this.target.damageTwo.damageType;
+			}
 		},
 		edit() {
 			var data = this.prepareData();
@@ -1845,7 +1970,13 @@ Vue.component('attack-modifier-field', {
 				saveType: this.saveType,
 				damageDiceNum: this.damageDiceNum,
 				damageDice: this.damageDice,
-				damageModifier: this.damageModifier
+				damageModifier: this.damageModifier,
+				damageType: this.damageType,
+				secondDamage: this.secondDamage,
+				secondDamageDiceNum: this.secondDamageDiceNum,
+				secondDamageDice: this.secondDamageDice,
+				secondDamageModifier: this.secondDamageModifier,
+				secondDamageType: this.secondDamageType
 				};
 		},
 		deleteTarget() {
@@ -1868,6 +1999,12 @@ Vue.component('attack-modifier-field', {
 			this.damageDiceNum = 0;
 			this.damageDice = 0;
 			this.damageModifier = 0;
+			this.damageType = null;
+			this.secondDamage = 'no';
+			this.secondDamageDiceNum = 0;
+			this.secondDamageDice = 0;
+			this.secondDamageModifier = 0;
+			this.secondDamageType = null;
 			if (this.target) {
 				this.task = 'Edit';
 			} else {
@@ -2072,14 +2209,21 @@ Vue.component('feed', {
 			</button>
 		</div>
 		<div class="card-body p-2 feed-div">
-			<ul class="list-group feed-body">
-				<li class="list-group-item feed-item" v-for="item in feed">{{ item.replace(/^\s+/g, '') }}</li>
+			<ul class="list-group feed-body pr-2">
+				<li class="list-group-item feed-item" v-for="item in feed" :class="isCritical(item)">{{ item.feedText }}</li>
 			</ul>
 		</div>
 	</div>
 	`,
 	props: ['feed'],
 	methods: {
+		isCritical(item) {
+			if (item.critical == 'critSuccess') {
+				return 'text-success';
+			} else if (item.critical == 'critFail') {
+				return 'text-danger';
+			}
+		},
 		clearFeed() {
 			app.feed = [];
 		}
@@ -2204,24 +2348,27 @@ Vue.component('dice-roller',{
 
 				<div class="col-md card px-0">
 					<h3 class="card-header">Feed</h3>
-					<ul class="list-group" v-for="item in feed">
-						<li class="list-group-item">
-							{{ item }}
-						</li>
+					<ul class="list-group">
+						<li class="list-group-item" v-for="item in feed">{{ item }}</li>
 					</ul>
 				</div>
 			</div>
 			<button class="btn btn-danger btn-sm float-right mt-2" @click="reset()">Reset</button>
 		</div>
 	`,
+	props: ['feed'],
 	data() {
 		return {
-			dice: [],
-			feed: []
+			dice: [
+				{ die: 4, rollTimes: 1, modifier: 0 },
+				{ die: 6, rollTimes: 1, modifier: 0 },
+				{ die: 8, rollTimes: 1, modifier: 0 },
+				{ die: 10, rollTimes: 1, modifier: 0 },
+				{ die: 12, rollTimes: 1, modifier: 0 },
+				{ die: 20, rollTimes: 1, modifier: 0 },
+				{ die: 100, rollTimes: 1, modifier: 0 }
+			]
 		}
-	},
-	created() {
-		this.reset();
 	},
 	methods: {
 		roll(die) {
@@ -2234,11 +2381,11 @@ Vue.component('dice-roller',{
 				total = total + result[i];
 			}
 			var modifiedTotal = total + die.modifier;
-			var resultString = 'You rolled ' + die.rollTimes + 'd' + die.die +' resulting in [' + result + '] for ' + total + ' + ' + die.modifier + ' for a total of ' + modifiedTotal + '.';
+			var resultString = "Rolled " + die.rollTimes + "d" + die.die + " for [" + result + "] + " + die.modifier + " = " + modifiedTotal + ".";
 			if(this.feed.length >= 10) {
 				this.feed.pop();
 			}
-			this.feed.unshift(resultString);
+			app.diceRollerFeed.unshift(resultString);
 		},
 		reset() {
 			this.dice = [
@@ -2250,7 +2397,7 @@ Vue.component('dice-roller',{
 				{ die: 20, rollTimes: 1, modifier: 0 },
 				{ die: 100, rollTimes: 1, modifier: 0 },
 			],
-			this.feed = [];
+			app.diceRollerFeed = [];
 		}
 	}
 });
@@ -2261,6 +2408,8 @@ const app = new Vue({
 		characters: [],
 
 		feed: [],
+
+		diceRollerFeed: [],
 
 		selected: null
 		
@@ -2287,11 +2436,11 @@ const app = new Vue({
 			this.selected = 'home';
 			$('.nav').find('.active').removeClass('active');
 		},
-		addToFeed(input) {
-			if(this.feed.length >=10) {
+		addToFeed(input, roll = false) {
+			if(this.feed.length >= 30) {
 				this.feed.pop();
 			}
-			this.feed.unshift(input);
+			this.feed.unshift(new FeedItem(input, roll));
 		}
 	}
 
@@ -2376,4 +2525,7 @@ $(document).ready(function() {
 });
 
 
-
+window.onbeforeunload = function(){
+	console.log('saving to localStorage');
+	localStorage.setItem('appCharacters', JSON.stringify(app.characters));
+};
