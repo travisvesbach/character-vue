@@ -1,5 +1,8 @@
 class Character {
 
+	//sets the stats that are only set during character load from json.
+	//attacks, modifiers, currentHp, spells, resources, showNotepad, 
+	//showResources, showSpells, notes
 	constructor(input) {
 		this.setStats(input);
 		this.attacks = [];
@@ -20,13 +23,7 @@ class Character {
 			this.currentHp = this.maxHp;
 		}
 
-		// if (this.spells == 'points' && input.currentSpellPoints) {
-		// 	this.currentSpellPoints = input.currentSpellPoints;
-		// } else if (this.spells == 'points') {
-		// 	this.currentSpellPoints = this.maxSpellPoints;
-		// }
-
-		this.spells = new Spells;
+		this.spells = new Spell;
 		if (input.spells) {
 			this.addSpells(input.spells);
 		}
@@ -52,10 +49,12 @@ class Character {
 		this.notes = (input.notes) ? input.notes : '';
 	}
 
+	//resets stats to the new input for an existing character.
 	updateCharacter(input) {
 		this.setStats(input);
 	}
 
+	//sets all of the characters stats based using input received from vue character-creator.
 	setStats(input) {
 		this.name = input.name;
 		this.level = input.level;
@@ -98,134 +97,22 @@ class Character {
 		this.intimidation = input.intimidation;
 		this.performance = input.performance;
 		this.persuasion = input.persuasion;
-		// this.spells = input.spells;
-		// if(this.spells == 'slots') {
-		// 	this.spellSlots = [];
-		// 	if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
-		// 		this.spellSlots = input.spellSlots;
-		// 	} else {
-		// 		this.oneSpells = input.oneSpells;
-		// 		if (isInteger(this.oneSpells) && this.oneSpells > 0) {
-		// 			this.addSpellSlots(1, this.oneSpells);
-		// 		}
-		// 		this.twoSpells = input.twoSpells;
-		// 		if (isInteger(this.twoSpells) && this.twoSpells > 0) {
-		// 			this.addSpellSlots(2, this.twoSpells);
-		// 		}
-		// 		this.threeSpells = input.threeSpells;
-		// 		if (isInteger(this.threeSpells) && this.threeSpells > 0) {
-		// 			this.addSpellSlots(3, this.threeSpells);
-		// 		}
-		// 		this.fourSpells = input.fourSpells;
-		// 		if (isInteger(this.fourSpells) && this.fourSpells > 0) {
-		// 			this.addSpellSlots(4, this.fourSpells);
-		// 		}
-		// 		this.fiveSpells = input.fiveSpells;
-		// 		if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
-		// 			this.addSpellSlots(5, this.fiveSpells);
-		// 		}
-		// 		this.sixSpells = input.sixSpells;
-		// 		if (isInteger(this.sixSpells) && this.sixSpells > 0) {
-		// 			this.addSpellSlots(6, this.sixSpells);
-		// 		}
-		// 		this.sevenSpells = input.sevenSpells;
-		// 		if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
-		// 			this.addSpellSlots(7, this.sevenSpells);
-		// 		}
-		// 		this.eightSpells = input.eightSpells;
-		// 		if (isInteger(this.eightSpells) && this.eightSpells > 0) {
-		// 			this.addSpellSlots(8, this.eightSpells);
-		// 		}
-		// 		this.nineSpells = input.nineSpells;
-		// 		if (isInteger(this.nineSpells) && this.nineSpells > 0) {
-		// 			this.addSpellSlots(9, this.nineSpells);
-		// 		}
-		// 	}
-		// } else if (this.spells == 'points') {
-		// 	this.maxSpellPoints = input.maxSpellPoints;
-		// 	this.maxSpellLevel = input.maxSpellLevel;
-		// }
-
 	}
 
-	// addSpellSlots(level, counter) {
-	// 	this.spellSlots[level] = [];
-	// 	for (var i=0;i<counter;i++) {
-	// 		this.spellSlots[level].push(new Slot);
-	// 	}
-	// }
-
-	// editSpells(input) {
-	// 	console.log('entered editSpells');
-	// 	console.log(input);
-	// 	this.spells = input.spells;
-	// 	if(this.spells == 'slots') {
-	// 		this.spellSlots = [];
-	// 		if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
-	// 			this.spellSlots = input.spellSlots;
-	// 		} else {
-	// 			this.oneSpells = input.oneSpells;
-	// 			if (isInteger(this.oneSpells) && this.oneSpells > 0) {
-	// 				this.addSpellSlots(1, this.oneSpells);
-	// 			}
-	// 			this.twoSpells = input.twoSpells;
-	// 			if (isInteger(this.twoSpells) && this.twoSpells > 0) {
-	// 				this.addSpellSlots(2, this.twoSpells);
-	// 			}
-	// 			this.threeSpells = input.threeSpells;
-	// 			if (isInteger(this.threeSpells) && this.threeSpells > 0) {
-	// 				this.addSpellSlots(3, this.threeSpells);
-	// 			}
-	// 			this.fourSpells = input.fourSpells;
-	// 			if (isInteger(this.fourSpells) && this.fourSpells > 0) {
-	// 				this.addSpellSlots(4, this.fourSpells);
-	// 			}
-	// 			this.fiveSpells = input.fiveSpells;
-	// 			if (isInteger(this.fiveSpells) && this.fiveSpells > 0) {
-	// 				this.addSpellSlots(5, this.fiveSpells);
-	// 			}
-	// 			this.sixSpells = input.sixSpells;
-	// 			if (isInteger(this.sixSpells) && this.sixSpells > 0) {
-	// 				this.addSpellSlots(6, this.sixSpells);
-	// 			}
-	// 			this.sevenSpells = input.sevenSpells;
-	// 			if (isInteger(this.sevenSpells) && this.sevenSpells > 0) {
-	// 				this.addSpellSlots(7, this.sevenSpells);
-	// 			}
-	// 			this.eightSpells = input.eightSpells;
-	// 			if (isInteger(this.eightSpells) && this.eightSpells > 0) {
-	// 				this.addSpellSlots(8, this.eightSpells);
-	// 			}
-	// 			this.nineSpells = input.nineSpells;
-	// 			if (isInteger(this.nineSpells) && this.nineSpells > 0) {
-	// 				this.addSpellSlots(9, this.nineSpells);
-	// 			}
-	// 		}
-	// 	} else if (this.spells == 'points') {
-	// 		this.maxSpellPoints = input.maxSpellPoints;
-	// 		this.maxSpellLevel = input.maxSpellLevel;
-	// 	}
-
-	// }
-
-	// addSpells(counter){
-	// 	var spellSlots = [];
-	// 	for (var i=0;i<counter;i++) {
-	// 		spellSlots.push("\u26AA");
-	// 	}
-	// 	return spellSlots;
-	// }
-
+	//creates a new instance of the Spell class to hold all the data for a charactor's spells.
 	addSpells(input) {
-		this.spells = new Spells(input);
+		this.spells = new Spell(input);
 
 	}
 
+	//creates a new instance of the Attack class to hold all the data and functions for an attack.
+	//Sorts the attacks array alphabetically. 
 	addAttack(attackData) {
 		this.attacks.push(new Attack(attackData));
 		this.attacks.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
+	//removes a given attack from the attacks array.
 	deleteAttack(removingAttack) {
 		console.log(removingAttack);
 		var index = this.attacks.indexOf(removingAttack);
@@ -240,11 +127,14 @@ class Character {
 		this.attacks = newArray;
 	}
 
+	//creates a new instance of the Modifier class to hold all the data and functions for an attack modifier.
+	//Sorts the modifiers array alphabetically. 
 	addModifier(modifierData) {
 		this.modifiers.push(new Modifier(modifierData));
 		this.modifiers.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
+	//removes a given modifier from the modifiers array.
 	deleteModifier(removingModifier) {
 		console.log(removingModifier);
 		var index = this.modifiers.indexOf(removingModifier);
@@ -259,11 +149,14 @@ class Character {
 		this.modifiers = newArray;
 	}
 
+	//creates a new instance of the Resource class to hold all the data and functions for a resource.
+	//Sorts the resources array alphabetically. 
 	addResource(resourceData) {
 		this.resources.push(new Counter(resourceData));
 		this.resources.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
+	//removes a given resource from the resources array.
 	deleteResource(removingResource) {
 		console.log(removingResource);
 		var index = this.resources.indexOf(removingResource);
@@ -278,6 +171,9 @@ class Character {
 		this.resources = newArray;
 	}
 
+	//Calls the make attack function for a given instance of the attack class.
+	//If modifiersIndexArray is not null, it finds the proper modifiers and calls their makeAttack functions.
+	//Sends the results to app.
 	attack(attack, type = 'normal', modifiersIndexArray = null){
 		var results = attack.makeAttack(type);
 		if (modifiersIndexArray && results.roll != 1) {
@@ -289,6 +185,7 @@ class Character {
 		app.addToFeed(results.resultsArray, results.roll);
 	}
 
+	//Rolls a given stat and sends the results to app.
 	rollStat(stat, statModifier, rollModifier) {
 		var roll = dice.d20();
 		if (rollModifier == 'advantage') {
@@ -307,7 +204,8 @@ class Character {
 
 }
 
-
+//Slot class is used for spell slots, spell counters, and resources.
+//Slot class is used by the Spell and Counter classes.
 class Slot {
 
 	constructor(used = false) {
@@ -319,22 +217,15 @@ class Slot {
 	}
 }
 
-class Spells {
+//Contains all of the spell variables and functions for a character
+class Spell {
+
 	constructor(input = false) {
 		this.spellType = 'no';
 		this.maxSpellPoints = 0;
 		this.maxSpellLevel = 0;
 		this.currentSpellPoints = 0;
 		this.spellCounters = [];
-		// this.oneSpells = 0;
-		// this.twoSpells = 0;
-		// this.threeSpells = 0;
-		// this.fourSpells = 0;
-		// this.fiveSpells = 0;
-		// this.sixSpells = 0;
-		// this.sevenSpells = 0;
-		// this.eightSpells = 0;
-		// this.nineSpells = 0;
 		if(! this.spellSlots) {
 			this.spellSlots = [];
 			for(var i=1;i<10;i++) {
@@ -352,29 +243,22 @@ class Spells {
 		} 
 	}
 
+	//Sets all of the spells variables when given an input.
+	//Input comes from the constructor or edit functions.
 	setSpells(input) {
 		this.spellType = input.spellType;
 		if(this.spellType == 'slots') {
 			if (Array.isArray(input.spellSlots) && input.spellSlots.length > 0) {
 				this.spellSlots = input.spellSlots;
 			} else {
-				// this.oneSpells = input.oneSpells;
 				this.addSpellSlots(1, input.oneSpells);
-				// this.twoSpells = input.twoSpells;
 				this.addSpellSlots(2, input.twoSpells);
-				// this.threeSpells = input.threeSpells;
 				this.addSpellSlots(3, input.threeSpells);
-				// this.fourSpells = input.fourSpells;
 				this.addSpellSlots(4, input.fourSpells);
-				// this.fiveSpells = input.fiveSpells;
 				this.addSpellSlots(5, input.fiveSpells);
-				// this.sixSpells = input.sixSpells;
 				this.addSpellSlots(6, input.sixSpells);
-				// this.sevenSpells = input.sevenSpells;
 				this.addSpellSlots(7, input.sevenSpells);
-				// this.eightSpells = input.eightSpells;
 				this.addSpellSlots(8, input.eightSpells);
-				// this.nineSpells = input.nineSpells;
 				this.addSpellSlots(9, input.nineSpells);
 			}
 		} else if (this.spellType == 'points') {
@@ -388,10 +272,12 @@ class Spells {
 		}
 	}
 
+	//Receives input from spell-form and calls setSpells.
 	edit(input) {
 		this.setSpells(input);
 	}
 
+	//Adds new instances of the Slot class to the spellSlots array
 	addSpellSlots(level, counter) {
 		if(this.spellSlots && this.spellSlots[level]) {
 			if(counter > this.spellSlots[level].length) {
@@ -412,11 +298,15 @@ class Spells {
 		}
 	}
 
+	//Adds a new instance of the Counter class to the spellCounters array.
+	//Sorts spellCounters alphabetically.
+	//Receives input from counter-field and the constructor.
 	addCounter(input) {
 		this.spellCounters.push(new Counter(input));
 		this.spellCounters.sort(sort_by('name', false, function(a){return a.toUpperCase()}));
 	}
 
+	//removes a given counter from the spellCounters array.
 	deleteCounter(removingCounter) {
 		console.log(removingCounter);
 		var index = this.spellCounters.indexOf(removingCounter);
@@ -439,10 +329,13 @@ class Attack {
 		console.log(this.name + " has been added");
 	}
 
+	//Called from the Character class.
+	//Calls the rollArrack/rollSave and rollDamage functions.
+	//Returns the results. 
 	makeAttack(type = 'normal') {
 		var attackRoll = null;
 		var results = [];
-		if (this.type == 'roll') {
+		if (this.type == 'attack') {
 			var fromRollAttack = this.rollAttack(type);
 			attackRoll = fromRollAttack[0];
 			fromRollAttack.shift();
@@ -450,9 +343,15 @@ class Attack {
 		} else if (this.type == 'save') {
 			results = this.rollSave();
 		}
-		results = this.rollDamage(this.damageOne, results, attackRoll);
-		if (this.secondDamage == 'yes' && attackRoll != 1) {
-			results = this.rollDamage(this.damageTwo, results, attackRoll);
+		if (attackRoll == 1) {
+			results.push('You critically failed...');
+			return {
+				resultsArray: results, 
+				roll: attackRoll
+			};
+		}
+		for(var i=0;i<this.damageArray.length;i++) {
+			results = this.rollDamage(this.damageArray[i], results, attackRoll);
 		}
 
 		console.log(results.join('\n'));
@@ -462,6 +361,8 @@ class Attack {
 		};
 	}
 
+	//Called from the makeAttack function.
+	//Rolls the attack roll(s) and returns the results.
 	rollAttack(type) {
 		var output = [];
 		var rollOne = null;
@@ -497,6 +398,8 @@ class Attack {
 		return output;
 	}
 
+	//Called from the makeAttack function.
+	//Returns a string about a DC save.
 	rollSave(){
 		var output = [];
 		output.push(this.name + ':');
@@ -504,6 +407,8 @@ class Attack {
 		return output;
 	}
 
+	//Called from the makeAttack function.
+	//Rolls the damage and returns the results.
 	rollDamage(damageObject, results, attackRoll = null) {
 		var damageRoll = null
 		var damageTotal = damageObject.damageModifier;
@@ -518,9 +423,6 @@ class Attack {
 					damageRollsArray.push(damageRoll);
 				}
 			}
-		} else if (attackRoll == 1) {
-			results.push('You critically failed...');
-			return results;
 		} else {
 			for(var i=0;i<damageObject.damageDiceNum;i++) { 
 					damageRoll = dice.roll(damageObject.damageDice);
@@ -541,110 +443,97 @@ class Attack {
 		return results;
 	}
 
+	//Called from attack-modifier-form.
+	//Calls setStats in order to update variables.
 	edit(attackData) {
 		this.setStats(attackData);
 		
 		console.log(this.name + " has been edited");
 	}
 
+	//Sets all of the variables for this instance.
 	setStats(attackData) {
 		this.name = attackData.name;
 		this.type = attackData.type;
-		if(attackData.type == 'roll') {
+		if(attackData.type == 'attack') {
 			this.attackModifier = attackData.attackModifier;
 		} else if (attackData.type == 'save' ) {
 			this.saveDC = attackData.saveDC;
 			this.saveType = attackData.saveType;
 		}
-		if (attackData.damageOne) {
-			this.damageOne = attackData.damageOne;
-		} else {
-			this.damageOne = {
-				damageDiceNum: attackData.damageDiceNum,
-				damageDice: attackData.damageDice,
-				damageModifier: attackData.damageModifier,
-				damageType: attackData.damageType
-			}
-		}
-		this.secondDamage = attackData.secondDamage;
-		if(this.secondDamage == 'yes') {
-			if (attackData.damageTwo) {
-				this.damageTwo = attackData.damageTwo;
-			} else {
-				this.damageTwo = {
-					damageDiceNum: attackData.secondDamageDiceNum,
-					damageDice: attackData.secondDamageDice,
-					damageModifier: attackData.secondDamageModifier,
-					damageType: attackData.secondDamageType
-				}
-			}
-		}
+		this.damageArray = attackData.damageArray;
 	}
 }
 
 class Modifier {
 
 	constructor(modifierData) {
-		this.name = modifierData.name;
-		this.type = modifierData.type;
-		if(this.type == 'auto') {
-			this.type = modifierData.type;
-		} else if (this.type == 'save' ) {
-			this.saveDC = modifierData.saveDC;
-			this.saveType = modifierData.saveType;
-		}
-		this.damageDiceNum = modifierData.damageDiceNum;
-		this.damageDice = modifierData.damageDice;
+		this.setStats(modifierData);
 		console.log(this.name + ' has been added');
 	}
 
+	//Called from the Character class.
+	//If this instance is a save, it adds a 
+	//Calls the rollArrack/rollSave and rollDamage functions.
+	//Returns the results.
 	makeAttack(results, roll = null) {
 		console.log(results);
 		results.push(this.name + ':');
-		if (this.type == 'auto') {
-			this.rollDamage(results, roll);
-		} else if (this.type == 'save') {
-			results.push('Your target(s) need(s) to make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
-			this.rollDamage(results);
+
+		if (this.type == 'save') {
+			results.push('Target(s) make a DC ' + this.saveDC + ' ' + this.saveType + ' saving throw.');
 		}
+
+		for(var i=0;i<this.damageArray.length;i++) {
+			results = this.rollDamage(this.damageArray[i], results, roll);
+		}
+
 		return results;
 	}
 
-	rollDamage(results, roll = null) {
+	//Called from makeAttack.
+	//Rolls the damage and returns the results.
+	rollDamage(damageObject, results, roll = null) {
 		var damageRoll = null
-		var damageTotal = 0;
+		var damageTotal = damageObject.damageModifier;
 		var damageRollsArray = [];
 
 		if (roll == 20) {
 			for(var i=0;i<2;i++) {
-				for(var x=0;x<this.damageDiceNum;x++) { 
-					damageRoll = dice.roll(this.damageDice);
+				for(var x=0;x<damageObject.damageDiceNum;x++) { 
+					damageRoll = dice.roll(damageObject.damageDice);
 					damageTotal += damageRoll;
 					damageRollsArray.push(damageRoll);
 				}
 			}
 		} else {
-			for(var i=0;i<this.damageDiceNum;i++) { 
-					damageRoll = dice.roll(this.damageDice);
+			for(var i=0;i<damageObject.damageDiceNum;i++) { 
+					damageRoll = dice.roll(damageObject.damageDice);
 					damageTotal = damageTotal + damageRoll;
 					damageRollsArray.push(damageRoll);
 			}
 		}
-		results.push('Damage: [' + damageRollsArray + '] = ' + damageTotal);
+		results.push(damageObject.damageType + ' Damage: [' + damageRollsArray + '] = ' + damageTotal);
 
 		return results;
 	}
 
+	//Called from attack-modifier-form.
+	//Calls setStats in order to update variables.	
 	edit(modifierData) {
+		this.setStats(modifierData);
+		console.log(this.name + " has been edited");
+	}
+
+	//Sets all of the variables for this instance.
+	setStats(modifierData) {
 		this.name = modifierData.name;
 		this.type = modifierData.type;
-		if (modifierData.type == 'save' ) {
+		if (this.type == 'save' ) {
 			this.saveDC = modifierData.saveDC;
 			this.saveType = modifierData.saveType;
-		}
-		this.damageDiceNum = modifierData.damageDiceNum;
-		this.damageDice = modifierData.damageDice;
-		console.log(this.name + " has been edited");
+		}	
+		this.damageArray = modifierData.damageArray;
 	}
 }
 
@@ -673,13 +562,6 @@ class Counter {
 		console.log(this.name + " has been added");
 	}
 
-	switchSlot(index) {
-		if (this.slots[index] == '\u26AA') {
-			this.slots[index] = '\u26AB';
-		} else {
-			this.slots[index] = '\u26AA';
-		}
-	}
 
 	edit(input) {
 		this.name = input.name;
@@ -715,7 +597,6 @@ class FeedItem {
 		}
 	}
 }
-
 
 var dice = {
 	roll: function(number) {
@@ -811,23 +692,17 @@ Vue.component('character-stats', {
 				</div>
 			</div>
 
-			<div v-if="edit" class="modal-scroll" role="dialog" aria-hidden="true">
-				<transition name="modal">
-				  	<div class="modal-dialog modal-lg" role="document">
-				    	<div class="modal-content card">
-							<div class="modal-header card-header">
-						        <h5 class="modal-title">Editing {{character.name}}</h5>
-						        <button type="button" class="close" @click="editCharacter">
-						          	<span aria-hidden="true">&times;</span>
-						        </button>
-						    </div>
-							<character-creator class="modal-body card-body" v-if="edit" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event">
-							</character-creator>
-						
-						</div>
-					</div>
-				</transition>
-			</div>
+			<modal v-if="edit" v-bind:input="'character-editor'">
+				<div class="modal-header card-header" slot="header">
+			        <h5 class="modal-title">Editing {{character.name}}</h5>
+			        <button type="button" class="close" @click="editCharacter">
+			          	<span aria-hidden="true">&times;</span>
+			        </button>
+			    </div>
+
+				<character-creator class="modal-body card-body" v-if="edit" v-bind:editCharacterData="{ characterData: character, edit: edit}" v-on:edit="edit = $event" slot="body">
+				</character-creator>
+			</modal>
 
 			<div class="row m-auto" >
 				<div class="card d-inline-block col-md rounded-0">
@@ -1489,16 +1364,7 @@ Vue.component('spells', {
 	},
 	data() {
 		return {
-			spellPointsCosts: [0,2,3,5,6,7,9,10,11,13],
-			onePoints: 2,
-			twoPoints: 3,
-			threePoints: 5,
-			fourPoints: 6,
-			fivePoints: 7,
-			sixPoints: 9,
-			sevenPoints: 10,
-			eightPoints: 11,
-			ninePoints: 13
+			spellPointsCosts: [0,2,3,5,6,7,9,10,11,13]
 		}
 	},
 	methods: {
@@ -1523,96 +1389,92 @@ Vue.component('spells-field', {
 	template: `
 		<div class="d-inline-block float-right">
 			<button class="btn btn-primary btn-sm" @click="startEdit">Edit</button>
-			<div v-if="show" class="modal-mask">
-				<transition name="modal">
-				  	<div class="modal-dialog" role="document">
-				    	<div class="modal-content">
-					      	<div class="modal-header card-header">
-					        	<h5 class="modal-title">Edit Spells</h5>
-					        	<button type="button" class="close" @click="reset">
-						          	<span aria-hidden="true">&times;</span>
-						        </button>
-					      	</div>
-					      	<div class="modal-body">
-								<div class="form-check form-check-inline">
-								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellSlots" value="slots" v-model="spellType">
-								    <label class="form-check-label" for="yesSpellSlots">Slots</label>
-								</div>
-								<div class="form-check form-check-inline">
-								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellPoints" value="points" v-model="spellType">
-								    <label class="form-check-label" for="yesSpellPoints">Points (DMG Variant)</label>
-								</div>
-								<div class="form-check form-check-inline">
-								    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spellType">
-								    <label class="form-check-label" for="noSpells">No</label>
-								</div>
-								<div v-if="spellType == 'points'">
-									<div class="form-group">
-								        <label for="spellPoints">Total Spell Points:</label>
-								        <input type="number" class="form-control" id="spellPoints" placeholder="0" v-model.number="maxSpellPoints">
-								    </div>		
-									<div class="form-group">
-								        <label for="maxSpellLevel">Max Spell Level Avaibale:</label>
-								        <input type="number" class="form-control" id="maxSpellLevel" placeholder="0" v-model.number="maxSpellLevel">
-								    </div>					    
-								</div>			
-								<div v-if="spellType == 'slots'">
-									<div class="form-row">
-										<div class="form-group col-6">
-									        <label for="oneSpells">1st Level Spells:</label>
-									        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
-									    </div>
-									    <div class="form-group col-6">
-									        <label for="twoSpells">2nd Level Spells:</label>
-									        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model.number="twoSpells">
-									    </div>
-									</div>
-									<div class="form-row">
-									    <div class="form-group col-6">
-									        <label for="threeSpells">3rd Level Spells:</label>
-									        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model.number="threeSpells">
-									    </div>
-									    <div class="form-group col-6">
-									        <label for="fourSpells">4th Level Spells:</label>
-									        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model.number="fourSpells">
-									    </div>
-									</div>
-									<div class="form-row">
-									    <div class="form-group col-6">
-									        <label for="fiveSpells">5th Level Spells:</label>
-									        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model.number="fiveSpells">
-									    </div>
-									    <div class="form-group col-6">
-									        <label for="sixSpells">6th Level Spells:</label>
-									        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model.number="sixSpells">
-									    </div>
-									</div>
-									<div class="form-row">
-									    <div class="form-group col-6">
-									        <label for="sevenSpells">7th Level Spells:</label>
-									        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model.number="sevenSpells">
-									    </div>
-									    <div class="form-group col-6">
-									        <label for="eightSpells">8th Level Spells:</label>
-									        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model.number="eightSpells">
-									    </div>
-									</div>
-									<div class="form-row">
-									    <div class="form-group col-6">
-									        <label for="nineSpells">9th Level Spells:</label>
-									        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model.number="nineSpells">
-									    </div>
-									</div>
-								</div>
-					      	</div>
-					      	<div class="modal-footer">
-								<button class="btn btn-primary btn-sm" @click="edit">Edit Spells</button>
-								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-					      	</div>
-				    	</div>
-				  	</div>
-				</transition>
-			</div>
+			<modal v-if="show">
+		      	<div class="modal-header card-header" slot="header">
+		        	<h5 class="modal-title">Edit Spells</h5>
+		        	<button type="button" class="close" @click="reset">
+			          	<span aria-hidden="true">&times;</span>
+			        </button>
+		      	</div>
+
+		      	<div class="modal-body" slot="body">
+					<div class="form-check form-check-inline">
+					    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellSlots" value="slots" v-model="spellType">
+					    <label class="form-check-label" for="yesSpellSlots">Slots</label>
+					</div>
+					<div class="form-check form-check-inline">
+					    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSpellPoints" value="points" v-model="spellType">
+					    <label class="form-check-label" for="yesSpellPoints">Points (DMG Variant)</label>
+					</div>
+					<div class="form-check form-check-inline">
+					    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSpells" value="no" v-model="spellType">
+					    <label class="form-check-label" for="noSpells">No</label>
+					</div>
+					<div v-if="spellType == 'points'">
+						<div class="form-group">
+					        <label for="spellPoints">Total Spell Points:</label>
+					        <input type="number" class="form-control" id="spellPoints" placeholder="0" v-model.number="maxSpellPoints">
+					    </div>		
+						<div class="form-group">
+					        <label for="maxSpellLevel">Max Spell Level Avaibale:</label>
+					        <input type="number" class="form-control" id="maxSpellLevel" placeholder="0" v-model.number="maxSpellLevel">
+					    </div>					    
+					</div>			
+					<div v-if="spellType == 'slots'">
+						<div class="form-row">
+							<div class="form-group col-6">
+						        <label for="oneSpells">1st Level Spells:</label>
+						        <input type="number" class="form-control" id="oneSpells" placeholder="0" v-model.number="oneSpells">
+						    </div>
+						    <div class="form-group col-6">
+						        <label for="twoSpells">2nd Level Spells:</label>
+						        <input type="number" class="form-control" id="twoSpells" placeholder="0" v-model.number="twoSpells">
+						    </div>
+						</div>
+						<div class="form-row">
+						    <div class="form-group col-6">
+						        <label for="threeSpells">3rd Level Spells:</label>
+						        <input type="number" class="form-control" id="threeSpells" placeholder="0" v-model.number="threeSpells">
+						    </div>
+						    <div class="form-group col-6">
+						        <label for="fourSpells">4th Level Spells:</label>
+						        <input type="number" class="form-control" id="fourSpells" placeholder="0" v-model.number="fourSpells">
+						    </div>
+						</div>
+						<div class="form-row">
+						    <div class="form-group col-6">
+						        <label for="fiveSpells">5th Level Spells:</label>
+						        <input type="number" class="form-control" id="fiveSpells" placeholder="0" v-model.number="fiveSpells">
+						    </div>
+						    <div class="form-group col-6">
+						        <label for="sixSpells">6th Level Spells:</label>
+						        <input type="number" class="form-control" id="sixSpells" placeholder="0" v-model.number="sixSpells">
+						    </div>
+						</div>
+						<div class="form-row">
+						    <div class="form-group col-6">
+						        <label for="sevenSpells">7th Level Spells:</label>
+						        <input type="number" class="form-control" id="sevenSpells" placeholder="0" v-model.number="sevenSpells">
+						    </div>
+						    <div class="form-group col-6">
+						        <label for="eightSpells">8th Level Spells:</label>
+						        <input type="number" class="form-control" id="eightSpells" placeholder="0" v-model.number="eightSpells">
+						    </div>
+						</div>
+						<div class="form-row">
+						    <div class="form-group col-6">
+						        <label for="nineSpells">9th Level Spells:</label>
+						        <input type="number" class="form-control" id="nineSpells" placeholder="0" v-model.number="nineSpells">
+						    </div>
+						</div>
+					</div>
+		      	</div>
+
+		      	<div class="modal-footer" slot="footer">
+					<button class="btn btn-primary btn-sm" @click="edit">Edit Spells</button>
+					<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+		      	</div>
+			</modal>
 		</div>
 	`,
 	props: ["spells"],
@@ -1718,29 +1580,25 @@ Vue.component('attack', {
 						<li class="list-group-item" v-for="attack in character.attacks">
 							<span>
 								{{attack.name}} |
-								<span v-if="attack.attackModifier && attack.attackModifier != 0 && attack.type == 'roll'">
+								<span v-if="attack.attackModifier && attack.attackModifier != 0 && attack.type == 'attack'">
 									+{{attack.attackModifier}} |
 								</span>
 								<span v-if="attack.type == 'save'">
-									DC {{attack.saveDC}} {{attack.saveType}} |
+									{{attack.saveType}} save |
 								</span>
-								{{attack.damageOne.damageDiceNum}}d{{attack.damageOne.damageDice}}
-								<span v-if="attack.damageOne.damageModifier && attack.damageOne.damageModifier != 0 ">
-									+ {{attack.damageOne.damageModifier}}
-								</span> 
-								{{attack.damageOne.damageType}} damage
-								<span v-if="attack.secondDamage == 'yes' && attack.damageTwo">
-									& {{attack.damageTwo.damageDiceNum}}d{{attack.damageTwo.damageDice}}
-									<span v-if="attack.damageTwo.damageModifier && attack.damageTwo.damageModifier != 0 ">
-										+ {{attack.damageTwo.damageModifier}}
+								<span v-for="(damageObject, index) in attack.damageArray" v-if="damageObject != null && typeof damageObject == 'object'">
+									<span v-if="index != 0">&</span>
+									{{damageObject.damageDiceNum}}d{{damageObject.damageDice}}
+									<span v-if="damageObject.damageModifier && damageObject.damageModifier != 0 ">
+										+ {{damageObject.damageModifier}}
 									</span> 
-									{{attack.damageTwo.damageType}} damage
+									{{damageObject.damageType}} damage
 								</span>
 							</span>
 							<span class="float-right">
-								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.type == 'roll'">Roll with disadvantage!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'disadvantage')" v-if="attack.type == 'attack'">Roll with disadvantage!</button>
 								<button class="btn btn-primary btn-sm" @click="rollAttack(attack)">Roll!</button>
-								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'advantage')" v-if="attack.type == 'roll'">Roll with advantage!</button>
+								<button class="btn btn-primary btn-sm" @click="rollAttack(attack, 'advantage')" v-if="attack.type == 'attack'">Roll with advantage!</button>
 							</span>
 							<attack-modifier-field v-bind:character="character" v-bind:target="attack" v-bind:targetType="'Attack'"></attack-modifier-field>
 						</li>
@@ -1749,9 +1607,6 @@ Vue.component('attack', {
 						</li>
 					</ul>
 				</div>
-	<!--			<div class="card-footer">
-					<attack-modifier-field v-bind:character="character" v-bind:targetType="'Attack'"></attack-modifier-field>
-				</div> -->
 			</div>
 		</div>
 	`,
@@ -1777,128 +1632,60 @@ Vue.component('attack-modifier-field', {
 		<div>
 			<button class="btn btn-primary btn-sm" @click="show = true" v-if="task == 'New'">Add {{targetType}}</button>
 			<a class="badge badge-light" @click="startEdit" v-if="task == 'Edit'">Edit {{targetType}}</a>
-			<div v-if="show" class="modal-mask">
-				<transition name="modal">
-				  	<div class="modal-dialog" role="document">
-				    	<div class="modal-content">
-					      	<div class="modal-header card-header">
-					        	<h5 class="modal-title">{{task}} {{targetType}}</h5>
-					        	<button type="button" class="close" @click="reset">
-						          	<span aria-hidden="true">&times;</span>
-						        </button>
-					      	</div>
-					      	<div class="modal-body">
-								<div class="my-2">
-									Name:
-									<input type="text" v-model="name">
-								</div>
-								<div class="my-2">
-									Attack Type: 
-									<select v-model="type">
-										<option v-if="targetType == 'Modifier'">auto</option>
-										<option v-if="targetType == 'Attack'">roll</option>
-										<option>save</option>
-									</select>
-								</div>
-								<div class="my-2">
-									<span v-if="type == 'roll'">
-										Attack Modifier: 
-										<input class="numInput" type="number" v-model.number="attackModifier">
-									</span>
-									<span v-if="type == 'save'">
-										DC: 
-										<input class="numInput" type="number" v-model.number="saveDC">
-										Save type:
-										<select v-model="saveType">
-											<option>STR</option>
-											<option>DEX</option>
-											<option>CON</option>
-											<option>INT</option>
-											<option>WIS</option>
-											<option>CHA</option>
-										</select>					
-									</span>
-								</div>
-								<div class="my-2">
-									Damage:
-									<input class="numInput" type="number" v-model.number="damageDiceNum">
-									d
-									<select v-model.number="damageDice">
-										<option>4</option>
-										<option>6</option>
-										<option>8</option>
-										<option>10</option>
-										<option>12</option>
-									</select>
-									+ 
-									<input class="numInput" type="number" v-model.number="damageModifier">
-									<select v-model="damageType">
-										<option>Acid</option>
-										<option>Bludgeoning</option>
-										<option>Cold</option>
-										<option>Fire</option>
-										<option>Force</option>
-										<option>Lightning</option>
-										<option>Necrotic</option>
-										<option>Piercing</option>
-										<option>Poison</option>
-										<option>Psychic</option>
-										<option>Radiant</option>
-										<option>Slashing</option>
-										<option>Thunder</option>
-									</select>
-								</div>
-								<div class="my-2">
-									Second damage type? 
-									<div class="form-check form-check-inline">
-									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yesSecondDamage" value="yes" v-model="secondDamage">
-									    <label class="form-check-label" for="yesSecondDamage">Yes</label>
-									</div>
-									<div class="form-check form-check-inline">
-									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="noSecondDamage" value="no" v-model="secondDamage">
-									    <label class="form-check-label" for="noSecondDamage">No</label>
-									</div>
-								</div>
-								<div class="my-2" v-if="secondDamage == 'yes'">
-									Second Damage:
-									<input class="numInput" type="number" v-model.number="secondDamageDiceNum">
-									d
-									<select v-model.number="secondDamageDice">
-										<option>4</option>
-										<option>6</option>
-										<option>8</option>
-										<option>10</option>
-										<option>12</option>
-									</select>
-									+ 
-									<input class="numInput" type="number" v-model.number="secondDamageModifier">
-									<select v-model="secondDamageType">
-										<option>Acid</option>
-										<option>Bludgeoning</option>
-										<option>Cold</option>
-										<option>Fire</option>
-										<option>Force</option>
-										<option>Lightning</option>
-										<option>Necrotic</option>
-										<option>Piercing</option>
-										<option>Poison</option>
-										<option>Psychic</option>
-										<option>Radiant</option>
-										<option>Slashing</option>
-										<option>Thunder</option>
-									</select>
-								</div>
-					      	</div>
-					      	<div class="modal-footer">
-					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{targetType}}</button>
-								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{targetType}}</button>
-								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{targetType}}</button>
-					      	</div>
-				    	</div>
-				  	</div>
-				</transition>
-			</div>
+
+			<modal v-if="show">
+
+		      	<div class="modal-header card-header" slot="header">
+		        	<h5 class="modal-title">{{task}} {{targetType}}</h5>
+		        	<button type="button" class="close" @click="reset">
+			          	<span aria-hidden="true">&times;</span>
+			        </button>
+			    </div>
+
+		      	<div class="modal-body" slot="body">
+					<div class="my-2">
+						Name:
+						<input type="text" v-model="name">
+					</div>
+					<div class="my-2">
+						Attack Type: 
+						<select v-model="type">
+							<option>attack</option>
+							<option>save</option>
+						</select>
+					</div>
+					<div class="my-2">
+						<span v-if="targetType == 'Attack' && type == 'attack'">
+							Attack Modifier: 
+							<input class="numInput" type="number" v-model.number="attackModifier">
+						</span>
+						<span v-if="type == 'save'">
+							DC: 
+							<input class="numInput" type="number" v-model.number="saveDC">
+							Save type:
+							<select v-model="saveType">
+								<option>STR</option>
+								<option>DEX</option>
+								<option>CON</option>
+								<option>INT</option>
+								<option>WIS</option>
+								<option>CHA</option>
+							</select>					
+						</span>
+					</div>
+					<damage-row  v-for="(damageObject, index) in damageArray" v-model="damageArray[index]" :key="index"></damage-row>
+					<button class="btn btn-primary btn-sm rounded-circle" @click="damageArray.push(1)">+</button>
+					<button class="btn btn-primary btn-sm rounded-circle" @click="damageArray.pop()" v-if="damageArray.length > 1">&#x2212</button>
+				</div>
+
+				<div class="modal-footer" slot="footer">
+		        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{targetType}}</button>
+					<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{targetType}}</button>
+					<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+					<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{targetType}}</button>
+				</div>
+
+			</modal>
 		</div>
 	`,
 	props: ["character", "target", "targetType"],
@@ -1913,17 +1700,8 @@ Vue.component('attack-modifier-field', {
 			attackModifier: 0,
 			saveDC: 0,
 			saveType: '',
-			damageDiceNum: 0,
-			damageDice: 0,
-			damageModifier: 0,
-			damageType: null,
-			object: '',
 			task: false,
-			secondDamage: 'no',
-			secondDamageDiceNum: 0,
-			secondDamageDice: 0,
-			secondDamageModifier: 0,
-			secondDamageType: null
+			damageArray: [1]
 
 		};
 	},
@@ -1944,17 +1722,7 @@ Vue.component('attack-modifier-field', {
 			this.attackModifier = this.target.attackModifier;
 			this.saveDC = this.target.saveDC;
 			this.saveType = this.target.saveType;
-			this.damageDiceNum = this.target.damageOne.damageDiceNum;
-			this.damageDice = this.target.damageOne.damageDice;
-			this.damageModifier = this.target.damageOne.damageModifier;
-			this.damageType = this.target.damageOne.damageType;
-			this.secondDamage = this.target.secondDamage;
-			if (this.secondDamage == 'yes') {
-				this.secondDamageDiceNum = this.target.damageTwo.damageDiceNum;
-				this.secondDamageDice = this.target.damageTwo.damageDice;
-				this.secondDamageModifier = this.target.damageTwo.damageModifier;
-				this.secondDamageType = this.target.damageTwo.damageType;
-			}
+			this.damageArray = this.target.damageArray;
 		},
 		edit() {
 			var data = this.prepareData();
@@ -1968,15 +1736,7 @@ Vue.component('attack-modifier-field', {
 				attackModifier: this.attackModifier,
 				saveDC: this.saveDC,
 				saveType: this.saveType,
-				damageDiceNum: this.damageDiceNum,
-				damageDice: this.damageDice,
-				damageModifier: this.damageModifier,
-				damageType: this.damageType,
-				secondDamage: this.secondDamage,
-				secondDamageDiceNum: this.secondDamageDiceNum,
-				secondDamageDice: this.secondDamageDice,
-				secondDamageModifier: this.secondDamageModifier,
-				secondDamageType: this.secondDamageType
+				damageArray: this.damageArray
 				};
 		},
 		deleteTarget() {
@@ -1996,15 +1756,7 @@ Vue.component('attack-modifier-field', {
 			this.attackModifier = 0;
 			this.saveDC = 0;
 			this.saveType = '';
-			this.damageDiceNum = 0;
-			this.damageDice = 0;
-			this.damageModifier = 0;
-			this.damageType = null;
-			this.secondDamage = 'no';
-			this.secondDamageDiceNum = 0;
-			this.secondDamageDice = 0;
-			this.secondDamageModifier = 0;
-			this.secondDamageType = null;
+			this.damageArray = [1];
 			if (this.target) {
 				this.task = 'Edit';
 			} else {
@@ -2014,6 +1766,71 @@ Vue.component('attack-modifier-field', {
 
 	}	
 });
+
+Vue.component('damage-row', {
+	template: `
+		<div class="my-2 d-inline-block" v-on:change="outputData">
+			Damage:
+			<input class="numInput" type="number" v-model.number="damageDiceNum">
+			d
+			<select v-model.number="damageDice">
+				<option>4</option>
+				<option>6</option>
+				<option>8</option>
+				<option>10</option>
+				<option>12</option>
+			</select>
+			+ 
+			<input class="numInput" type="number" v-model.number="damageModifier">
+			<select v-model="damageType">
+				<option>Acid</option>
+				<option>Bludgeoning</option>
+				<option>Cold</option>
+				<option>Fire</option>
+				<option>Force</option>
+				<option>Lightning</option>
+				<option>Necrotic</option>
+				<option>Piercing</option>
+				<option>Poison</option>
+				<option>Psychic</option>
+				<option>Radiant</option>
+				<option>Slashing</option>
+				<option>Thunder</option>
+			</select>
+		</div>
+	`,
+	props: ["value"],
+	data() {
+		return {
+			damageDiceNum: 0,
+			damageDice: null,
+			damageModifier: 0,
+			damageType: null
+		}
+	},
+	mounted() {
+		if (this.value.damageDiceNum) {
+			this.damageDiceNum = this.value.damageDiceNum;
+			this.damageDice = this.value.damageDice;
+			this.damageModifier = this.value.damageModifier;
+			this.damageType = this.value.damageType;
+		}
+	},
+	methods: {
+		outputData() {
+			var data = this.prepareData();
+			this.$emit('input', data);
+		},
+		prepareData() {
+			return {
+				damageDiceNum: this.damageDiceNum,
+				damageDice: this.damageDice,
+				damageModifier: this.damageModifier,
+				damageType: this.damageType
+			}
+		}
+	}
+})
 
 Vue.component('resources', {
 	template: `
@@ -2073,48 +1890,45 @@ Vue.component('counter-field', {
 		<div class="d-flex" style="flex: 1;">
 			<button class="btn btn-primary btn-sm mt-auto mx-auto" @click="show = true" v-if="task == 'New'">Add {{counterType}}</button>
 			<a class="badge badge-light" @click="startEdit" v-if="task == 'Edit'">Edit</a>
-			<div v-if="show" class="modal-mask">
-				<transition name="modal">
-				  	<div class="modal-dialog" role="document">
-				    	<div class="modal-content">
-					      	<div class="modal-header card-header">
-					        	<h5 class="modal-title">{{task}} {{counterType}}</h5>
-					        	<button type="button" class="close" @click="reset">
-						          	<span aria-hidden="true">&times;</span>
-						        </button>
-					      	</div>
-					      	<div class="modal-body">
-								<div class="my-2">
-									Name:
-									<input type="text" v-model="name">
-								</div>
-								<div class="my-2">
-									<span v-if="counterType == 'Spell Counter'">Number of Rounds:</span>
-									<span v-if="counterType == 'Resource'">Total:</span>
-									<input class="numInput" type="number" v-model.number="total">
-								</div>
-								<div class="my-2">
-									Points or Slots:
-									<div class="form-check form-check-inline">
-									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="slots" value="slots" v-model="type">
-									    <label class="form-check-label" for="slots">Slots</label>
-									</div>
-									<div class="form-check form-check-inline">
-									    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="points" value="points" v-model="type">
-									    <label class="form-check-label" for="points">Points</label>
-									</div>
-								</div>							
-					      	</div>
-					      	<div class="modal-footer">
-					        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{counterType}}</button>
-								<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{counterType}}</button>
-								<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
-								<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{counterType}}</button>
-					      	</div>
-				    	</div>
-				  	</div>
-				</transition>
-			</div>
+
+			<modal v-if="show">
+		      	<div class="modal-header card-header" slot="header">
+		        	<h5 class="modal-title">{{task}} {{counterType}}</h5>
+		        	<button type="button" class="close" @click="reset">
+			          	<span aria-hidden="true">&times;</span>
+			        </button>
+		      	</div>
+
+		      	<div class="modal-body" slot="body">
+					<div class="my-2">
+						Name:
+						<input type="text" v-model="name">
+					</div>
+					<div class="my-2">
+						<span v-if="counterType == 'Spell Counter'">Number of Rounds:</span>
+						<span v-if="counterType == 'Resource'">Total:</span>
+						<input class="numInput" type="number" v-model.number="total">
+					</div>
+					<div class="my-2">
+						Points or Slots:
+						<div class="form-check form-check-inline">
+						    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="slots" value="slots" v-model="type">
+						    <label class="form-check-label" for="slots">Slots</label>
+						</div>
+						<div class="form-check form-check-inline">
+						    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="points" value="points" v-model="type">
+						    <label class="form-check-label" for="points">Points</label>
+						</div>
+					</div>							
+		      	</div>
+
+		      	<div class="modal-footer" slot="footer">
+		        	<button class="btn btn-primary btn-sm" @click="add" v-if="task == 'New'">Add {{counterType}}</button>
+					<button class="btn btn-primary btn-sm" @click="edit" v-if="task == 'Edit'">Edit {{counterType}}</button>
+					<button class="btn btn-danger btn-sm" @click="reset">Cancel</button>
+					<button class="btn btn-danger btn-sm ml-auto" @click="deleteTarget" v-if="task == 'Edit'">Delete {{counterType}}</button>
+				</div>
+			</modal>
 		</div>
 	`,
 	props: ["character", "counter", "counterType"],
@@ -2402,6 +2216,40 @@ Vue.component('dice-roller',{
 	}
 });
 
+Vue.component('modal', {
+	template:`
+		<transition name="modal">
+		    <div class="modal-mask">
+		        <div class="modal-dialog modal-dialog-centered" v-bind:class="{'modal-lg': input == 'character-editor'}" role="document">
+		            <div class="modal-content">
+
+	                    <slot name="header">
+	                        default header
+	                    </slot>
+
+
+	                    <slot name="body">
+	                        default body
+	                    </slot>
+
+	                    <slot name="footer">
+
+	                    </slot>
+
+		            </div>
+		        </div>
+		    </div>
+		</transition>
+	`,
+	props: ['input'],
+	mounted() {
+		$('body').addClass("overflow-hidden");
+	},
+	beforeDestroy() {
+		$('body').removeClass("overflow-hidden");
+	}
+});
+
 const app = new Vue({
 	el: '#app',
 	data: {
@@ -2446,12 +2294,6 @@ const app = new Vue({
 
 });
 
-
-// $('.nav').on('click', '.nav-link', function(){
-//    $('.nav').find('.active').removeClass('active');
-//    $(this).addClass('active');
-// });
-
 function getData() {
 	console.log('getting data');
 	var retrievedObject;
@@ -2471,57 +2313,10 @@ function saveData() {
 		}, 10000);
 }
 
-// function exportData() {
-// 	console.log('entered export');
-
-//     if(!app.characters) {
-//         alert('error : No data')
-//         return;
-//     }
-
-//     var jsonCharacters = JSON.stringify(app.characters);
-
-//   	var a = document.createElement('a');
-//   	document.body.appendChild(a);
-//   	a.setAttribute('href', 'data:text/plain;charset=utf-u,'+encodeURIComponent(jsonCharacters));
-//   	a.setAttribute('download', 'characterData.json');
-//   	a.click()
-//   	console.log(a);
-//  }
-
-// function importData() {
-// 	var files = $('#selectFiles').prop('files')[0];
-// 	console.log(files);
-// 	if (files.length <= 0) {
-// 		return false;
-// 	}
-
-// 	var fr = new FileReader();
-
-// 	fr.onload = function(retrievedObject) { 
-// 		var jsonCharacters = JSON.parse(retrievedObject.target.result);
-// 		app.characters = [];
-// 		for (var i=0;i<jsonCharacters.length;i++) {
-// 			console.log(i + '/' + jsonCharacters.length);
-// 			app.characters.push(new Character(jsonCharacters[i]));
-// 		}
-// 	}
-
-// 	fr.readAsText(files);
-// }
-
-
-// function isInteger(x) {
-//     return x % 1 === 0;
-// }
-
 
 $(document).ready(function() {
 	getData();
 	saveData();
-
-	// $('#export').click(exportData);
-	// $('#import').click(importData);
 });
 
 
