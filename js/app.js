@@ -61,6 +61,7 @@ class Character {
 		this.maxHp = input.maxHp;
 		this.ac = input.ac;
 		this.initiative = input.initiative;
+		this.speed = input.speed;
 		this.strength = input.strength;
 		this.strengthModifier = input.strengthModifier;
 		this.strengthSave = input.strengthSave;
@@ -342,6 +343,8 @@ class Attack {
 			results = fromRollAttack;
 		} else if (this.type == 'save') {
 			results = this.rollSave();
+		} else if (this.type == 'auto') {
+			results.push(this.name + ':');
 		}
 		if (attackRoll == 1) {
 			results.push('You critically failed...');
@@ -663,7 +666,7 @@ Vue.component('character-stats', {
 	template: `
 		<div v-if="character">
 			<div class="row m-auto card-header border-left border-right">
-				<div class="col-md-5 px-0">
+				<div class="col-md-3 px-0">
 					<h2 class="d-inline-block">{{character.name}}</h2>
 					<span class="dropdown">
 					  <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -679,11 +682,14 @@ Vue.component('character-stats', {
 					</span><br>
 					<span>Level {{character.level}}</span>
 				</div>
-				<div class="col-md-2 text-center">
+				<div class="col-md-3 text-center">
 					<h5>AC: {{character.ac}}</h5>
 					<h5><a @click="rollStat('Initiative', character.initiative)">Initiative: {{character.initiative}}</a></h5>
 				</div>
-				<div class="col-md-5 px-0">
+				<div class="col-md-3 text-center">
+					<h5>Speed: {{character.speed}}</h5>
+				</div>
+				<div class="col-md-3 px-0">
 					<div class="float-right">
 						<h5>HP: <input type="number" class="hpInput" v-model.number="character.currentHp"> / {{character.maxHp}}
 						</h5>
@@ -973,6 +979,10 @@ Vue.component('character-creator', {
 					        <input type="number" class="form-control" id="characterMaxHp" placeholder="0" v-model.number="maxHp">
 					    </div>
 					    <div class="form-group">
+					        <label for="speed">Speed:</label>
+					        <input type="text" class="form-control" id="speed" placeholder="Enter character speed" v-model="speed">
+					    </div>
+					    <div class="form-group">
 					        <label for="ac">AC:</label>
 					        <input type="number" class="form-control" id="ac" placeholder="0" v-model.number="ac">
 					    </div>
@@ -1165,6 +1175,7 @@ Vue.component('character-creator', {
 			name: '',
 			level: 0,
 			maxHp: 0,
+			speed: '',
 			ac: 0,
 			initiative: 0,
 			strength: 0,
@@ -1214,6 +1225,7 @@ Vue.component('character-creator', {
 			this.name = this.character.name;
 			this.level = this.character.level;
 			this.maxHp = this.character.maxHp;
+			this.speed = this.character.speed;
 			this.ac = this.character.ac;
 			this.initiative = this.character.initiative;
 			this.strength = this.character.strength;
@@ -1271,6 +1283,7 @@ Vue.component('character-creator', {
 				name: this.name,
 				level: this.level,
 				maxHp: this.maxHp,
+				speed: this.speed,
 				ac: this.ac,
 				initiative: this.initiative,
 				strength: this.strength,
@@ -1651,6 +1664,7 @@ Vue.component('attack-modifier-field', {
 						Attack Type: 
 						<select v-model="type">
 							<option>attack</option>
+							<option>auto</option>
 							<option>save</option>
 						</select>
 					</div>
